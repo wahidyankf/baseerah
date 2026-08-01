@@ -12,14 +12,16 @@ export default function Icon() {
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        background: "#0284c7",
+        // rgb(63, 105, 211) — matches --color-primary in libs/web-ui-token/src/beaver-nest.css
+        // (Satori/ImageResponse can't read CSS custom properties, so the resolved value is hardcoded)
+        background: "#3f69d3",
         color: "#ffffff",
         fontSize: 20,
         fontWeight: 800,
         borderRadius: 6,
       }}
     >
-      ب
+      B
     </div>,
     { ...size },
   );

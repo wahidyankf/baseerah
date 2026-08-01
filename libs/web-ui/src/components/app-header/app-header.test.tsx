@@ -34,4 +34,15 @@ describe("AppHeader", () => {
     render(<AppHeader title="Workouts" trailing={<span>Edit</span>} />);
     expect(screen.getByText("Edit")).toBeTruthy();
   });
+
+  it("wraps title in a link when titleHref provided", () => {
+    render(<AppHeader title="Workouts" titleHref="/" />);
+    const link = screen.getByRole("link", { name: "Workouts" });
+    expect(link.getAttribute("href")).toBe("/");
+  });
+
+  it("renders title without a link when titleHref absent", () => {
+    render(<AppHeader title="Workouts" />);
+    expect(screen.queryByRole("link")).toBeNull();
+  });
 });

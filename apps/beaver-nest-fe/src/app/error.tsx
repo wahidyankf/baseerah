@@ -1,5 +1,6 @@
 "use client";
 
+import { Button } from "@open-sharia-enterprise/web-ui";
 import { AppFrame } from "@/components/AppFrame";
 
 // Next.js App Router requires error.tsx to be a Client Component (it hydrates over the failed
@@ -9,9 +10,7 @@ export default function Error({ reset }: { error: Error & { digest?: string }; r
   return (
     <AppFrame>
       <p className="text-2xl font-semibold">Something went wrong.</p>
-      <button type="button" onClick={() => reset()} className="bg-primary text-primary-foreground rounded-lg px-5 py-2">
-        Try again
-      </button>
+      <Button onClick={() => reset()}>Try again</Button>
     </AppFrame>
   );
 }

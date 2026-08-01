@@ -31,3 +31,8 @@ Feature: Frontend hello world
     When the 404 page renders
     Then it shows BeaverNest branding
     And it offers a link back to the homepage
+
+  Scenario: External GitHub link announces it opens in a new tab
+    Given a first-time visitor viewing the rendered homepage
+    When they encounter the "View on GitHub" link
+    Then its accessible name indicates it opens in a new browser tab

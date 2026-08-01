@@ -14,14 +14,14 @@ abbreviations.
 ### Current Apps
 
 - `rhino-cli` - Repository management CLI tools - Rust application (ported from Go 2026-05-23)
-- `baseerah-be` - Baseerah backend REST API - F#/Giraffe/ASP.NET application (port 19320)
-- `baseerah-be-e2e` - HTTP-driven E2E tests for `baseerah-be` - Playwright
-- `baseerah-fe` - Baseerah frontend - Next.js 16 App Router application (port 19310)
-- `baseerah-fe-e2e` - Playwright FE E2E tests for `baseerah-fe`
+- `beaver-nest-be` - BeaverNest backend REST API - F#/Giraffe/ASP.NET application (port 19320)
+- `beaver-nest-be-e2e` - HTTP-driven E2E tests for `beaver-nest-be` - Playwright
+- `beaver-nest-fe` - BeaverNest frontend - Next.js 16 App Router application (port 19310)
+- `beaver-nest-fe-e2e` - Playwright FE E2E tests for `beaver-nest-fe`
 
 Every prior app (`ose-www`, `ose-be`, `ayokoding-www`, `ayokoding-cli`, `ose-cli`, `crane-cli`,
 `organiclever-www`, `organiclever-app-web`, `organiclever-be`, `wahidyankf-www`, and their `-e2e`
-counterparts) was deleted by the 2026 Baseerah repo reset — see the
+counterparts) was deleted by the 2026 BeaverNest repo reset — see the
 [baseerah-repo-reset plan](../plans/done/2026-07-31__baseerah-repo-reset/README.md).
 
 ## Application Characteristics
@@ -46,26 +46,26 @@ apps/rhino-cli/
 └── README.md                # App documentation
 ```
 
-### F# Backend Application (`baseerah-be`)
+### F# Backend Application (`beaver-nest-be`)
 
 ```
-apps/baseerah-be/
-├── src/BaseerahBe/           # F# source (Program.fs, WebApp.fs)
+apps/beaver-nest-be/
+├── src/BeaverNestBe/           # F# source (Program.fs, WebApp.fs)
 ├── tests/                    # Unit + integration test projects
-├── generated-contracts/      # Generated from baseerah-contracts OpenAPI spec (gitignored)
+├── generated-contracts/      # Generated from beaver-nest-contracts OpenAPI spec (gitignored)
 ├── Dockerfile
 ├── project.json              # Nx project configuration
 └── README.md                 # App documentation
 ```
 
-### Next.js Application (`baseerah-fe`)
+### Next.js Application (`beaver-nest-fe`)
 
 ```
-apps/baseerah-fe/
+apps/beaver-nest-fe/
 ├── src/
 │   ├── app/                      # Next.js App Router pages
 │   ├── components/               # Reusable React components
-│   └── generated-contracts/      # Generated from baseerah-contracts OpenAPI spec (gitignored)
+│   └── generated-contracts/      # Generated from beaver-nest-contracts OpenAPI spec (gitignored)
 ├── public/                       # Static assets
 ├── next.config.ts                # Next.js configuration
 ├── tsconfig.json                 # TypeScript configuration
@@ -74,10 +74,10 @@ apps/baseerah-fe/
 └── README.md                     # App documentation
 ```
 
-### Playwright E2E Test App (`baseerah-be-e2e`, `baseerah-fe-e2e`)
+### Playwright E2E Test App (`beaver-nest-be-e2e`, `beaver-nest-fe-e2e`)
 
 ```
-apps/baseerah-be-e2e/
+apps/beaver-nest-be-e2e/
 ├── playwright.config.ts         # Playwright configuration (baseURL, reporters)
 ├── package.json                 # Pinned @playwright/test dependency
 ├── tsconfig.json                # TypeScript config (extends workspace base)
@@ -115,29 +115,29 @@ Use Nx commands to run apps:
 
 ```bash
 # Development mode
-nx dev baseerah-fe
-nx run baseerah-be:dev
+nx dev beaver-nest-fe
+nx run beaver-nest-be:dev
 
 # Build for production
-nx build baseerah-fe
-nx build baseerah-be
+nx build beaver-nest-fe
+nx build beaver-nest-be
 nx build rhino-cli
 
 # Run CLI applications
 nx run rhino-cli
 
 # Run E2E tests (target app must be running first)
-nx run baseerah-fe-e2e:test:e2e
-nx run baseerah-be-e2e:test:e2e
+nx run beaver-nest-fe-e2e:test:e2e
+nx run beaver-nest-be-e2e:test:e2e
 ```
 
 ## Deployment Branches
 
-`baseerah-fe` and `baseerah-be` have deployer agents and CI caller workflows wired but dormant — no
-`prod-baseerah-fe`/`stag-baseerah-be` deploy target is provisioned yet. See
-[apps-baseerah-fe-deployer](../.claude/agents/apps-beaver-nest-fe-deployer.md),
-[apps-baseerah-be-deployer](../.claude/agents/apps-beaver-nest-be-deployer.md), and the
-[baseerah-first-deploy](../plans/ideas/beaver-nest-first-deploy.md) idea brief for the deferred
+`beaver-nest-fe` and `beaver-nest-be` have deployer agents and CI caller workflows wired but dormant — no
+`prod-beaver-nest-fe`/`stag-beaver-nest-be` deploy target is provisioned yet. See
+[apps-beaver-nest-fe-deployer](../.claude/agents/apps-beaver-nest-fe-deployer.md),
+[apps-beaver-nest-be-deployer](../.claude/agents/apps-beaver-nest-be-deployer.md), and the
+[beaver-nest-first-deploy](../plans/ideas/beaver-nest-first-deploy.md) idea brief for the deferred
 provisioning work.
 
 ## Language Support
@@ -145,6 +145,6 @@ provisioning work.
 Currently:
 
 - **Rust** (CLI tools) - `rhino-cli`
-- **F#** (backend API) - `baseerah-be`
-- **TypeScript/Next.js** (frontend) - `baseerah-fe`
-- **TypeScript/Playwright** (E2E testing) - `baseerah-be-e2e`, `baseerah-fe-e2e`
+- **F#** (backend API) - `beaver-nest-be`
+- **TypeScript/Next.js** (frontend) - `beaver-nest-fe`
+- **TypeScript/Playwright** (E2E testing) - `beaver-nest-be-e2e`, `beaver-nest-fe-e2e`

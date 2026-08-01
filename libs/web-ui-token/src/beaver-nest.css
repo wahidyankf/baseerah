@@ -63,7 +63,7 @@
   --color-input: var(--warm-200);
   --color-ring: var(--hue-sky);
 
-  /* Baseerah radius scale — soft, between OL's rounded and OSE's sharp */
+  /* BeaverNest radius scale — soft, between OL's rounded and OSE's sharp */
   --radius: 0.625rem; /* 10 px — base */
   --radius-sm: 0.375rem; /* 6 px  */
   --radius-md: 0.625rem; /* 10 px */

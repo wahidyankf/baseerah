@@ -12,7 +12,7 @@ export function AppFrame({ children }: AppFrameProps) {
   return (
     <div className="flex min-h-screen flex-col">
       <div className="border-border text-primary border-b">
-        <AppHeader title="BeaverNest" />
+        <AppHeader title="BeaverNest" titleHref="/" />
       </div>
       <main className="flex flex-1 flex-col items-center justify-center gap-5 px-6 py-12 text-center">{children}</main>
       <footer className="border-border bg-secondary text-muted-foreground border-t px-8 py-4 text-center text-sm">

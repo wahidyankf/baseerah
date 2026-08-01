@@ -34,3 +34,12 @@ let ``I send a GET request to "/api/v1/hello\?extra=param"`` () =
     let resp = client.Value.GetAsync("/api/v1/hello?extra=param").Result
     lastStatus <- int resp.StatusCode
     lastBody <- resp.Content.ReadAsStringAsync().Result
+
+// Rule-16 finding SG-001: a wrong HTTP method on a known path is refused with
+// the same catch-all 404 envelope as an unknown path (Giraffe matches path+verb
+// together, so there is no intermediate "path matched, verb didn't" state).
+[<When>]
+let ``I send a POST request to "/api/v1/hello"`` () =
+    let resp = client.Value.PostAsync("/api/v1/hello", new StringContent("")).Result
+    lastStatus <- int resp.StatusCode
+    lastBody <- resp.Content.ReadAsStringAsync().Result

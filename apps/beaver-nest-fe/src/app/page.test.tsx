@@ -33,5 +33,22 @@ describe("Backend hello world", () => {
 
     const githubLink = screen.getByRole("link", { name: /view on github/i });
     expect(githubLink).toHaveAttribute("href", "https://github.com/wahidyankf/baseerah");
+    expect(githubLink).toHaveAccessibleName(/opens in new tab/i);
+  });
+
+  test("the header brand text links back to the homepage", async () => {
+    const { default: Page } = await import("./page");
+    render(await Page());
+
+    const homeLink = screen.getByRole("link", { name: "BeaverNest" });
+    expect(homeLink).toHaveAttribute("href", "/");
+  });
+
+  test("the live backend greeting is visually distinguished from the static tagline", async () => {
+    const { default: Page } = await import("./page");
+    render(await Page());
+
+    const greeting = screen.getByText("Hello from BeaverNest");
+    expect(greeting.className).toContain("text-accent-foreground");
   });
 });

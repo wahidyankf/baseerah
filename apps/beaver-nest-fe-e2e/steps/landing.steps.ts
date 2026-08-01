@@ -96,3 +96,12 @@ Then("it shows BeaverNest branding", async ({ page }) => {
 Then("it offers a link back to the homepage", async ({ page }) => {
   await expect(page.getByRole("link", { name: /back to home/i })).toHaveAttribute("href", "/");
 });
+
+// @covers specs/apps/beaver-nest/behavior/beaver-nest-fe/gherkin/hello/landing-page.feature:External GitHub link announces it opens in a new tab
+When("they encounter the {string} link", async () => {
+  // No-op: the assertion below directly queries the link by its accessible name.
+});
+
+Then("its accessible name indicates it opens in a new browser tab", async ({ page }) => {
+  await expect(page.getByRole("link", { name: /view on github.*opens in new tab/i })).toBeVisible();
+});

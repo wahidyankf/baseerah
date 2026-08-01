@@ -3,6 +3,36 @@
 
 # Learnings: beaver-nest-rebrand
 
+## Phase 16: a null-byte URL path bypasses the entire ASP.NET Core middleware pipeline, including Giraffe
+
+Rule-16's API exploratory retest found `GET /api/v1/hello%00` returns a bodyless Kestrel `400` instead
+of `beaver-nest-be`'s usual `{"error": "..."}` envelope (finding AET-001). Investigated whether an
+`app.Use(...)`/`UseExceptionHandler` middleware ahead of `UseGiraffe` could normalize it — it can't:
+Kestrel's HTTP/1.1 request-target parser rejects the malformed percent-encoding
+(`BadHttpRequestException`, `RequestRejectionReason.InvalidRequestTarget`) and writes its own raw 400
+**before** `IHttpApplication.ProcessRequestAsync` is invoked, meaning no `IApplicationBuilder`
+middleware — regardless of registration order — ever runs for that connection. This is
+version-independent Kestrel behavior, not specific to Giraffe or this app. **Route**: deferred as a
+backlog idea (`plans/ideas/beaver-nest-be-nullbyte-path-error-envelope.md`) rather than fixed — fixing
+it would mean replacing Kestrel or writing a raw `IConnectionListenerFactory`, disproportionate for a
+Minor/Low edge case unreachable by any real client. Worth remembering for any future ASP.NET
+Core/Giraffe backend in this repo: don't assume app-level middleware can normalize every error path —
+malformed request-line/target errors are a hard exception.
+
+## Phase 16: `development-environment-setup.md`'s preserved-citation count is 4, not the 2 Phase 17 expects
+
+Phase 16's repo-wide residual sweep confirmed `repo-governance/workflows/infra/development-environment-setup.md`
+correctly falls into Decision-12's class (b) (preserved `wahidyankf/baseerah` GitHub URL + `cd baseerah`
+citations, deferred to Phase 17's flip) — but `git grep -c baseerah` on it returns `4`, not the `2`
+Phase 17's gate text expects. The file contains the git-clone-and-cd snippet **twice** (a Quick Start
+section and a more detailed walkthrough further down), each contributing one `wahidyankf/baseerah`
+URL line and one `cd baseerah` line — 2 snippets × 2 lines = 4. This is a real, pre-existing doc
+structure, not a residual defect; no fix applied here since Phase 16 doesn't touch Decision-12 files.
+**Route**: when Phase 17 runs its GitHub-URL flip, `perl -pi -e 's/^(\s*)cd baseerah$/$1cd beaver-nest/'`
+already handles multiple lines (global across the file), so the flip step itself needs no change —
+only its acceptance-criterion prose undercounts this one file by 2. Flag this if Phase 17's automated
+count check fails; the true expected count for this file is 4, not 2.
+
 ## Phase 13: the GHCR-image acceptance check assumed the cutover push itself would trigger a rebuild — it didn't, and that's fine
 
 Phase 13's delivery.md acceptance criterion for the GHCR cutover assumed that pushing the renamed

@@ -1509,20 +1509,20 @@ definition` → `...beaver-nest-default.json...`) — leaving either one unrenam
       pointer and the agent definition" (`specs/apps/rhino/behavior/rhino-cli/gherkin/harness/agents-bindings.feature:10-15`),
       with only its step text changing.
 
-                                                                                                                                                                          ```gherkin
-                                                                                                                                                                          Scenario: rhino-cli's Amazon Q binding constant points at the renamed file
-                                                                                                                                                                            Given apps/rhino-cli's AMAZONQ_AGENT_DEFINITION constant after the rhino-cli rename phase
-                                                                                                                                                                            When nx run rhino-cli:test:integration runs
-                                                                                                                                                                            Then the test asserting the constant's path value passes against ".amazonq/cli-agents/beaver-nest-default.json"
-                                                                                                                                                                            And the generated file's "name" field reads "beaver-nest-default"
-                                                                                                                                                                          ```
+                                            ```gherkin
+                                            Scenario: rhino-cli's Amazon Q binding constant points at the renamed file
+                                              Given apps/rhino-cli's AMAZONQ_AGENT_DEFINITION constant after the rhino-cli rename phase
+                                              When nx run rhino-cli:test:integration runs
+                                              Then the test asserting the constant's path value passes against ".amazonq/cli-agents/beaver-nest-default.json"
+                                              And the generated file's "name" field reads "beaver-nest-default"
+                                            ```
 
-                                                                                                                                                                          Acceptance: run `npx nx run rhino-cli:test:integration` (or the project's equivalent test
-                                                                                                                                                                          target covering `tests/agents.rs`) and confirm the suite runs without a step-binding-mismatch
-                                                                                                                                                                          error (the renamed macro literal and the renamed Gherkin step text resolve to each other) but
-                                                                                                                                                                          the "Emitting writes the rules pointer and the agent definition" scenario's assertions fail
-                                                                                                                                                                          against the still-unrenamed source constant in `bindings.rs` (a deliberate, expected RED
-                                                                                                                                                                          state).
+                                            Acceptance: run `npx nx run rhino-cli:test:integration` (or the project's equivalent test
+                                            target covering `tests/agents.rs`) and confirm the suite runs without a step-binding-mismatch
+                                            error (the renamed macro literal and the renamed Gherkin step text resolve to each other) but
+                                            the "Emitting writes the rules pointer and the agent definition" scenario's assertions fail
+                                            against the still-unrenamed source constant in `bindings.rs` (a deliberate, expected RED
+                                            state).
 
 - [ ] [AI] GREEN: edit `apps/rhino-cli/src/application/agents/bindings.rs` — rename the
       `AMAZONQ_AGENT_DEFINITION` constant's value to `".amazonq/cli-agents/beaver-nest-default.json"`
@@ -1628,54 +1628,424 @@ beaver-nest-fe-e2e,beaver-nest-contracts,rhino-cli` — acceptance: exits 0 for 
 
 ### Manual UI Verification (Playwright MCP) — single-locale app
 
-- [ ] [AI] Start the local stack: `npm run beaver-nest:dev` (docker compose, per Phase 12) —
+- [x] [AI] Start the local stack: `npm run beaver-nest:dev` (docker compose, per Phase 12) —
       acceptance: both `beaver-nest-be` (port 19320) and `beaver-nest-fe` (port 19310) report
-      healthy.
-- [ ] [AI] Navigate to `http://localhost:19310/` via `browser_navigate`; resize to 375px, 768px,
-      1280px via `browser_resize` at each breakpoint — acceptance: page renders at all three.
-- [ ] [AI] Inspect via `browser_snapshot` — verify the level-one heading reads "BeaverNest", the
+      healthy. **Done** — `docker compose ps` confirmed both `Up ... (healthy)`.
+- [x] [AI] Navigate to `http://localhost:19310/` via `browser_navigate`; resize to 375px, 768px,
+      1280px via `browser_resize` at each breakpoint — acceptance: page renders at all three. **Done.**
+- [x] [AI] Inspect via `browser_snapshot` — verify the level-one heading reads "BeaverNest", the
       greeting text reads "Hello from BeaverNest", the one-line description contains no
       Arabic/Indonesian etymology text, and no hoverable brand-chip element is present — acceptance:
-      all four conditions hold.
-- [ ] [AI] Navigate to a non-existent path (e.g. `/does-not-exist`) — acceptance: the 404 page shows
-      "BeaverNest" branding and a link back to `/`.
-- [ ] [AI] Check for JS errors via `browser_console_messages` — acceptance: zero errors.
-- [ ] [AI] Verify API integration via `browser_network_requests` — acceptance: the greeting fetch
-      request targets `beaver-nest-be`'s renamed base URL.
-- [ ] [AI] Capture one screenshot per breakpoint via `browser_take_screenshot`, saved to
-      `evidence/phase-16-landing-page-{375,768,1280}px.png` — acceptance: three files exist.
-- [ ] [AI] Reference each screenshot in this checklist: `![BeaverNest landing page at 375px]
+      all four conditions hold. **Done** — snapshot shows `heading "BeaverNest"`, `paragraph: Hello
+from BeaverNest`, description paragraph is plain English with no etymology text, no chip
+      element present.
+- [x] [AI] Navigate to a non-existent path (e.g. `/does-not-exist`) — acceptance: the 404 page shows
+      "BeaverNest" branding and a link back to `/`. **Done** — title "404 · BeaverNest", heading
+      "BeaverNest", `link "Back to home" -> /`.
+- [x] [AI] Check for JS errors via `browser_console_messages` — acceptance: zero errors. **Done** —
+      0 errors/warnings on the landing page (the one error observed was the browser's own
+      network-log line for the intentional 404 response itself, not a JS runtime error).
+- [x] [AI] Verify API integration via `browser_network_requests` — acceptance: the greeting fetch
+      request targets `beaver-nest-be`'s renamed base URL. **Done** — the fetch is server-side
+      (Next.js SSR, invisible to the browser network tab); verified indirectly via the correctly
+      rendered "Hello from BeaverNest" text plus `docker-compose.yml`'s
+      `BEAVER_NEST_FE_API_BASE_URL: http://beaver-nest-be:19320` env var.
+- [x] [AI] Capture one screenshot per breakpoint via `browser_take_screenshot`, saved to
+      `evidence/phase-16-landing-page-{375,768,1280}px.png` — acceptance: three files exist. **Done.**
+- [x] [AI] Reference each screenshot in this checklist: `![BeaverNest landing page at 375px]
 (./evidence/phase-16-landing-page-375px.png)` (repeat for 768px and 1280px).
+
+![BeaverNest landing page at 375px](./evidence/phase-16-landing-page-375px.png)
+![BeaverNest landing page at 768px](./evidence/phase-16-landing-page-768px.png)
+![BeaverNest landing page at 1280px](./evidence/phase-16-landing-page-1280px.png)
 
 ### Manual API Verification (curl)
 
-- [ ] [AI] Verify the health endpoint: `curl -s http://localhost:19320/api/v1/health | jq .` —
-      acceptance: 200 status, response pasted inline below as `>` blockquote lines.
-- [ ] [AI] Verify the greeting endpoint: `curl -s http://localhost:19320/api/v1/hello | jq .` —
+- [x] [AI] Verify the health endpoint: `curl -s http://localhost:19320/api/v1/health | jq .` —
+      acceptance: 200 status, response pasted inline below as `>` blockquote lines. **Done.**
+- [x] [AI] Verify the greeting endpoint: `curl -s http://localhost:19320/api/v1/hello | jq .` —
       acceptance: 200 status, response body contains "BeaverNest", pasted inline below as `>`
-      blockquote lines.
+      blockquote lines. **Done.**
 
-> _(paste curl output for /api/v1/health and /api/v1/hello here during execution)_
+> `GET /api/v1/health` → 200
+>
+>     { "status": "ok" }
+>
+> `GET /api/v1/hello` → 200
+>
+>     { "message": "Hello from BeaverNest" }
 
 ### Rule-15 Three-Tester Retest (before archival)
 
-- [ ] [AI] Run the three live-site testers (`web-exploratory-tester` + `web-usability-tester` +
+- [x] [AI] Run the three live-site testers (`web-exploratory-tester` + `web-usability-tester` +
       `web-design-tester`) against `http://localhost:19310/` — acceptance: EWT/UWT/DWT findings and
-      spec-gaps recorded.
-- [ ] [AI] Append each finding here as a new unchecked checkbox, source-attributed
+      spec-gaps recorded. All three passes complete (see annotations below); 6 findings total (1 EWT,
+      3 UWT, 2 DWT), all fixed.
+      **`web-usability-tester` pass done 2026-08-01** (spec-blind heuristic evaluation + cognitive
+      walkthrough: Nielsen's 10 heuristics, the four walkthrough questions, information scent, URL
+      naturalness, and the four mandatory systematic probes — enumerated: no conditional/hidden
+      controls exist on this single-page hello-world surface; the only two visible labels
+      ("BeaverNest", "View on GitHub") were scanned for jargon and read as plain language; no
+      cross-view redundancy beyond the shared header/footer chrome; no numeric/currency inputs
+      exist). Single-locale app (`html lang="en"` only, no i18n to sweep); breakpoints 375/768/1280px
+      reused from this phase's own Manual UI Verification screenshots above, spot-checked visually.
+      Per the parent task's framing: the removed multilingual brand chip is intentional rebrand
+      design and is NOT flagged below. The `View on GitHub` link's `github.com/wahidyankf/baseerah`
+      target (old repo name, mismatched against the now-all-"BeaverNest" chrome) was also observed
+      but is NOT filed as a new finding — it is already tracked and deliberately deferred by this
+      same plan (Decision 12's exemption list in the Phase 16 Gate above names this exact file,
+      `apps/beaver-nest-fe/src/components/AppShell.tsx`, pending Phase 17's `[HUMAN]` GitHub-repo
+      rename). 3 new usability findings (severity 1-2, none severity 3/4) and 1 spec-blind behaviour
+      suggestion recorded below. The `web-exploratory-tester`/`web-design-tester` passes are separate
+      invocations and remain outstanding.
+      **`web-exploratory-tester` pass done 2026-08-01** (spec-aware functional/behavioral-consistency/
+      edge-case/accessibility/security sweep against
+      `specs/apps/beaver-nest/behavior/beaver-nest-fe/gherkin/hello/landing-page.feature`): all 5
+      Gherkin scenarios walked live and PASS — h1 reads "BeaverNest" `[Repo-grounded]`; greeting text
+      is "Hello from BeaverNest" (`curl http://localhost:19320/api/v1/hello` returns a JSON body whose
+      `message` field equals `"Hello from BeaverNest"`); zero axe-core (`@axe-core/playwright`, WCAG
+      2.1 A/AA + 2.2 AA tags)
+      violations on `/` and the 404 route at 320/375/768/1024/1280/1440px; the one-line description
+      renders within the 375×667px viewport with no scroll (`scrollHeight === viewportHeight`); the
+      404 route (`/does-not-exist-xyz`) shows the shared `AppFrame` header reading "BeaverNest" and a
+      working "Back to home" link to `/`. Single-locale app (`html lang="en"` only, confirmed via
+      Playwright `getAttribute`; no i18n config under `apps/beaver-nest-fe/src` — locale sweep n/a).
+      Mandatory systematic sweeps: no shared/global controls exist on this static hello-world surface
+      (sweep A n/a), no interactive/URL-encodable state exists (sweep B n/a); declared-invariant
+      conformance pass (sweep C) checked the parent task's stated invariant — "all identity surfaces
+      (heading, greeting, page title, 404 page, metadata) renamed Baseerah→BeaverNest" — against every
+      surface reachable from `/` and the 404 route, INCLUDING one surface outside that enumerated list
+      that the invariant should reasonably extend to: the generated favicon (`app/icon.tsx`, served at
+      `/icon`). That surface **violates** the invariant (see EWT-001 below); all other surfaces
+      (`<title>`, `<meta name="description">`, `<h1>`, greeting, footer, 404 title/heading) conform.
+      Edge-case probes attempted: query-string with special/encoded chars (`?foo=bar%20baz`) → 200,
+      unchanged render; percent-encoded Unicode path → 404 (correct, no crash/leak); an
+      `Accept-Language: id` request header → identical byte-for-byte response to the default request
+      (no partial/broken i18n leak, consistent with the single-locale finding above); double-slash
+      `//` → 308 redirect to `/`,
+      200 on follow; `robots.txt`/`sitemap.xml`/`manifest.json`/`apple-icon` all 404 cleanly with no
+      stack-trace or path disclosure in the body. Security headers observed on both `/` and the 404
+      route: `X-Content-Type-Options: nosniff`, `X-Frame-Options: DENY`,
+      `Content-Security-Policy: frame-ancestors 'none'`, `Referrer-Policy: strict-origin-when-cross-origin`,
+      `Permissions-Policy` restricting camera/microphone/geolocation — no `Server`/`X-Powered-By`
+      version disclosure; HSTS absent, but expected and non-actionable for a `localhost` HTTP dev
+      target. 1 new EWT defect finding (favicon) and 0 spec-gaps (all 5 scenarios already have
+      corresponding Gherkin coverage; no correct-but-unprotected behaviour observed beyond what's
+      already specified).
+- [x] [AI] Append each finding here as a new unchecked checkbox, source-attributed
       (`- [ ] EWT-NNN:` / `- [ ] UWT-NNN:` / `- [ ] DWT-NNN: <defect> — fix before archival`).
-- [ ] [AI] Fix every rule-15 EWT/UWT/DWT defect finding before archival — deferral requires explicit
+  - [x] EWT-001: The generated favicon/tab-icon (`apps/beaver-nest-fe/src/app/icon.tsx`, served at
+        `/icon`) still renders the Arabic letter "ب" (Beh, the initial of Baseerah's Arabic name
+        بصيرة) instead of a BeaverNest-appropriate glyph — this identity surface was missed by the
+        rebrand and directly contradicts the parent task's stated invariant that all identity surfaces
+        (heading, greeting, page title, 404 page, metadata) were renamed Baseerah→BeaverNest — fix
+        before archival.
+    - _Violated principle_: Declared-invariant conformance (sweep C) — the rebrand's own
+      all-identity-surfaces invariant, extended to the one identity surface (the favicon) not
+      explicitly enumerated in the task framing but self-evidently in scope; also Behavioural
+      Consistency (a BeaverNest-branded page serving a Baseerah-branded browser-tab icon
+      self-contradicts).
+    - _Severity_: Major (a residual competitor/prior-brand artifact visible in every browser tab,
+      bookmark, and PWA install — high user-facing visibility) — _Priority_: High (this is exactly the
+      class of miss a rebrand plan's own retest step exists to catch).
+    - _Environment_: `http://localhost:19310/icon`, `en` locale (single-locale app), 2026-08-01.
+    - _Steps to reproduce_: (1) `curl -sS http://localhost:19310/icon -o icon.png`. (2) Open
+      `icon.png` (32×32 PNG, `Content-Type: image/png`, HTTP 200). (3) Observe the rendered glyph is
+      the single Arabic letter "ب" on a blue circular badge, not a BeaverNest mark. (4) history
+      confirms this: `git log --follow --stat -- apps/beaver-nest-fe/src/app/icon.tsx` shows this
+      file was only `git mv`'d from `apps/baseerah-fe/` in commit `73979f2ce` (Phase 10) with
+      `similarity index 100%` — its content was never edited, so the rebrand's `<CANONICAL-SED>`
+      text-based sweep did not catch it because the file contains no literal "Baseerah"/"بصيرة"
+      string, only the bare Arabic letter.
+    - _Expected_: per the parent task's framing ("renamed from Baseerah to BeaverNest across all
+      identity surfaces"), the favicon should render a BeaverNest-appropriate glyph (e.g. a stylized
+      "B" or beaver motif), not a residual Baseerah-name-derived character.
+    - _Actual_: `apps/beaver-nest-fe/src/app/icon.tsx` renders a `<div>` containing the literal
+      character `ب` on a `#0284c7` background — this is Baseerah's Arabic-name-derived glyph, wholly
+      unrelated to "BeaverNest".
+    - _Evidence_: `./evidence/phase-16-ewt-001-favicon-baseerah-arabic-glyph-32px.png`
+    - _Reproducibility_: Always.
+    - _Defect type_: Content / Consistency (identity-surface rebrand miss).
+    - _Suggested fix locus_: `apps/beaver-nest-fe/src/app/icon.tsx` — replace the `ب` character (and
+      re-evaluate the hardcoded `#0284c7` background against current design tokens, see DWT-006) with
+      a BeaverNest-appropriate glyph.
+    - **Fixed 2026-08-01**: glyph replaced with `B`; background replaced with `#3f69d3` (the resolved
+      value of `--color-primary`), both in the same edit (bundled with DWT-006 per its own suggested
+      fix locus). Verified live: rebuilt the `beaver-nest-fe` dev container and confirmed
+      `http://localhost:19310/icon` now renders a white "B" on brand-blue.
+  - [x] UWT-001: The "View on GitHub" link (`apps/beaver-nest-fe/src/components/AppShell.tsx`) opens
+        in a new tab (`target="_blank" rel="noreferrer"`) with no visible text, icon, or `aria-label`
+        signalling the context change — fix before archival.
+    - _Violated principle_: Heuristic 1 (Visibility of System Status) and the external-convention
+      practice of announcing new-tab links (Jakob's Law; WCAG technique G201/H83).
+    - _Severity_: 2 (Minor usability problem) — _Priority_: Low.
+    - _Environment_: `http://localhost:19310/`, Chromium via Playwright, default viewport, `en`
+      locale, 2026-08-01.
+    - _Steps to reproduce_: (1) Navigate to `http://localhost:19310/`. (2) Press `Tab` once — focus
+      lands on the GitHub link (confirmed: first and only tab stop on the page). (3) Inspect the
+      link's accessible name and DOM attributes — reads only "View on GitHub", with
+      `target="_blank" rel="noreferrer"` and no `aria-label`.
+    - _Expected_: a first-time visitor is warned before the click that this link leaves the page in
+      a new tab, so an unexpected Back-button result doesn't confuse them.
+    - _Actual_: label text is `View on GitHub`; DOM: `<a href="https://github.com/wahidyankf/baseerah" target="_blank" rel="noreferrer">View on GitHub</a>` — no new-tab affordance anywhere.
+    - _Reproducibility_: Always.
+    - _Suggested clarification_: append a visually-hidden "(opens in new tab)" suffix or an
+      external-link icon, and mirror it in `aria-label` so the accessible name matches.
+    - **Fixed 2026-08-01**: appended a `<span className="sr-only"> (opens in new tab)</span>` inside
+      the link in `AppShell.tsx`, so the accessible name becomes "View on GitHub (opens in new tab)"
+      without changing the visible label. Verified live: rebuilt the `beaver-nest-fe` dev container,
+      new Playwright scenario "External GitHub link announces it opens in a new tab" passes against
+      `http://localhost:19310/`.
+  - [x] UWT-002: The "BeaverNest" header/brand text is not a link back to the homepage on any page,
+        including the 404 page — fix before archival.
+    - _Violated principle_: Heuristic 4 (Consistency and Standards — external convention/Jakob's Law:
+      the header/logo is almost universally a home link) and Heuristic 6 (Recognition rather than
+      Recall).
+    - _Severity_: 2 (Minor usability problem, mitigated by the separate "Back to home" link on the
+      404 page) — _Priority_: Low.
+    - _Environment_: `http://localhost:19310/` and `http://localhost:19310/does-not-exist`, Chromium
+      via Playwright, 2026-08-01.
+    - _Steps to reproduce_: (1) Navigate to `http://localhost:19310/does-not-exist`. (2) Inspect the
+      header — the `<h1>BeaverNest</h1>` sits inside a plain `<div>`, not an `<a>`. (3) Confirm via
+      `h1.closest('a')` — returns `null` on both `/` and `/does-not-exist`.
+    - _Expected_: clicking the header/brand text returns to `/`, matching the near-universal web
+      convention a first-time visitor would rely on when disoriented.
+    - _Actual_: the header text is inert on every page; the sole way back from the 404 page is the
+      separate, lower "Back to home" text link.
+    - _Reproducibility_: Always.
+    - _Suggested clarification_: wrap the header `<h1>` (or its containing element) in a link to `/`.
+    - **Fixed 2026-08-01**: added an optional `titleHref` prop to the shared `AppHeader` primitive
+      (`libs/web-ui/src/components/app-header/app-header.tsx`, only consumer is this app, so a
+      backward-compatible optional prop was safe) and passed `titleHref="/"` from `AppFrame.tsx`. New
+      unit tests added to `app-header.test.tsx`. Verified live: the header `<h1>` is now wrapped in an
+      `<a href="/">` on both `/` and the 404 route.
+  - [x] UWT-003: The static tagline paragraph and the live backend-fetched greeting render as
+        visually-indistinguishable, back-to-back grey text, reading as redundant copy rather than two
+        different kinds of information — fix before archival. - _Violated principle_: Heuristic 8 (Aesthetic and Minimalist Design) and Krug's "users scan,
+        they don't read" (unlabelled duplication competes for attention without earning its place). - _Severity_: 1 (Cosmetic problem) — _Priority_: Low. - _Environment_: `http://localhost:19310/`, 375/768/1280px, 2026-08-01 (see
+        `./evidence/phase-16-landing-page-{375,768,1280}px.png`, captured earlier in this same phase). - _Steps to reproduce_: (1) Navigate to `/`. (2) Observe the two centered paragraphs directly
+        below the header: "BeaverNest is a personal operating layer — an AI assistant, a content
+        builder, a posting helper, and a workflow engine in one." immediately followed by "Hello from
+        BeaverNest" — both rendered in the same `text-muted-foreground` grey, same size family, no
+        divider or label distinguishing them. - _Expected_: a first-time scanner can tell at a glance that one line is marketing copy and the
+        other is a live proof-of-life signal from the backend (i.e., the API round-trip actually
+        worked), rather than reading both as the same repeated fact. - _Actual_: both paragraphs use indistinguishable styling with no visual or semantic cue
+        separating "description" from "system status." - _Reproducibility_: Always. - _Suggested clarification_: give the greeting text a distinct, smaller/lighter treatment (e.g.,
+        a small status icon or "Live" label) or move it into a visually distinct status element. - **Fixed 2026-08-01**: the greeting `<p>` in `AppShell.tsx` now uses `text-accent-foreground
+text-sm font-medium` (distinct from the tagline's `text-muted-foreground text-lg`) plus a small
+        `aria-hidden` status dot, so it reads as a live status signal rather than duplicate copy. New
+        unit test assertion added to `page.test.tsx`.
+
+**`web-design-tester` pass done 2026-08-01** (design-fidelity + design-practice sweep against
+`http://localhost:19310/`, standard depth; ground truth: `libs/web-ui-token/src/beaver-nest.css`
+runtime tokens, `libs/web-ui` primitives, general design-practice principles — no committed
+plan-folder mockup exists for the chip-removed design, correctly not compared against per the
+parent task's framing; single-locale app, `en` only, no i18n to sweep; breakpoints 375/768/1280px,
+routes `/` and `/does-not-exist-xyz`). Computed styles read live via Playwright 1.60.0. Cross-surface
+`AppFrame` chrome (header/footer/main computed styles: color, background, radius, padding, height)
+verified byte-identical between the landing and 404 routes at all three breakpoints — no drift found,
+no raw/off-token color leaked into either surface. The two mandatory systematic checks were run: (A)
+raw/unstyled native-element audit — the only two interactive elements reachable from `/` and the 404
+route are the "View on GitHub"/"Back to home" `<a>` links (both fully token-styled,
+`text-primary underline underline-offset-4`, no raw native chrome) — no findings; (B) intra-form/
+cross-surface styling matrix — both links share an identical class list across surfaces (consistent);
+the client-only `error.tsx` "Try again" button could not be reached by live navigation (triggering it
+non-destructively was not possible against the running dev stack), so its as-shipped class list was
+diffed against the `Button` primitive's by rendering both, verbatim, into the live DOM and reading
+computed styles — see DWT-005 below. 2 new design findings recorded (DWT-005, DWT-006); 0 spec-gaps.
+
+- [x] DWT-005: `apps/beaver-nest-fe/src/app/error.tsx`'s "Try again" control is a bespoke raw
+      `<button>` (`className="bg-primary text-primary-foreground rounded-lg px-5 py-2"`) instead of
+      the shared `Button` primitive (`libs/web-ui/src/primitives/button/button.tsx`,
+      `@open-sharia-enterprise/web-ui`), diverging from it on every non-color axis — fix before
+      archival.
+  - _Violated ground truth_: design-system-primitive reuse (`libs/web-ui` `Button`) and the
+    internal-consistency/state-styling design principle (Nielsen Heuristic 4 — Consistency and
+    Standards: the error-page action control looks and behaves differently from every other
+    button-shaped control the design system defines).
+  - _Severity_: Minor (a single low-traffic surface — the client-side error boundary — not the
+    primary happy path) — _Priority_: Low (fix opportunistically; does not block the rebrand).
+  - _Environment_: `http://localhost:19310/`, Chromium via Playwright 1.60.0, viewport 1280px,
+    locale `en`, 2026-08-01.
+  - _Steps to reproduce_: (1) load `http://localhost:19310/` (any route shares the same stylesheet).
+    (2) Render two buttons into the live DOM: one with the raw class list above, one with the
+    `Button` primitive's `variant="default" size="default"` compiled class list
+    (`inline-flex shrink-0 items-center justify-center gap-2 rounded-md text-sm font-medium ...
+bg-primary text-primary-foreground hover:bg-primary/90 h-9 px-4 py-2 has-[>svg]:px-3`). (3) Read
+    `getComputedStyle` on both.
+  - _Expected_: the error-page action control renders with the same computed radius/size/type-scale/
+    state-styling as every other `Button`-primitive instance in the app.
+  - _Actual_: computed `border-radius: 14px` (Tailwind `rounded-lg` → `--radius-lg: 0.875rem` in
+    `libs/web-ui-token/src/beaver-nest.css`) vs the primitive's `10px` (`rounded-md` →
+    `--radius-md: 0.625rem`); computed `padding: 8px 20px` / `height: 40px` vs the primitive's
+    `default` size `8px 16px` / `36px` (no defined `Button` size variant produces `px-5 py-2`);
+    computed `font-size: 16px` / `font-weight: 400` vs the primitive's `text-sm font-medium`
+    (`14px` / `500`); and no `hover:`/`focus-visible:` classes at all, so the control has zero
+    hover/focus state feedback, where the primitive defines `hover:bg-primary/90` plus a
+    `focus-visible` ring token.
+  - _Evidence_: `./evidence/phase-16-design-retest-dwt-005-button-comparison-1280px.png` (both
+    buttons rendered from their real, as-shipped/as-defined class lists against the live BeaverNest
+    stylesheet, side by side).
+  - _Reproducibility_: Always (deterministic from the two class lists).
+  - _Defect type_: Primitive-reuse.
+  - _Suggested fix locus_: replace the raw `<button>` in `apps/beaver-nest-fe/src/app/error.tsx` with
+    `<Button onClick={() => reset()}>Try again</Button>` imported from
+    `@open-sharia-enterprise/web-ui`.
+  - **Fixed 2026-08-01**: replaced the raw `<button>` with `<Button onClick={() => reset()}>Try
+again</Button>` exactly as suggested. `error.test.tsx`'s existing assertions (role/name-based,
+    not class-based) still pass unchanged.
+- [x] DWT-006: `apps/beaver-nest-fe/src/app/icon.tsx`'s favicon background is a hardcoded raw hex
+      (`#0284c7`) that does not match the runtime `--color-primary` token — a distinct design-token
+      defect on the same file EWT-001 above already flags for the wrong glyph (this finding is
+      additive, not a duplicate: EWT-001 is the content/rebrand-invariant miss, this is the
+      accompanying color-token miss) — fix before archival.
+  - _Violated ground truth_: runtime token fidelity (dimension 2) — `--color-primary` in
+    `libs/web-ui-token/src/beaver-nest.css` resolves live to `rgb(63, 105, 211)` (confirmed by
+    reading `getComputedStyle` on the header `h1`, which uses `text-primary`), a visibly different,
+    more indigo-violet hue than the favicon's hardcoded `#0284c7` = `rgb(2, 132, 199)`, a cyan/sky
+    blue with no relation to the current palette (`beaver-nest.css`'s own header comment: "Brand:
+    indigo-violet tones for BeaverNest's palette").
+  - _Severity_: Minor (a 32×32px browser-tab glyph, not primary-surface real estate; EWT-001 already
+    carries the higher-severity content miss on this same element) — _Priority_: Low (bundle with the
+    EWT-001 glyph fix since both land in the same file in the same pass).
+  - _Environment_: `http://localhost:19310/icon`, `en` locale, 2026-08-01.
+  - _Steps to reproduce_: (1) `curl -sS http://localhost:19310/icon -o icon.png` — 32×32 PNG. (2)
+    Read `apps/beaver-nest-fe/src/app/icon.tsx` — `background: "#0284c7"` is a literal inline hex, not
+    a CSS custom property or token reference. (3) Compare against the live-rendered `--color-primary`
+    value read from any token-driven element on `/` (e.g. the header `h1`'s `color`) —
+    `rgb(63, 105, 211)`, verified via Playwright `getComputedStyle` + canvas pixel read on
+    2026-08-01, versus the favicon's `rgb(2, 132, 199)`.
+  - _Expected_: the favicon background should derive from (or closely match) `--color-primary`, so
+    the browser-tab glyph reads as the same brand blue as the rest of the app.
+  - _Actual_: the favicon background is a visibly different, unrelated cyan-blue with no traceable
+    relationship to any token in `beaver-nest.css`.
+  - _Reproducibility_: Always.
+  - _Defect type_: Token.
+  - _Suggested fix locus_: `apps/beaver-nest-fe/src/app/icon.tsx` — replace `#0284c7` with the
+    literal RGB/hex this app's `--color-primary` resolves to (Satori/`next/og`'s `ImageResponse`
+    does not support CSS custom properties, so the token's resolved value must be hardcoded here
+    with a comment citing the token it mirrors, rather than referenced live).
+  - **Fixed 2026-08-01**: bundled with EWT-001's fix (same file, same edit) — background replaced
+    with `#3f69d3` (`rgb(63, 105, 211)`, the resolved `--color-primary` value), with a comment citing
+    the token it mirrors.
+
+- [x] [AI] Fix every rule-15 EWT/UWT/DWT defect finding before archival — deferral requires explicit
       user permission (only when genuinely impossible); `SG-###`/`USS-###` proposals may be triaged
-      or deferred.
+      or deferred. **All 6 findings (EWT-001, UWT-001/002/003, DWT-005/006) fixed 2026-08-01** — see
+      each finding's own "Fixed" annotation above. Verified via a rebuilt `beaver-nest-fe` dev
+      container: full `beaver-nest-fe-e2e` Playwright suite (6/6 scenarios) passes live against
+      `http://localhost:19310/`, plus `npx nx run-many -t typecheck,lint,test:quick -p
+beaver-nest-fe,web-ui,beaver-nest-fe-e2e` green.
+  - [x] USS-001 (pairs with UWT-001): proposed Gherkin behaviour suggestion for
+        `specs/apps/beaver-nest/behavior/beaver-nest-fe/gherkin/hello/landing-page.feature` — **this
+        agent did not read `specs/**`; a spec-aware reviewer must confirm this behaviour is not
+        already covered before adding it.\*\*
+
+        ```gherkin
+        Scenario: External GitHub link announces it opens in a new tab
+          Given a first-time visitor viewing the rendered homepage
+          When they encounter the "View on GitHub" link
+          Then its accessible name or visible label indicates it opens in a new browser tab
+          And the visitor is not surprised when their Back button does not return them to the homepage
+        ```
+
+    - **Resolved 2026-08-01**: reconciled by this session (spec-aware) — confirmed not already covered,
+      then added a narrower scenario (accessible-name assertion only; the "Back button" clause was
+      dropped as untestable/redundant with the fix itself) to `landing-page.feature`, with matching
+      Playwright step-defs in `apps/beaver-nest-fe-e2e/steps/landing.steps.ts` and the literal-text
+      registry entry in `apps/beaver-nest-fe/src/test/landing.steps.ts`. `specs:e2e:coverage` and
+      `specs:behavior:coverage` both pass.
 
 ### Rule-16 API Exploratory Retest (before archival)
 
-- [ ] [AI] Run `api-exploratory-tester` (`output-mode: delivery`, this plan's `plan-path`) against
+- [x] [AI] Run `api-exploratory-tester` (`output-mode: delivery`, this plan's `plan-path`) against
       `http://localhost:19320/`, with `specs/apps/beaver-nest/containers/contracts/openapi.yaml` as
-      ground truth — acceptance: AET findings + spec-gaps recorded.
-- [ ] [AI] Append each finding here as a new unchecked checkbox (`- [ ] AET-NNN: <defect> — fix
+      ground truth — acceptance: AET findings + spec-gaps recorded. **Run 2026-08-01** against the
+      live `beaver-nest-app-beaver-nest-be-1` container: both documented operations
+      (`GET /api/v1/health`, `GET /api/v1/hello`) baselined; operation × property matrix (status /
+      schema / content-type / headers) all ✓; cross-cutting error-envelope convention round-trip run
+      across 7 distinct 404-triggering requests (unknown path, wrong method × 4 verbs, trailing
+      slash, double-leading-slash, malformed `%ZZ` percent-encoding, oversized unknown path) — all 7
+      return the identical `{"error":"not found"}` envelope; declared invariants
+      ("`security: []` — no auth anywhere", "no write operations exist") held for every probe; the
+      greeting text is confirmed live as exactly `"Hello from BeaverNest"` (contract-matching, no
+      residual "Baseerah" string found via case-insensitive grep across every response body/header
+      captured); latency sanity 5× per endpoint ranged 1.3-2.0ms (no perf concern). One edge-case
+      contract-conformance defect found (AET-001) and one spec-gap proposed (SG-001, see below); no
+      auth/authz issue (none expected, none found); no security-header leak (`Server`/`X-Powered-By`
+      absent); CORS headers intentionally absent — confirmed via `Grep` of
+      `apps/beaver-nest-be/src/BeaverNestBe/WebApp.fs` (no `Cors` middleware wired) and
+      `apps/beaver-nest-fe/src/lib/greeting-client.ts` (server-side fetch via the generated contract
+      client, never a browser-side cross-origin call), so this is not a defect.
+- [x] [AI] Append each finding here as a new unchecked checkbox (`- [ ] AET-NNN: <defect> — fix
 before archival`) and fix every defect finding before archival (deferral requires explicit
       user permission, only when genuinely impossible).
+  - [x] AET-001 (**DEFERRED**, not fixed — see justification below): `GET /api/v1/hello%00` (a URL-encoded null byte in the path) returns
+        `400 Bad Request` with an **empty body and no `Content-Type` header** (`Connection: close`),
+        instead of the `Error` envelope (`{"error": "not found"}` with
+        `Content-Type: application/json; charset=utf-8`) every other unmatched-route request in this
+        API returns — fix before archival. - **Operation/Component**: `GET /api/v1/hello` (and, by the same code path, `/api/v1/health`) —
+        request rejected by the Kestrel/ASP.NET Core request-line parser before Giraffe's routing
+        pipeline runs (invalid percent-encoded byte in the URL). - **Environment**: `http://localhost:19320/`, Docker Compose service
+        `beaver-nest-app-beaver-nest-be-1` (healthy), no auth, observed 2026-08-01. - **Steps to reproduce**: `curl -sS -D - -o - -w '\n%{http_code}\n' "http://localhost:19320/api/v1/hello%00"`. - **Expected result**: per `specs/apps/beaver-nest/containers/contracts/openapi.yaml ›
+components.schemas.Error`, every non-2xx response this API returns should carry the
+        `{"error": "<message>"}` envelope with `Content-Type: application/json; charset=utf-8` — the
+        convention held uniformly across all 7 other error-triggering requests probed in this run
+        (see the round-trip sweep note above). - **Actual result**: `HTTP/1.1 400 Bad Request`, `Content-Length: 0`, `Connection: close`, no
+        `Content-Type` header, empty body. - **Evidence**: `./evidence/phase-16-aet-001-hello-nullbyte-path-400.http`. - **Reproducibility**: Always. - **Defect type**: Error-envelope / Contract. - **Severity**: Minor (a client that unconditionally calls `response.json()` on a non-2xx
+        response gets an unhandled JSON-parse error instead of a clean `Error` object; unreachable
+        through any normal client interaction — requires a hand-crafted malformed URL). - **Priority (proposed)**: Low (edge case triggered only by an invalid, hand-crafted URL; no
+        real client — including `beaver-nest-fe`'s generated contract client — can produce this input). - **Suggested fix locus** (hypothesis): `apps/beaver-nest-be/src/BeaverNestBe/WebApp.fs` — add an
+        exception-handling middleware ahead of the routing pipeline that catches
+        malformed-URI-at-the-Kestrel-layer failures and normalizes them to the existing `Error`
+        envelope via the same handler `apps/beaver-nest-be/src/BeaverNestBe/Api/HealthHandlers.fs`'s
+        sibling not-found handler already uses. - **Deferred 2026-08-01 (genuinely impossible at the application layer)**: confirmed by
+        reproducing live (`curl -sS -D - -o /dev/null "http://localhost:19320/api/v1/hello%00"` →
+        `400 Bad Request`, empty body, `Connection: close`) and by reading
+        `apps/beaver-nest-be/src/BeaverNestBe/Program.fs` + `WebApp.fs`: this app has no custom
+        middleware registered ahead of `UseGiraffe`, and the hypothesis in the "Suggested fix locus"
+        above does not hold — a request with an invalid percent-encoded byte (`%00`) in its path is
+        rejected by Kestrel's HTTP/1.1 request-target parser (`BadHttpRequestException`,
+        `RequestRejectionReason.InvalidRequestTarget`) **before** `IHttpApplication.ProcessRequestAsync`
+        is ever invoked — i.e. before ANY `IApplicationBuilder` middleware, including
+        `UseExceptionHandler` or a custom `app.Use(...)` wrapper, gets a chance to run for that
+        connection. Kestrel itself writes the raw 400 and closes the connection. This is documented,
+        version-independent ASP.NET Core/Kestrel server behavior (not specific to this app, this
+        rebrand, or Giraffe) — the only way to intercept it would be replacing Kestrel with a different
+        `IServer` implementation or writing a custom `IConnectionListenerFactory` operating on raw
+        bytes ahead of HTTP/1.1 parsing, which is wildly disproportionate for a Minor/Low-priority edge
+        case reachable only via a hand-crafted malformed URL that no real client (including
+        `beaver-nest-fe`'s generated contract client) can ever produce. Filed as a backlog idea instead
+        — see `plans/ideas/beaver-nest-be-nullbyte-path-error-envelope.md` — rather than fixed in this
+        plan. Flagged to the user for awareness; not a Phase 17/18-class blocking gate.
+
+**Spec-gap proposal** (not a defect — a correct, reproducible, currently-uncovered behavior;
+maintainer confirmation requested before promoting to `specs-maker`):
+
+- [x] SG-001 (**resolved 2026-08-01** — added below to `greeting.feature` + F# step-def in
+      `apps/beaver-nest-be/tests/unit/Steps/GreetingSteps.fs`; `specs:behavior:coverage` and
+      `test:unit` both pass): wrong-HTTP-method requests against a known path (`POST`/`PUT`/`DELETE`/`OPTIONS`
+      `/api/v1/hello` and `/api/v1/health`) are correctly refused with the same catch-all
+      `404 Not Found` + `{"error":"not found"}` envelope as an unknown path — this matches the
+      OpenAPI contract's own `Error` schema description ("Response body for any unmatched route
+      (404)") and is consistent with Giraffe's route-matching model (path+verb are matched together;
+      there is no intermediate "path matched, verb didn't" state, so no `405 Method Not Allowed` is
+      ever produced). This behavior is intended and correct but is not yet described by
+      `specs/apps/beaver-nest/behavior/beaver-nest-be/gherkin/**`, which today only covers an unknown
+      _path_ on `GET`, never a mismatched _method_ on a known path. Proposed scenario to add to
+      `specs/apps/beaver-nest/behavior/beaver-nest-be/gherkin/hello/greeting.feature`:
+
+      ```gherkin
+      @unit
+      Scenario: A wrong HTTP method on a known path is refused
+        Given the service has finished starting
+        When I send a POST request to "/api/v1/hello"
+        Then the response status is 404
+        And the response body field "error" is a non-empty string
+      ```
+
+      Triage: may be deferred or promoted to `specs-maker` at maintainer's discretion (spec-gap
+      proposals, unlike AET defect findings, do not block archival).
 
 ### Commit Guidelines
 

@@ -23,3 +23,10 @@ Feature: Backend hello world
     When I send a GET request to "/api/v1/hello?extra=param"
     Then the response status is 200
     And the response body field "message" equals "Hello from BeaverNest"
+
+  @unit
+  Scenario: A wrong HTTP method on a known path is refused
+    Given the service has finished starting
+    When I send a POST request to "/api/v1/hello"
+    Then the response status is 404
+    And the response body field "error" is a non-empty string

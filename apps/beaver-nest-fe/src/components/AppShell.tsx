@@ -11,14 +11,17 @@ export function AppShell({ greeting }: AppShellProps) {
         BeaverNest is a personal operating layer — an AI assistant, a content builder, a posting helper, and a workflow
         engine in one.
       </p>
-      <p className="text-muted-foreground text-sm">{greeting}</p>
+      <p className="text-accent-foreground flex items-center gap-1.5 text-sm font-medium">
+        <span aria-hidden="true" className="bg-accent-foreground inline-block h-1.5 w-1.5 rounded-full" />
+        {greeting}
+      </p>
       <a
         href="https://github.com/wahidyankf/baseerah"
         target="_blank"
         rel="noreferrer"
         className="text-primary underline underline-offset-4"
       >
-        View on GitHub
+        View on GitHub<span className="sr-only"> (opens in new tab)</span>
       </a>
     </AppFrame>
   );

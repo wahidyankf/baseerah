@@ -15,6 +15,7 @@ ideas/ (two-pagers) → backlog/ (full 5-doc plans) → in-progress/ → done/
 - [bare-repo-landing-method-step-count-drift](./bare-repo-landing-method-step-count-drift.md) — the landing method numbers eight steps but is summarized as "seven-step" in nine sites across three repos.
 - [beaver-nest-first-deploy](./beaver-nest-first-deploy.md) — provision the first real `prod-beaver-nest-fe`/`stag-beaver-nest-be` deploy targets; the deployer agents and CI callers ship wired but dormant.
 - [beaver-nest-first-llm-integration](./beaver-nest-first-llm-integration.md) — give `beaver-nest-be` its first real LLM-backed route; today there is no capture, no notes, no prompt plumbing at all.
+- [beaver-nest-be-nullbyte-path-error-envelope](./beaver-nest-be-nullbyte-path-error-envelope.md) — a null-byte path request gets a bodyless Kestrel 400 instead of `beaver-nest-be`'s usual `Error` envelope; fixing it means replacing the server.
 - [beaver-nest-persistence-layer](./beaver-nest-persistence-layer.md) — give `beaver-nest-be` a real data store; every route today is stateless and the greeting is a hardcoded constant.
 - [behavior-coverage-json-report-wiring](./behavior-coverage-json-report-wiring.md) — wire rhino-cli's JSON-run-report cross-check into project targets + CI.
 - [ci-setup-rust-toolchain-retry](./ci-setup-rust-toolchain-retry.md) — `setup-rust` flaked 7× in one phase on the toolchain download; add a retry in all three repos.

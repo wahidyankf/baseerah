@@ -1,0 +1,15 @@
+### Request
+```
+GET /api/v1/hello%00 HTTP/1.1
+Host: localhost:19320
+```
+
+### Response
+```
+HTTP/1.1 400 Bad Request
+Content-Length: 0
+Connection: close
+Date: Sat, 01 Aug 2026 05:44:20 GMT
+
+(body: empty, 0 bytes)
+```
