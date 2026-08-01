@@ -25,7 +25,7 @@ pub struct FrontmatterFinding {
 
 /// Path prefixes that identify website app content directories exempt from
 /// this audit. Currently empty — no application path is exempt — retained as
-/// the documented extension point for a future Baseerah content tree that
+/// the documented extension point for a future `BeaverNest` content tree that
 /// legitimately needs a frontmatter-audit exemption.
 const WEBSITE_APP_PREFIXES: &[&str] = &[];
 
@@ -291,7 +291,7 @@ mod tests {
 
     #[test]
     fn no_application_path_is_exempt_from_the_audit() {
-        assert!(!is_website_app("apps/baseerah-fe/content/post.md"));
+        assert!(!is_website_app("apps/beaver-nest-fe/content/post.md"));
         assert!(!is_website_app("apps/ayokoding-www/content/x.md"));
     }
 

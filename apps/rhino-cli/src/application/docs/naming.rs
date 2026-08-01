@@ -276,7 +276,7 @@ mod tests {
     /// `README.md`/`AGENTS.md`/`CLAUDE.md`/`CONTRIBUTING.md`/`LICENSING-NOTICE.md`/`ROADMAP.md` — it
     /// is GitHub's ecosystem-standard security-policy filename, not a naming choice the kebab-case
     /// rule governs. `SECURITY.md` existed since before this rule shipped but was never
-    /// staged/changed in a commit that ran `md naming validate` until a Baseerah-identity rewrite
+    /// staged/changed in a commit that ran `md naming validate` until a BeaverNest-identity rewrite
     /// pass edited it, tripping the pre-commit hook — same discovery pattern as the
     /// `ROADMAP.md` regression above.
     #[test]

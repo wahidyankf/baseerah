@@ -695,7 +695,7 @@ fn given_bridge_files_exist(w: &mut AgentsWorld) {
     w.write_matching_bindings();
     for rel in [
         ".amazonq/rules/00-agents-md.md",
-        ".amazonq/cli-agents/baseerah-default.json",
+        ".amazonq/cli-agents/beaver-nest-default.json",
     ] {
         let bytes = std::fs::read(w.work.path().join(rel)).expect("read prior emission");
         w.bindings_snapshot.push((rel.to_string(), bytes));
@@ -728,7 +728,7 @@ fn given_bridge_file_deleted(w: &mut AgentsWorld) {
     std::fs::remove_file(
         w.work
             .path()
-            .join(".amazonq/cli-agents/baseerah-default.json"),
+            .join(".amazonq/cli-agents/beaver-nest-default.json"),
     )
     .expect("remove bridge file");
 }
@@ -781,17 +781,17 @@ fn then_rules_pointer_written(w: &mut AgentsWorld) {
 }
 
 #[then(
-    "the file .amazonq/cli-agents/baseerah-default.json is written as a valid Amazon Q agent definition"
+    "the file .amazonq/cli-agents/beaver-nest-default.json is written as a valid Amazon Q agent definition"
 )]
 fn then_agent_definition_written(w: &mut AgentsWorld) {
     let content = std::fs::read_to_string(
         w.work
             .path()
-            .join(".amazonq/cli-agents/baseerah-default.json"),
+            .join(".amazonq/cli-agents/beaver-nest-default.json"),
     )
     .expect("read agent definition");
     let json: Value = serde_json::from_str(&content).expect("valid json");
-    assert_eq!(json["name"], "baseerah-default");
+    assert_eq!(json["name"], "beaver-nest-default");
 }
 
 #[then(
@@ -801,7 +801,7 @@ fn then_agent_definition_resources(w: &mut AgentsWorld) {
     let content = std::fs::read_to_string(
         w.work
             .path()
-            .join(".amazonq/cli-agents/baseerah-default.json"),
+            .join(".amazonq/cli-agents/beaver-nest-default.json"),
     )
     .expect("read agent definition");
     let json: Value = serde_json::from_str(&content).expect("valid json");
@@ -844,7 +844,7 @@ fn then_identifies_drifted_bridge_file(w: &mut AgentsWorld) {
 fn then_reports_missing_bridge_file(w: &mut AgentsWorld) {
     let out = w.stdout();
     assert!(
-        out.contains("Binding: .amazonq/cli-agents/baseerah-default.json"),
+        out.contains("Binding: .amazonq/cli-agents/beaver-nest-default.json"),
         "got: {out}"
     );
     assert!(

@@ -105,9 +105,9 @@ mod tests {
     fn resolve_folders_default_reads_config_areas() {
         // The default app list is the config-supplied `specs.ddd-areas`, not a
         // source-hard-coded allowlist.
-        let default_apps = vec!["baseerah".to_string()];
+        let default_apps = vec!["beaver-nest".to_string()];
         let v = resolve_folders(None, &[], &default_apps);
-        assert_eq!(v, vec!["specs/apps/baseerah".to_string()]);
+        assert_eq!(v, vec!["specs/apps/beaver-nest".to_string()]);
     }
 
     #[test]

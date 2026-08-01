@@ -1368,11 +1368,11 @@ fn given_fd_created(w: &mut DocsWorld) {
 #[given("a markdown file with forbidden date metadata under an application directory")]
 fn given_fd_no_app_exempt(w: &mut DocsWorld) {
     w.write(
-        "apps/baseerah-fe/content/post.md",
+        "apps/beaver-nest-fe/content/post.md",
         "---\nupdated: 2026-01-01\n---\n",
     );
-    w.frontmatter_target = Some("apps/baseerah-fe".to_string());
-    w.file_a = Some("apps/baseerah-fe/content/post.md".to_string());
+    w.frontmatter_target = Some("apps/beaver-nest-fe".to_string());
+    w.file_a = Some("apps/beaver-nest-fe/content/post.md".to_string());
 }
 
 #[when("the developer runs md frontmatter validate on the directory")]
