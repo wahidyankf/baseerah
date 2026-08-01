@@ -3,6 +3,31 @@
 
 # Learnings: beaver-nest-rebrand
 
+## Phase 8: `git add` on an invalid multi-pathspec call can stage some paths with STALE content, silently
+
+While staging Phase 8, an initial `git add -A <path1> <path2> ... <badpath> ...` call errored on a
+pathspec that no longer existed (`baseerah.sln`, already `git mv`'d to `beaver-nest.sln`). Git
+processes pathspecs left-to-right and aborts on the first invalid one — but paths listed BEFORE the
+bad one (`apps/beaver-nest-be`, both e2e `project.json` files) were still staged before the abort. The
+committed content for those already-staged paths turned out to be the content as it existed **at that
+exact `git add` call**, not the fully-CANONICAL-SED'd content confirmed correct moments earlier by
+`git grep -lic baseerah` — because that verification ran against the **working tree**, and a later,
+separate content edit had already landed in the working tree but not yet been re-staged. The result:
+`git commit` silently committed pre-sed `BaseerahBe`/`BASEERAH_BE_*` strings inside every file under
+`apps/beaver-nest-be/`, even though `git status` showed clean rename entries and the pre-commit hook
+ran green (fantomas/prettier reformatted the stale content, they don't check semantic correctness).
+Caught only by re-running `git grep -lic baseerah` against `HEAD` (not the working tree) after the
+commit — the working tree still showed the corrected content as a fresh unstaged diff. Fixed with a
+follow-up commit (`425ad4679`) staging the corrected content, then re-verified `test:quick` green
+against the corrected `HEAD`.
+
+**Generalizable rule**: after any commit that follows a `git mv` + content-sed sequence, re-verify the
+grep/structural check against `git show HEAD:<path>` (or `git diff HEAD` showing empty), not just the
+working tree — a working-tree-only check can pass while the actual commit still holds stale content,
+especially after a multi-pathspec `git add` call that partially failed. Never batch a rename-path and
+a not-yet-renamed path in the same `git add` invocation; stage each already-confirmed-final path
+individually or verify the command's exit code before trusting anything got staged from it.
+
 ## Phase 6 (addendum): the cross-phase RED/GREEN/REFACTOR design conflicts with `.husky/pre-push`, blocking the push itself (not just CI)
 
 Phase 6's Post-Push CI Verification note anticipated `beaver-nest-fe`/`beaver-nest-be`
