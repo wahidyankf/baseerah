@@ -1,17 +1,17 @@
-# Baseerah first LLM integration
+# BeaverNest first LLM integration
 
-One-line summary: give `baseerah-be` its first real AI-assistant capability — currently there is
+One-line summary: give `beaver-nest-be` its first real AI-assistant capability — currently there is
 no capture, no notes, no LLM calls, and no prompt plumbing at all.
 
 > Idea, added 2026-07-31, filed from `baseerah-repo-reset`'s Product Scope § Out of scope.
 
 ## Problem / context
 
-`baseerah-repo-reset` scoped `baseerah-be`/`baseerah-fe` as a pure hello-world walking skeleton:
+`baseerah-repo-reset` scoped `beaver-nest-be`/`beaver-nest-fe` as a pure hello-world walking skeleton:
 "Every product feature [is out of scope]. No capture, no notes, no LLM calls, no prompt plumbing,
 no AI SDK dependency, no scheduling, no posting." That was correct for establishing the engineering
-harness, but it means none of Baseerah's actual stated purpose — an AI assistant, per
-[Baseerah Vision](../../repo-governance/vision/beaver-nest.md) — exists yet.
+harness, but it means none of BeaverNest's actual stated purpose — an AI assistant, per
+[BeaverNest Vision](../../repo-governance/vision/beaver-nest.md) — exists yet.
 
 ## Why now
 
@@ -20,13 +20,13 @@ to build. Choosing a provider/SDK before a feature is scoped would be speculativ
 
 ## Prior art / precedents
 
-- [Baseerah Vision](../../repo-governance/vision/beaver-nest.md) — states the product is "an AI
+- [BeaverNest Vision](../../repo-governance/vision/beaver-nest.md) — states the product is "an AI
   assistant, a content builder, a posting helper, and a personal workflow engine"; this idea is the
   first slice of the "AI assistant" facet.
 - `vercel:ai-architect` agent (already available in this repo's agent roster) — specializes in
   architecting AI-powered applications, choosing AI SDK patterns, and configuring providers; the
   natural agent to drive this once scoped.
-- [baseerah-persistence-layer](./baseerah-persistence-layer.md) — an LLM integration that needs to
+- [beaver-nest-persistence-layer](./beaver-nest-persistence-layer.md) — an LLM integration that needs to
   remember anything (conversation history, captured notes) depends on this idea landing first or
   alongside it.
 
@@ -39,7 +39,7 @@ to build. Choosing a provider/SDK before a feature is scoped would be speculativ
 
 ## Rough scope & non-goals
 
-In scope: eventually, the first LLM-backed route in `baseerah-be`.
+In scope: eventually, the first LLM-backed route in `beaver-nest-be`.
 
 Out of scope (for now): choosing a specific model/provider, prompt design, or any persistence for
 LLM output — those depend on the concrete feature this idea is deferred until.
@@ -48,12 +48,12 @@ LLM output — those depend on the concrete feature this idea is deferred until.
 
 - Which capability is the first LLM-backed feature — capture, notes, or something else? (open —
   determines the whole shape)
-- Does this depend on [baseerah-persistence-layer](./baseerah-persistence-layer.md) landing first,
+- Does this depend on [beaver-nest-persistence-layer](./beaver-nest-persistence-layer.md) landing first,
   or can a stateless first LLM call (no storage) ship independently? (open)
 - Provider choice and cost/rate-limit implications for a personal-use product? (open)
 
 ## What success looks like + promotion signal
 
-Success: `baseerah-be` serves one real LLM-backed route, however small. Ready to promote once a
+Success: `beaver-nest-be` serves one real LLM-backed route, however small. Ready to promote once a
 maintainer picks the first concrete AI capability to build — until then it correctly stays an
 under-specified idea.

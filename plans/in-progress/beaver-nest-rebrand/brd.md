@@ -69,7 +69,7 @@ Solo-maintainer repository — no sign-off or stakeholder ceremony applies. The 
 - **No new deploy target is provisioned.** The existing dormant-deployer posture (deployer agents
   and CI callers wired but no `prod-*`/`stag-*` target live) is preserved as-is under the new names;
   provisioning the first real target remains the separately-tracked
-  [baseerah-first-deploy idea](../../ideas/baseerah-first-deploy.md) (renamed to
+  [baseerah-first-deploy idea](../../ideas/beaver-nest-first-deploy.md) (renamed to
   `beaver-nest-first-deploy.md` by this plan).
 - **No dual-publish bridge for the GHCR image name.** Per Q9, this is a hard cutover: the old
   `ghcr.io/wahidyankf/baseerah-be` image name is abandoned with no compatibility alias, because

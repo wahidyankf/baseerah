@@ -19,7 +19,7 @@ Deployment architecture, environment branches, and Vercel configuration for the 
 > not deployed via Vercel. `beaver-nest-fe` and `beaver-nest-be` are now scaffolded, and their deployer
 > agents and CI caller workflows exist, but no deploy target is provisioned yet (no `prod-beaver-nest-fe`
 > Vercel project, no `stag-beaver-nest-be` consumer) — see
-> [baseerah-first-deploy](../../../plans/ideas/baseerah-first-deploy.md). See
+> [beaver-nest-first-deploy](../../../plans/ideas/beaver-nest-first-deploy.md). See
 > [applications.md](./applications.md) and the
 > [baseerah-repo-reset plan](../../../plans/done/2026-07-31__baseerah-repo-reset/README.md).
 

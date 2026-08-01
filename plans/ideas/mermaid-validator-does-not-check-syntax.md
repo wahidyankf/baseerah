@@ -43,7 +43,7 @@ Three independent forces make this the moment:
   one is in the tooling those documents call.
 - A remediation backlog for the app that first exposed this (`ayokoding-mermaid-diagram-remediation`,
   636 violations exposed when a `detect_kind` fix landed) existed at filing time; that app and its
-  content were since removed by the Baseerah repo reset, so the specific 636-violation corpus is
+  content were since removed by the BeaverNest repo reset, so the specific 636-violation corpus is
   moot, but the underlying gate defect is unrelated to any one app's content and remains live: any
   future corpus can be "remediated" to a false-green pass under this tool exactly the same way.
 

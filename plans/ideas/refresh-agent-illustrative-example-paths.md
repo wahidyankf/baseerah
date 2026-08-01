@@ -1,7 +1,7 @@
 # Refresh Agent Illustrative Example Paths
 
 One-line summary: several generic, reusable agent definitions still illustrate their usage with
-example paths naming apps this repo deleted during the Baseerah repo reset.
+example paths naming apps this repo deleted during the BeaverNest repo reset.
 
 > Idea, added 2026-07-31.
 

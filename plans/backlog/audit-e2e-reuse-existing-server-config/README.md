@@ -19,7 +19,7 @@ hardcoded `true` unconditionally in six configs, not gated on `!process.env.CI`:
 `apps/ayokoding-www-fe-e2e`, `apps/ayokoding-www-be-e2e`, `apps/organiclever-www-fe-e2e`,
 `apps/wahidyankf-www-fe-e2e`, `apps/ose-www-fe-e2e`, `apps/ose-www-be-e2e` — plus one config that
 already gated it correctly, `apps/organiclever-app-web-e2e` (`reuseExistingServer:
-!process.env.CI`). **All seven of those apps were deleted from this repo by the Baseerah repo
+!process.env.CI`). **All seven of those apps were deleted from this repo by the BeaverNest repo
 reset** (see `plans/in-progress/baseerah-repo-reset/`), so none of the originally-listed files
 exist anymore.
 

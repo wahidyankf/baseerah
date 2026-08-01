@@ -25,7 +25,7 @@ deleting the worktree after the plan is archived and pushed.
 - [ ] [AI] Determine whether `libs/web-ui/e2e/playwright.config.ts`'s CI runner is ephemeral-per-job
       or shared/persistent (checking workflow YAML runner labels against this repo's self-hosted
       vs. GitHub-hosted runner usage). The plan's originally-cited six configs were deleted along
-      with their apps by the Baseerah repo reset; this is the sole surviving hardcoded-`true`
+      with their apps by the BeaverNest repo reset; this is the sole surviving hardcoded-`true`
       config as of 2026-07-31 — re-run the repo-wide `playwright.config.ts` search before starting
       in case new `*-e2e` projects were added since.
 - [ ] [AI] Record the availability/persistence verdict, with the evidence used

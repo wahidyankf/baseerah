@@ -408,7 +408,7 @@ docs/` returns only that same captured file set.
 
 ## Phase 4: `plans/backlog/`, `plans/ideas/`, and `plans/in-progress/README.md` Sweep
 
-- [ ] [AI] Rename the three idea briefs: `git mv plans/ideas/baseerah-first-deploy.md
+- [x] [AI] Rename the three idea briefs: `git mv plans/ideas/baseerah-first-deploy.md
 plans/ideas/beaver-nest-first-deploy.md && git mv plans/ideas/baseerah-first-llm-integration.md
 plans/ideas/beaver-nest-first-llm-integration.md && git mv
 plans/ideas/baseerah-persistence-layer.md plans/ideas/beaver-nest-persistence-layer.md` —
@@ -418,7 +418,12 @@ plans/ideas/baseerah-persistence-layer.md plans/ideas/beaver-nest-persistence-la
       since the file didn't exist yet at that path) — repoint this one link to
       `beaver-nest-first-deploy.md` in this same commit now that the file has actually moved (see
       [learnings.md](./learnings.md)).
-- [ ] [AI] Apply `<CANONICAL-SED>` to every git-tracked file under `plans/backlog/` and
+      **Done 2026-08-01**: all 3 files renamed; `deployment.md`'s link repointed. `md links
+      validate` also found 2 MORE repo-wide inbound links to the old path (`apps/README.md`,
+      `plans/in-progress/beaver-nest-rebrand/brd.md`) — fixed both with a targeted path-only sed
+      (new learnings.md entry: this is the same class of bug as the Phase 1 discovery, this time
+      triggered by a `git mv` rather than a content rename).
+- [x] [AI] Apply `<CANONICAL-SED>` to every git-tracked file under `plans/backlog/` and
       `plans/ideas/`, plus `plans/in-progress/README.md`, preserving historical citations per
       [tech-docs.md Decision 6](./tech-docs.md#decision-log): (1) capture `git grep -l
 "baseerah-repo-reset" -- plans/backlog/ plans/ideas/ plans/in-progress/README.md >
@@ -436,7 +441,7 @@ plans/ideas/baseerah-persistence-layer.md plans/ideas/beaver-nest-persistence-la
       that same captured file set (`plans/in-progress/README.md`'s residual `baseerah` match here is
       exactly this preserved citation; its separate capital-`Baseerah` "from X to Y" sentence is
       fixed by the next step and checked by the Phase 4 Gate below).
-- [ ] [AI] Manually fix the "from X to Y" narrative sentence(s) the blind sed pass just destroyed:
+- [x] [AI] Manually fix the "from X to Y" narrative sentence(s) the blind sed pass just destroyed:
       `plans/in-progress/README.md`'s `beaver-nest-rebrand` entry describes this plan as renaming
       "the repository's product identity from Baseerah to BeaverNest" — because both the old-name
       and new-name tokens collapse to the same replacement string under `<CANONICAL-SED>`'s catch-all
@@ -448,25 +453,33 @@ plans/ideas/baseerah-persistence-layer.md plans/ideas/beaver-nest-persistence-la
       substitution for narrative sentences describing the rename itself — acceptance: manual read of
       `plans/in-progress/README.md`'s entry confirms it still names both "Baseerah" and "BeaverNest"
       and reads coherently.
-- [ ] [AI] Update `plans/ideas/README.md`'s three bullet links to point at the renamed filenames —
+      **Done 2026-08-01**: fixed to "...renames the repository's product identity to BeaverNest
+      (formerly Baseerah)...". No other "from X to Y"-shaped sentences found elsewhere in
+      `plans/backlog/`/`plans/ideas/`.
+- [x] [AI] Update `plans/ideas/README.md`'s three bullet links to point at the renamed filenames —
       acceptance: `grep -c "beaver-nest-first-deploy.md\]" plans/ideas/README.md` returns at least
       `1` and the equivalent checks pass for the other two renamed files.
+      **Done 2026-08-01**: already correct — the CANONICAL-SED pass renamed these link targets
+      alongside the `git mv`, since both happened in this same phase. Verified all 3 links resolve.
 
 ### Local Quality Gates (Before Push)
 
-- [ ] Run `npx nx affected -t typecheck lint test:quick specs:behavior:coverage` — fix ALL failures.
+- [x] Run `npx nx affected -t typecheck lint test:quick specs:behavior:coverage` — fix ALL failures.
+      **Done 2026-08-01**: nx affected (27 tasks, 26 cached) all succeed. `md links validate`
+      initially found 2 broken links from the idea-brief renames (see notes above); fixed, re-ran,
+      clean. `markdownlint-cli2` across all touched paths — 0 errors.
 
 ### Commit Guidelines
 
-- [ ] [AI] Commit: `chore(rebrand): rename baseerah references across active plans/`
+- [x] [AI] Commit: `chore(rebrand): rename baseerah references across active plans/`
 
 ### Post-Push CI Verification
 
-- [ ] [AI] Commit and push to origin main; monitor CI; fix and re-push on any failure.
+- [x] [AI] Commit and push to origin main; monitor CI; fix and re-push on any failure.
 
 ### Phase 4 Gate
 
-- [ ] [AI] `git grep -l "baseerah-repo-reset" -- plans/backlog/ plans/ideas/
+- [x] [AI] `git grep -l "baseerah-repo-reset" -- plans/backlog/ plans/ideas/
 plans/in-progress/README.md | diff - local-temp/rebrand-citations-phase4.txt` reports no
       differences, and `git grep -lic baseerah plans/backlog/ plans/ideas/` returns only that
       captured file set restricted to `plans/backlog/`/`plans/ideas/` (no other residue). (This
@@ -474,16 +487,20 @@ plans/in-progress/README.md | diff - local-temp/rebrand-citations-phase4.txt` re
       `plans/in-progress/beaver-nest-rebrand/`, necessarily narrates the old name throughout and is
       renamed and moved to `plans/done/` only in the final Plan Archival step — see Phase 16's
       residual-sweep exclusion for the same reasoning.)
-- [ ] [AI] `grep -c "baseerah-repo-reset" plans/in-progress/README.md` returns exactly `1` (the
+      **Done 2026-08-01**: diff clean, residual set unchanged.
+- [x] [AI] `grep -c "baseerah-repo-reset" plans/in-progress/README.md` returns exactly `1` (the
       preserved lowercase illustrative-example citation at line 17, restored by the revert step
       above — this is a SEPARATE citation from the "Baseerah" capital-B check below; both must hold
       simultaneously in this one file).
-- [ ] [AI] `grep -c "Baseerah" plans/in-progress/README.md` returns exactly `1` (the intentionally
+      **Done 2026-08-01**: returns `1`.
+- [x] [AI] `grep -c "Baseerah" plans/in-progress/README.md` returns exactly `1` (the intentionally
       preserved "formerly Baseerah" historical framing added by the manual fix above — case-sensitive,
       so it does not double-count the lowercase citation checked above).
-- [ ] [AI] `test -f plans/ideas/beaver-nest-first-deploy.md && test -f
+      **Done 2026-08-01**: returns `1`.
+- [x] [AI] `test -f plans/ideas/beaver-nest-first-deploy.md && test -f
 plans/ideas/beaver-nest-first-llm-integration.md && test -f
 plans/ideas/beaver-nest-persistence-layer.md` all succeed.
+      **Done 2026-08-01**: all three exist.
 
 > **Pause Safety**: active plan content is fully renamed and pushed; `plans/done/` remains untouched
 > per the historical-citation exemption (Decision 6). Safe to stop. To resume: confirm level with
@@ -1249,20 +1266,20 @@ definition` → `...beaver-nest-default.json...`) — leaving either one unrenam
       pointer and the agent definition" (`specs/apps/rhino/behavior/rhino-cli/gherkin/harness/agents-bindings.feature:10-15`),
       with only its step text changing.
 
-                                                                      ```gherkin
-                                                                      Scenario: rhino-cli's Amazon Q binding constant points at the renamed file
-                                                                        Given apps/rhino-cli's AMAZONQ_AGENT_DEFINITION constant after the rhino-cli rename phase
-                                                                        When nx run rhino-cli:test:integration runs
-                                                                        Then the test asserting the constant's path value passes against ".amazonq/cli-agents/beaver-nest-default.json"
-                                                                        And the generated file's "name" field reads "beaver-nest-default"
-                                                                      ```
+                                                                            ```gherkin
+                                                                            Scenario: rhino-cli's Amazon Q binding constant points at the renamed file
+                                                                              Given apps/rhino-cli's AMAZONQ_AGENT_DEFINITION constant after the rhino-cli rename phase
+                                                                              When nx run rhino-cli:test:integration runs
+                                                                              Then the test asserting the constant's path value passes against ".amazonq/cli-agents/beaver-nest-default.json"
+                                                                              And the generated file's "name" field reads "beaver-nest-default"
+                                                                            ```
 
-                                                                      Acceptance: run `npx nx run rhino-cli:test:integration` (or the project's equivalent test
-                                                                      target covering `tests/agents.rs`) and confirm the suite runs without a step-binding-mismatch
-                                                                      error (the renamed macro literal and the renamed Gherkin step text resolve to each other) but
-                                                                      the "Emitting writes the rules pointer and the agent definition" scenario's assertions fail
-                                                                      against the still-unrenamed source constant in `bindings.rs` (a deliberate, expected RED
-                                                                      state).
+                                                                            Acceptance: run `npx nx run rhino-cli:test:integration` (or the project's equivalent test
+                                                                            target covering `tests/agents.rs`) and confirm the suite runs without a step-binding-mismatch
+                                                                            error (the renamed macro literal and the renamed Gherkin step text resolve to each other) but
+                                                                            the "Emitting writes the rules pointer and the agent definition" scenario's assertions fail
+                                                                            against the still-unrenamed source constant in `bindings.rs` (a deliberate, expected RED
+                                                                            state).
 
 - [ ] [AI] GREEN: edit `apps/rhino-cli/src/application/agents/bindings.rs` — rename the
       `AMAZONQ_AGENT_DEFINITION` constant's value to `".amazonq/cli-agents/beaver-nest-default.json"`

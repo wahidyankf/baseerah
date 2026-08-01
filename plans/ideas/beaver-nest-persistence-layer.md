@@ -1,17 +1,17 @@
-# Baseerah persistence layer
+# BeaverNest persistence layer
 
-One-line summary: give `baseerah-be` a real data store — currently every route is stateless and the
+One-line summary: give `beaver-nest-be` a real data store — currently every route is stateless and the
 greeting is a hardcoded constant.
 
 > Idea, added 2026-07-31, filed from `baseerah-repo-reset`'s Product Scope § Out of scope.
 
 ## Problem / context
 
-`baseerah-repo-reset` deliberately built `baseerah-be`/`baseerah-fe` as a stateless hello-world
+`baseerah-repo-reset` deliberately built `beaver-nest-be`/`beaver-nest-fe` as a stateless hello-world
 skeleton: "No persistence. No database, no in-memory store, no state of any kind. The greeting is a
-constant." That was the right scope for a walking skeleton, but it means Baseerah has zero
+constant." That was the right scope for a walking skeleton, but it means BeaverNest has zero
 capability to remember anything — no notes, no captures, no user data — which is the entire point
-of the product per [Baseerah Vision](../../repo-governance/vision/beaver-nest.md).
+of the product per [BeaverNest Vision](../../repo-governance/vision/beaver-nest.md).
 
 ## Why now
 
@@ -51,6 +51,6 @@ be decided without a concrete feature driving the requirements.
 
 ## What success looks like + promotion signal
 
-Success: `baseerah-be` can durably store and retrieve real product data. Ready to promote only when
+Success: `beaver-nest-be` can durably store and retrieve real product data. Ready to promote only when
 a concrete feature (capture, notes, or similar) needs state to design against — until then it
 correctly stays an under-specified idea.

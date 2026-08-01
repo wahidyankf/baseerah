@@ -16,7 +16,7 @@ collides with an app in any sibling repo.
 
 **Candidate scope, pending the Phase 1 scope confirmation** (see `tech-docs.md` and
 `delivery.md`'s Phase 1): a registry covering every app across `ose-public`, `ose-primer`,
-`ose-private`, and `baseerah`, plus a validator runnable from any one repo.
+`ose-private`, and `beaver-nest`, plus a validator runnable from any one repo.
 
 ## Acceptance Criteria (Gherkin)
 
@@ -38,5 +38,5 @@ Feature: Cross-repo port registry
 
 ## Non-Goals
 
-- Does not re-litigate `baseerah-be`'s (19320) or `baseerah-fe`'s (19310) already-allocated ports.
+- Does not re-litigate `beaver-nest-be`'s (19320) or `beaver-nest-fe`'s (19310) already-allocated ports.
 - Does not change any app's runtime port configuration — only adds a check.

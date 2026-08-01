@@ -33,6 +33,18 @@ renamed before the path moves). **Generalizable rule**: whenever a phase's conte
 markdown link whose _target_ is renamed by a _later_ phase, revert that one link's text in the
 current phase and add an explicit repoint step to the later phase's `git mv` item.
 
+## Phase 4: renaming a file leaves repo-wide inbound links dangling, same as Phase 1
+
+Confirmed the same class of bug documented in the Phase 1 entry above, this time for a `git mv`
+(not just a content rename): after `git mv plans/ideas/baseerah-first-deploy.md
+plans/ideas/beaver-nest-first-deploy.md`, `md links validate` found 2 more repo-wide inbound links
+(`apps/README.md`, `plans/in-progress/beaver-nest-rebrand/brd.md`) beyond the one already caught in
+Phase 3 (`docs/reference/system-architecture/deployment.md`, reverted there pending this phase).
+Fixed all three with a targeted path-only sed (not a full prose sweep of the referencing files,
+since e.g. `apps/README.md` still legitimately says `baseerah-fe`/`baseerah-be` elsewhere until
+Phases 8-11). **Reconfirms the Phase 1 rule**: every phase with a `git mv` (Phases 6, 8, 9, 10, 11, 12) must re-run `git grep -l "<old-path>"` across the whole repo, not just its own file set, before
+pushing.
+
 ## Phase 2: BSD `xargs` on macOS has no `-a` flag
 
 The plan's own reference commands use `xargs -a <file> -I{} ...` to feed a captured citation-file

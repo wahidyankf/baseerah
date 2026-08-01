@@ -4,7 +4,7 @@
 
 - Confirm whether the CI runner for `libs/web-ui/e2e/playwright.config.ts` (the sole surviving
   hardcoded-`true` config; the plan's originally-cited six configs were deleted along with their
-  apps by the Baseerah repo reset) ever actually risks a port collision (fresh runner per job vs. a
+  apps by the BeaverNest repo reset) ever actually risks a port collision (fresh runner per job vs. a
   shared/reused runner where a stray process could persist).
 - If CI runners are ephemeral per job, the risk is local-development-only — the fix might be
   documentation (a caveat on developers running e2e locally) rather than a config change.

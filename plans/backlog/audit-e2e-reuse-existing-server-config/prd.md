@@ -17,7 +17,7 @@ already be bound to the port.
 
 Covers `libs/web-ui/e2e/playwright.config.ts`, the sole surviving `playwright.config.ts` still
 hardcoding `reuseExistingServer: true` per `README.md`'s Context (the six originally-enumerated
-`*-e2e` configs were deleted along with their apps by the Baseerah repo reset); does not cover the
+`*-e2e` configs were deleted along with their apps by the BeaverNest repo reset); does not cover the
 e2e test scenarios or assertions themselves.
 
 ## Acceptance Criteria (Gherkin)

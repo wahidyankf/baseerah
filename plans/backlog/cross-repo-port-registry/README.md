@@ -1,13 +1,13 @@
 # Cross-Repo Port Registry
 
 > **Status**: Backlog (not started). Filed from a Knowledge Capture learning surfaced during
-> `baseerah-repo-reset`'s Phase 0 (port allocation for `baseerah-be`/`baseerah-fe`).
+> `baseerah-repo-reset`'s Phase 0 (port allocation for `beaver-nest-be`/`beaver-nest-fe`).
 
 ## Context
 
 Port allocation across `/Users/wkf/ose-projects/` is documented nowhere machine-readable — only in
 a prose table in each repo's own `docs/reference/monorepo-structure.md`, and only per-repo.
-`ose-public`, `ose-primer`, `ose-private`, and `baseerah` all live under that same parent directory
+`ose-public`, `ose-primer`, `ose-private`, and `beaver-nest` all live under that same parent directory
 and can run concurrently, so a port collision is a cross-repo concern that no single repo's docs
 can settle. `baseerah-repo-reset` worked around this by allocating a band (`19310`/`19320`) that no
 sibling repo's table claims, plus a manual re-verification step before committing — a one-time
@@ -16,10 +16,10 @@ workaround, not a fix.
 ## Scope
 
 **In scope**: design and place a shared, machine-checkable port registry spanning the four sibling
-repos (`ose-public`, `ose-primer`, `ose-private`, `baseerah`) so a new app's port allocation can be
+repos (`ose-public`, `ose-primer`, `ose-private`, `beaver-nest`) so a new app's port allocation can be
 validated automatically instead of by manual prose-table review.
 
-**Out of scope**: re-litigating `baseerah-be`'s (`19320`) or `baseerah-fe`'s (`19310`) already-
+**Out of scope**: re-litigating `beaver-nest-be`'s (`19320`) or `beaver-nest-fe`'s (`19310`) already-
 allocated ports; any change to those two apps.
 
 ## Navigation

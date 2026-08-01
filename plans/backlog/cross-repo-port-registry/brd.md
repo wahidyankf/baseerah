@@ -11,7 +11,7 @@ repos both claiming the same port only surfaces when someone tries to run both a
 ## Impact
 
 **Affected roles**: any engineer or AI agent scaffolding a new app anywhere under
-`/Users/wkf/ose-projects/` (`ose-public`, `ose-primer`, `ose-private`, `baseerah`), since all four
+`/Users/wkf/ose-projects/` (`ose-public`, `ose-primer`, `ose-private`, `beaver-nest`), since all four
 can run concurrently on the same machine.
 
 ## Success Metrics

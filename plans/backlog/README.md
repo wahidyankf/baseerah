@@ -8,7 +8,7 @@ that genuinely need a full plan's depth to answer.
 
 - [audit-e2e-reuse-existing-server-config](./audit-e2e-reuse-existing-server-config/README.md)
   — Audits whether `reuseExistingServer: true` (hardcoded unconditionally in
-  `libs/web-ui/e2e/playwright.config.ts`, the sole surviving offender after the Baseerah repo reset
+  `libs/web-ui/e2e/playwright.config.ts`, the sole surviving offender after the BeaverNest repo reset
   deleted the plan's six originally-cited apps) risks silently reusing a stale, unrelated server,
   and applies a CI-conditional gate, doc caveat, or automated check depending on runner persistence.
 - [coverage-artifact-relative-paths](./coverage-artifact-relative-paths/README.md)

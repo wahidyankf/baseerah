@@ -7,11 +7,11 @@
 
 `libs/fsharp-crane-core/tests/unit/coverage.json` is git-tracked but is a generated .NET coverage
 artifact that embeds absolute filesystem paths from whichever checkout last ran the test suite.
-Running the suite from `/Users/wkf/ose-projects/baseerah` regenerated it with this checkout's
+Running the suite from `/Users/wkf/ose-projects/beaver-nest` regenerated it with this checkout's
 paths (previously baked with `ose-public`'s), producing an 11-line diff with zero relation to any
 actual code change. This dirties the tree on every `test:quick` run from any checkout whose
 absolute path differs from whoever committed it last — a latent hazard for exactly the kind of
-concurrent-clone setup (`ose-public`/`ose-primer`/`ose-private`/`baseerah` all under
+concurrent-clone setup (`ose-public`/`ose-primer`/`ose-private`/`beaver-nest` all under
 `/Users/wkf/ose-projects/`) this workspace already has. The regenerated file was reverted
 (`git checkout -- libs/fsharp-crane-core/tests/unit/coverage.json`) as out of `baseerah-repo-reset`
 scope (a pruning/deletion plan, not a coverage-tooling fix).

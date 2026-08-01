@@ -9,10 +9,10 @@ collision detection depends entirely on a human reading four separate tables cor
 ## Proposed Investigation
 
 - Enumerate every currently-allocated port across the four repos (`ose-public`, `ose-primer`,
-  `ose-private`, `baseerah`) by reading each repo's `docs/reference/monorepo-structure.md`.
+  `ose-private`, `beaver-nest`) by reading each repo's `docs/reference/monorepo-structure.md`.
 - Decide the registry's home: a shared file synced via the existing `ose-public`/`ose-primer`
   parity loop, a `repo-config.yml` key checked independently per repo, or a dedicated
-  cross-repo file outside the parity loop (given `baseerah` and `ose-private` don't participate in
+  cross-repo file outside the parity loop (given `beaver-nest` and `ose-private` don't participate in
   it).
 - Decide the validator's home: a new `rhino-cli` subcommand, or a lightweight script wired into an
   existing Nx target (e.g. a `repo-config.yml` validation step).

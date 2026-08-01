@@ -13,9 +13,9 @@ ideas/ (two-pagers) → backlog/ (full 5-doc plans) → in-progress/ → done/
 - [acceptance-clause-vacuity](./acceptance-clause-vacuity.md) — acceptance clauses that cannot fail certify nothing; require falsifiability in both directions.
 - [agents-md-progressive-disclosure](./agents-md-progressive-disclosure.md) — `AGENTS.md` sits under 20 B beneath its 30,000 B ceiling; restore headroom via progressive disclosure.
 - [bare-repo-landing-method-step-count-drift](./bare-repo-landing-method-step-count-drift.md) — the landing method numbers eight steps but is summarized as "seven-step" in nine sites across three repos.
-- [baseerah-first-deploy](./baseerah-first-deploy.md) — provision the first real `prod-baseerah-fe`/`stag-baseerah-be` deploy targets; the deployer agents and CI callers ship wired but dormant.
-- [baseerah-first-llm-integration](./baseerah-first-llm-integration.md) — give `baseerah-be` its first real LLM-backed route; today there is no capture, no notes, no prompt plumbing at all.
-- [baseerah-persistence-layer](./baseerah-persistence-layer.md) — give `baseerah-be` a real data store; every route today is stateless and the greeting is a hardcoded constant.
+- [beaver-nest-first-deploy](./beaver-nest-first-deploy.md) — provision the first real `prod-beaver-nest-fe`/`stag-beaver-nest-be` deploy targets; the deployer agents and CI callers ship wired but dormant.
+- [beaver-nest-first-llm-integration](./beaver-nest-first-llm-integration.md) — give `beaver-nest-be` its first real LLM-backed route; today there is no capture, no notes, no prompt plumbing at all.
+- [beaver-nest-persistence-layer](./beaver-nest-persistence-layer.md) — give `beaver-nest-be` a real data store; every route today is stateless and the greeting is a hardcoded constant.
 - [behavior-coverage-json-report-wiring](./behavior-coverage-json-report-wiring.md) — wire rhino-cli's JSON-run-report cross-check into project targets + CI.
 - [ci-setup-rust-toolchain-retry](./ci-setup-rust-toolchain-retry.md) — `setup-rust` flaked 7× in one phase on the toolchain download; add a retry in all three repos.
 - [class-sweep-completeness](./class-sweep-completeness.md) — class sweeps miss producer surfaces, root instruction files, and the block around a cited substring.
