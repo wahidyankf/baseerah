@@ -1,0 +1,84 @@
+openapi: 3.1.0
+info:
+  title: BeaverNest API
+  description: >-
+    Phase 1 hello-world contract for beaver-nest-be. Exactly three GET routes: a liveness
+    check, a greeting, and a 404 handler for anything else. No write operations exist
+    in this phase.
+  version: 1.0.0
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+servers:
+  - url: http://localhost:19320
+    description: Local beaver-nest-be
+security: []
+paths:
+  /api/v1/health:
+    get:
+      operationId: getHealth
+      summary: Liveness check
+      description: Reports whether beaver-nest-be has finished starting and is serving traffic.
+      responses:
+        "200":
+          description: The service is live.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Health"
+        "404":
+          description: No matching route.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /api/v1/hello:
+    get:
+      operationId: getHello
+      summary: Greeting
+      description: Returns the hello-world greeting beaver-nest-fe renders on its landing page.
+      responses:
+        "200":
+          description: The greeting.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Greeting"
+        "404":
+          description: No matching route.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+components:
+  schemas:
+    Health:
+      type: object
+      description: Liveness response body.
+      required:
+        - status
+      properties:
+        status:
+          type: string
+          description: Always "ok" when the service is live.
+          example: ok
+    Greeting:
+      type: object
+      description: Greeting response body.
+      required:
+        - message
+      properties:
+        message:
+          type: string
+          description: The hello-world greeting text.
+          example: Hello from BeaverNest
+    Error:
+      type: object
+      description: Response body for any unmatched route (404).
+      required:
+        - error
+      properties:
+        error:
+          type: string
+          description: Non-empty human-readable error message.
+          example: not found

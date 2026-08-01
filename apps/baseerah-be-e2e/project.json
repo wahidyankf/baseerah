@@ -24,7 +24,7 @@
         "command": "npx bddgen && npx tsc --noEmit",
         "cwd": "apps/baseerah-be-e2e"
       },
-      "inputs": ["default", "{workspaceRoot}/specs/apps/baseerah/behavior/baseerah-be/gherkin/**/*.feature"]
+      "inputs": ["default", "{workspaceRoot}/specs/apps/beaver-nest/behavior/beaver-nest-be/gherkin/**/*.feature"]
     },
     "test:unit": {
       "executor": "nx:run-commands",
@@ -78,24 +78,24 @@
     "specs:behavior:coverage": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- specs behavior-coverage validate --shared-steps specs/apps/baseerah/behavior/baseerah-be/gherkin apps/baseerah-be-e2e"
+        "command": "cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- specs behavior-coverage validate --shared-steps specs/apps/beaver-nest/behavior/beaver-nest-be/gherkin apps/baseerah-be-e2e"
       },
       "cache": true,
       "inputs": [
-        "{workspaceRoot}/specs/apps/baseerah/behavior/baseerah-be/gherkin/**/*.feature",
+        "{workspaceRoot}/specs/apps/beaver-nest/behavior/beaver-nest-be/gherkin/**/*.feature",
         "{projectRoot}/steps/**/*.ts"
       ]
     },
     "specs:e2e:coverage": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "npx bddgen && cargo run --release --quiet --manifest-path ../../apps/rhino-cli/Cargo.toml -- specs e2e-coverage validate --project baseerah-be-e2e --features \"../../specs/apps/baseerah/behavior/baseerah-be/gherkin/**/*.feature\" --features-gen .features-gen --baseline e2e-coverage-baseline.json",
+        "command": "npx bddgen && cargo run --release --quiet --manifest-path ../../apps/rhino-cli/Cargo.toml -- specs e2e-coverage validate --project baseerah-be-e2e --features \"../../specs/apps/beaver-nest/behavior/beaver-nest-be/gherkin/**/*.feature\" --features-gen .features-gen --baseline e2e-coverage-baseline.json",
         "cwd": "apps/baseerah-be-e2e"
       },
       "cache": true,
       "inputs": [
         "{workspaceRoot}/apps/rhino-cli/src/**/*.rs",
-        "{workspaceRoot}/specs/apps/baseerah/behavior/baseerah-be/gherkin/**/*.feature",
+        "{workspaceRoot}/specs/apps/beaver-nest/behavior/beaver-nest-be/gherkin/**/*.feature",
         "{projectRoot}/steps/**/*.ts",
         "{projectRoot}/playwright.config.ts",
         "{projectRoot}/e2e-coverage-baseline.json"
@@ -145,7 +145,7 @@
     }
   },
   "namedInputs": {
-    "specs": ["{workspaceRoot}/specs/apps/baseerah/behavior/baseerah-be/gherkin/**/*.feature"]
+    "specs": ["{workspaceRoot}/specs/apps/beaver-nest/behavior/beaver-nest-be/gherkin/**/*.feature"]
   },
   "tags": ["type:e2e", "platform:playwright", "lang:ts", "domain:baseerah"],
   "implicitDependencies": ["baseerah-be"]

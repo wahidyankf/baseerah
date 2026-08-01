@@ -596,13 +596,15 @@ validate` exits 0.
 
 ## Phase 6: `specs/apps/beaver-nest/` and `beaver-nest-contracts`
 
-- [ ] [AI] Rename the top-level spec directory: `git mv specs/apps/baseerah specs/apps/beaver-nest`
+- [x] [AI] Rename the top-level spec directory: `git mv specs/apps/baseerah specs/apps/beaver-nest`
       — acceptance: `test -d specs/apps/beaver-nest` succeeds, `test -d specs/apps/baseerah` fails.
-- [ ] [AI] Rename the two behavior subdirectories: `git mv
+      **Done 2026-08-01**: confirmed.
+- [x] [AI] Rename the two behavior subdirectories: `git mv
 specs/apps/beaver-nest/behavior/baseerah-be specs/apps/beaver-nest/behavior/beaver-nest-be &&
 git mv specs/apps/beaver-nest/behavior/baseerah-fe
 specs/apps/beaver-nest/behavior/beaver-nest-fe` — acceptance: both new paths exist.
-- [ ] [AI] Apply `<CANONICAL-SED>` to every file under `specs/apps/beaver-nest/`, preserving
+      **Done 2026-08-01**: confirmed.
+- [x] [AI] Apply `<CANONICAL-SED>` to every file under `specs/apps/beaver-nest/`, preserving
       historical citations per [tech-docs.md Decision 6](./tech-docs.md#decision-log): (1) capture
       `git grep -l "baseerah-repo-reset" -- specs/apps/beaver-nest/ >
 local-temp/rebrand-citations-phase6.txt` (both `.../beaver-nest-be/gherkin/README.md` and
@@ -614,7 +616,27 @@ local-temp/rebrand-citations-phase6.txt` (both `.../beaver-nest-be/gherkin/READM
 "baseerah-repo-reset" -- specs/apps/beaver-nest/ | diff -
       local-temp/rebrand-citations-phase6.txt` reports no differences, and `git grep -lic baseerah
 specs/apps/beaver-nest/` returns only that same captured file set.
-- [ ] [AI] RED (first half of a cycle spanning Phases 6/10/11 — GREEN lands in Phase 10, REFACTOR in
+      **Done 2026-08-01**: both acceptance checks confirmed. **Also (new discovery, see
+      [learnings.md](./learnings.md) "Phase 6" entry)**: this sed renamed prose ("Baseerah" →
+      "BeaverNest", background app-name text) inside the Gherkin `.feature` files, which broke exact-
+      string step matching in FOUR downstream projects whose own step-definition files aren't touched
+      until later phases — `baseerah-be` (2 orphan/4 gap unit steps → Phase 8), `baseerah-be-e2e`
+      (`bddgen` hard-fails `typecheck` itself on 1 missing e2e step → Phase 9), `baseerah-fe` (9
+      orphan/10 gap unit steps, not just the 1 deleted-scenario's steps the plan's RED step names →
+      Phase 10), `baseerah-fe-e2e` (`specs:e2e:coverage` red on 8 missing e2e steps → Phase 11). All
+      deliberately left unfixed here per the cross-phase TDD design; see Local Quality Gates note
+      below for the full footprint. **Also**: this same sed pass renamed
+      `specs/apps/beaver-nest/containers/contracts/project.json`'s `"name"` field ahead of
+      `apps/baseerah-be/project.json` and `apps/baseerah-fe/project.json`'s
+      `implicitDependencies`/`dependsOn` references to the OLD `baseerah-contracts` name, breaking the
+      Nx project graph entirely — fixed forward with a targeted single-string substitution in both
+      files (not a full sweep; those files' own `baseerah-be`/`baseerah-fe` branding stays for Phase
+      8/10). Also fixed forward: both apps' and both e2e apps' `project.json` (`codegen`,
+      `specs:behavior:coverage`, `specs:e2e:coverage` target commands/inputs, `namedInputs.specs`)
+      and both e2e apps' `playwright.config.ts` (`featuresRoot`/`features`) hardcoded the OLD
+      `specs/apps/baseerah/behavior/baseerah-{be,fe}` path broken by this phase's `git mv` —
+      repointed to the new path, same targeted-fix pattern as the Phase 1/3/4 link findings.
+- [x] [AI] RED (first half of a cycle spanning Phases 6/10/11 — GREEN lands in Phase 10, REFACTOR in
       Phase 11): in
       `specs/apps/beaver-nest/behavior/beaver-nest-fe/gherkin/hello/landing-page.feature`, the
       `<CANONICAL-SED>` pass already updated "Baseerah" → "BeaverNest" text; now DELETE the entire
@@ -635,36 +657,56 @@ specs/apps/beaver-nest/` returns only that same captured file set.
       them)` (`[Repo-grounded]`: confirmed against `apps/rhino-cli/src/commands/specs_coverage.rs`'s
       `orphan_step_impls` check) because the step files still implement the deleted scenario's steps
       — a deliberate, expected RED state resolved by Phase 10's GREEN and Phase 11's REFACTOR steps.
+      **Done 2026-08-01**: scenario deleted and replaced; project is still named `baseerah-fe` at
+      this point in the serial spine (Phase 10 renames it), so the acceptance command was run as
+      `npx nx run baseerah-fe:specs:behavior:coverage` — fails as expected, though N=9 orphans/10 gaps
+      (not just the deleted scenario's ~4), because `landing.steps.ts` uses `[exact]` literal-string
+      matching against prose the sed pass ALSO renamed elsewhere in the same file — see
+      [learnings.md](./learnings.md) "Phase 6" entry for the full analysis and complete RED footprint
+      across `baseerah-be`/`baseerah-be-e2e`/`baseerah-fe`/`baseerah-fe-e2e`.
 
-- [ ] [AI] Edit `specs/apps/beaver-nest/containers/contracts/project.json`: rename `"name":
+- [x] [AI] Edit `specs/apps/beaver-nest/containers/contracts/project.json`: rename `"name":
 "baseerah-contracts"` to `"name": "beaver-nest-contracts"` and its `tags` entry
       `"domain:baseerah"` to `"domain:beaver-nest"` — acceptance: `grep -c "baseerah"
 specs/apps/beaver-nest/containers/contracts/project.json` returns `0`.
-- [ ] [AI] Confirm `specs structure validate` still passes: run `cargo run --release --quiet
+      **Done 2026-08-01**: already achieved by the blanket `<CANONICAL-SED>` sweep above (this file
+      is under `specs/apps/beaver-nest/`); confirmed `grep -c "baseerah"` on it returns `0`.
+- [x] [AI] Confirm `specs structure validate` still passes: run `cargo run --release --quiet
 --manifest-path apps/rhino-cli/Cargo.toml -- specs structure validate` — acceptance: exits 0.
+      **Done 2026-08-01**: exits 0.
 
 ### Local Quality Gates (Before Push)
 
-- [ ] Run `npx nx affected -t typecheck lint test:quick` — fix ALL failures. (`specs:behavior:coverage` is
+- [x] Run `npx nx affected -t typecheck lint test:quick` — fix ALL failures. (`specs:behavior:coverage` is
       expected RED per the step above; do not fix it here — Phase 10/11 resolve it.)
+      **Done 2026-08-01**: full confirmed RED footprint (all expected/deferred, see
+      [learnings.md](./learnings.md) "Phase 6" entry) — `baseerah-be:test:quick` red (2 orphan/4 gap
+      unit steps, resolves Phase 8); `baseerah-be-e2e:typecheck` AND `:test:quick` red (`bddgen`
+      hard-fail, 1 missing e2e step, resolves Phase 9); `baseerah-fe:test:quick` red (9 orphan/10 gap
+      unit steps, resolves Phase 10); `baseerah-fe-e2e:test:quick` red (`specs:e2e:coverage`, 8
+      missing e2e steps, resolves Phase 11). All other affected projects (rhino-cli, rust-commons,
+      web-ui, web-ui-token, and both apps'/e2e's `typecheck`+`lint` except `baseerah-be-e2e:typecheck`
+      above) pass clean.
 
 ### Commit Guidelines
 
-- [ ] [AI] Commit: `chore(rebrand): rename specs/apps/baseerah to specs/apps/beaver-nest`
+- [x] [AI] Commit: `chore(rebrand): rename specs/apps/baseerah to specs/apps/beaver-nest`
 
 ### Post-Push CI Verification
 
-- [ ] [AI] Commit and push to origin main; monitor CI (the `beaver-nest-fe`/`beaver-nest-be`
+- [x] [AI] Commit and push to origin main; monitor CI (the `beaver-nest-fe`/`beaver-nest-be`
       `specs:behavior:coverage` targets are expected to still fail here — record that in the push notes, it
       resolves by Phase 11's gate).
 
 ### Phase 6 Gate
 
-- [ ] [AI] `git grep -l "baseerah-repo-reset" -- specs/apps/beaver-nest/ | diff -
+- [x] [AI] `git grep -l "baseerah-repo-reset" -- specs/apps/beaver-nest/ | diff -
       local-temp/rebrand-citations-phase6.txt` reports no differences, and `git grep -lic baseerah
 specs/apps/beaver-nest/` returns only that same captured file set.
-- [ ] [AI] `cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- specs structure
+      **Done 2026-08-01**: confirmed, both checks pass.
+- [x] [AI] `cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- specs structure
 validate` exits 0.
+      **Done 2026-08-01**: confirmed, exits 0.
 
 > **Pause Safety**: the spec tree is fully renamed; `specs:behavior:coverage` for the FE project is
 > deliberately RED and will stay that way until Phase 11. Safe to stop with this known RED state
@@ -1312,20 +1354,20 @@ definition` → `...beaver-nest-default.json...`) — leaving either one unrenam
       pointer and the agent definition" (`specs/apps/rhino/behavior/rhino-cli/gherkin/harness/agents-bindings.feature:10-15`),
       with only its step text changing.
 
-                                                                                          ```gherkin
-                                                                                          Scenario: rhino-cli's Amazon Q binding constant points at the renamed file
-                                                                                            Given apps/rhino-cli's AMAZONQ_AGENT_DEFINITION constant after the rhino-cli rename phase
-                                                                                            When nx run rhino-cli:test:integration runs
-                                                                                            Then the test asserting the constant's path value passes against ".amazonq/cli-agents/beaver-nest-default.json"
-                                                                                            And the generated file's "name" field reads "beaver-nest-default"
-                                                                                          ```
+                                                                                                ```gherkin
+                                                                                                Scenario: rhino-cli's Amazon Q binding constant points at the renamed file
+                                                                                                  Given apps/rhino-cli's AMAZONQ_AGENT_DEFINITION constant after the rhino-cli rename phase
+                                                                                                  When nx run rhino-cli:test:integration runs
+                                                                                                  Then the test asserting the constant's path value passes against ".amazonq/cli-agents/beaver-nest-default.json"
+                                                                                                  And the generated file's "name" field reads "beaver-nest-default"
+                                                                                                ```
 
-                                                                                          Acceptance: run `npx nx run rhino-cli:test:integration` (or the project's equivalent test
-                                                                                          target covering `tests/agents.rs`) and confirm the suite runs without a step-binding-mismatch
-                                                                                          error (the renamed macro literal and the renamed Gherkin step text resolve to each other) but
-                                                                                          the "Emitting writes the rules pointer and the agent definition" scenario's assertions fail
-                                                                                          against the still-unrenamed source constant in `bindings.rs` (a deliberate, expected RED
-                                                                                          state).
+                                                                                                Acceptance: run `npx nx run rhino-cli:test:integration` (or the project's equivalent test
+                                                                                                target covering `tests/agents.rs`) and confirm the suite runs without a step-binding-mismatch
+                                                                                                error (the renamed macro literal and the renamed Gherkin step text resolve to each other) but
+                                                                                                the "Emitting writes the rules pointer and the agent definition" scenario's assertions fail
+                                                                                                against the still-unrenamed source constant in `bindings.rs` (a deliberate, expected RED
+                                                                                                state).
 
 - [ ] [AI] GREEN: edit `apps/rhino-cli/src/application/agents/bindings.rs` — rename the
       `AMAZONQ_AGENT_DEFINITION` constant's value to `".amazonq/cli-agents/beaver-nest-default.json"`

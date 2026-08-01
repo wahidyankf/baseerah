@@ -7,11 +7,11 @@
     "codegen": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "npx openapi-generator-cli generate -i $(pwd)/specs/apps/baseerah/containers/contracts/generated/openapi-bundled.yaml -g fsharp-giraffe-server -o $(pwd)/apps/baseerah-be/generated-contracts --model-package BaseerahBe.Contracts --global-property=models,modelDocs=false,apiDocs=false"
+        "command": "npx openapi-generator-cli generate -i $(pwd)/specs/apps/beaver-nest/containers/contracts/generated/openapi-bundled.yaml -g fsharp-giraffe-server -o $(pwd)/apps/baseerah-be/generated-contracts --model-package BaseerahBe.Contracts --global-property=models,modelDocs=false,apiDocs=false"
       },
-      "dependsOn": ["baseerah-contracts:bundle"],
+      "dependsOn": ["beaver-nest-contracts:bundle"],
       "cache": true,
-      "inputs": ["{workspaceRoot}/specs/apps/baseerah/containers/contracts/generated/openapi-bundled.yaml"],
+      "inputs": ["{workspaceRoot}/specs/apps/beaver-nest/containers/contracts/generated/openapi-bundled.yaml"],
       "outputs": ["{projectRoot}/generated-contracts"]
     },
     "build": {
@@ -114,11 +114,11 @@
     "specs:behavior:coverage": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- specs behavior-coverage validate --shared-steps specs/apps/baseerah/behavior/baseerah-be/gherkin apps/baseerah-be"
+        "command": "cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- specs behavior-coverage validate --shared-steps specs/apps/beaver-nest/behavior/beaver-nest-be/gherkin apps/baseerah-be"
       },
       "cache": true,
       "inputs": [
-        "{workspaceRoot}/specs/apps/baseerah/behavior/baseerah-be/gherkin/**/*.feature",
+        "{workspaceRoot}/specs/apps/beaver-nest/behavior/beaver-nest-be/gherkin/**/*.feature",
         "{projectRoot}/src/**/*.fs"
       ]
     },
@@ -173,8 +173,8 @@
     }
   },
   "namedInputs": {
-    "specs": ["{workspaceRoot}/specs/apps/baseerah/behavior/baseerah-be/gherkin/**/*.feature"]
+    "specs": ["{workspaceRoot}/specs/apps/beaver-nest/behavior/beaver-nest-be/gherkin/**/*.feature"]
   },
   "tags": ["type:app", "platform:giraffe", "lang:fsharp", "domain:baseerah"],
-  "implicitDependencies": ["baseerah-contracts", "rhino-cli"]
+  "implicitDependencies": ["beaver-nest-contracts", "rhino-cli"]
 }

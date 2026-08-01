@@ -7,11 +7,11 @@
     "codegen": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "npx @hey-api/openapi-ts -i specs/apps/baseerah/containers/contracts/generated/openapi-bundled.yaml -o apps/baseerah-fe/src/generated-contracts -s"
+        "command": "npx @hey-api/openapi-ts -i specs/apps/beaver-nest/containers/contracts/generated/openapi-bundled.yaml -o apps/baseerah-fe/src/generated-contracts -s"
       },
-      "dependsOn": ["baseerah-contracts:bundle"],
+      "dependsOn": ["beaver-nest-contracts:bundle"],
       "cache": true,
-      "inputs": ["{workspaceRoot}/specs/apps/baseerah/containers/contracts/generated/openapi-bundled.yaml"],
+      "inputs": ["{workspaceRoot}/specs/apps/beaver-nest/containers/contracts/generated/openapi-bundled.yaml"],
       "outputs": ["{projectRoot}/src/generated-contracts"]
     },
     "dev": {
@@ -106,11 +106,11 @@
     "specs:behavior:coverage": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- specs behavior-coverage validate --shared-steps specs/apps/baseerah/behavior/baseerah-fe/gherkin apps/baseerah-fe"
+        "command": "cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- specs behavior-coverage validate --shared-steps specs/apps/beaver-nest/behavior/beaver-nest-fe/gherkin apps/baseerah-fe"
       },
       "cache": true,
       "inputs": [
-        "{workspaceRoot}/specs/apps/baseerah/behavior/baseerah-fe/gherkin/**/*.feature",
+        "{workspaceRoot}/specs/apps/beaver-nest/behavior/beaver-nest-fe/gherkin/**/*.feature",
         "{projectRoot}/src/**/*.tsx"
       ]
     },
@@ -150,8 +150,8 @@
     }
   },
   "namedInputs": {
-    "specs": ["{workspaceRoot}/specs/apps/baseerah/behavior/baseerah-fe/gherkin/**/*.feature"]
+    "specs": ["{workspaceRoot}/specs/apps/beaver-nest/behavior/beaver-nest-fe/gherkin/**/*.feature"]
   },
   "tags": ["type:app", "platform:nextjs", "lang:ts", "domain:baseerah"],
-  "implicitDependencies": ["baseerah-contracts", "web-ui", "web-ui-token"]
+  "implicitDependencies": ["beaver-nest-contracts", "web-ui", "web-ui-token"]
 }

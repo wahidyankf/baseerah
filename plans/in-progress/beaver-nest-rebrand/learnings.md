@@ -33,6 +33,52 @@ renamed before the path moves). **Generalizable rule**: whenever a phase's conte
 markdown link whose _target_ is renamed by a _later_ phase, revert that one link's text in the
 current phase and add an explicit repoint step to the later phase's `git mv` item.
 
+## Phase 6: renamed Gherkin prose orphans EVERY step in a file, not just the one deleted scenario — and `bddgen` hard-fails typecheck for e2e projects
+
+Phase 6's `<CANONICAL-SED>` pass renames "Baseerah" → "BeaverNest" (and `baseerah-be`/`baseerah-fe` →
+`beaver-nest-be`/`beaver-nest-fe`) throughout the Gherkin feature-file prose, per its own explicit
+design. The plan's RED step anticipated exactly ONE orphaned scenario (the deleted brand-chip
+scenario) in `apps/baseerah-fe/src/test/landing.steps.ts`. In practice, that file's step
+implementations use `[exact]` literal-string matching (not parameterized Cucumber Expressions), so
+**every** step whose Gherkin text mentions the renamed strings goes orphan — 9 orphans / 10 gaps for
+`baseerah-fe`, not 1. The same mechanism also hit `baseerah-be`'s unit-test steps (2 orphans / 4 gaps
+in `GreetingSteps.fs`/`HealthSteps.fs`, e.g. background line + greeting response body text) — a
+project the plan's Phase 6 RED callout never named at all, though its own Post-Push CI Verification
+note (line ~657) does correctly anticipate both `beaver-nest-fe`/`beaver-nest-be` failing.
+
+Worse, the two e2e projects (`baseerah-be-e2e`, `baseerah-fe-e2e`) use `playwright-bdd`'s `bddgen`
+codegen step, invoked as a prerequisite inside their `typecheck`/`test:quick` targets
+(`npx bddgen && npx tsc --noEmit` for be-e2e; `npx bddgen && ...` inside `specs:e2e:coverage` for
+both). `bddgen` hard-errors (non-zero exit, no partial output) the moment ANY Gherkin step lacks a
+matching TS step implementation — so `baseerah-be-e2e:typecheck` itself fails (not just its specs
+coverage target), a wider blast radius than the plan's Local Quality Gates text implies ("typecheck
+lint" should stay green with only `specs:behavior:coverage` red).
+
+**Full confirmed RED footprint at end of Phase 6** (all expected, none require Phase-6 fixes):
+
+| Project           | Target(s) red             | Cause                                                     | Resolves at |
+| ----------------- | ------------------------- | --------------------------------------------------------- | ----------- |
+| `baseerah-be`     | `test:quick`              | 2 orphan / 4 gap unit steps                               | Phase 8     |
+| `baseerah-be-e2e` | `typecheck`, `test:quick` | `bddgen` hard-fail, 1 missing e2e step                    | Phase 9     |
+| `baseerah-fe`     | `test:quick`              | 9 orphan / 10 gap unit steps                              | Phase 10    |
+| `baseerah-fe-e2e` | `test:quick`              | `bddgen`-driven `specs:e2e:coverage`, 8 missing e2e steps | Phase 11    |
+
+**Also discovered and fixed forward** (targeted single-string fixes, not full sweeps, since these
+files are owned by later phases): `apps/baseerah-be/project.json` and `apps/baseerah-fe/project.json`
+both had `dependsOn`/`implicitDependencies` referencing `baseerah-contracts` by name, which Phase 6
+renamed to `beaver-nest-contracts` — this broke the Nx project graph for EVERY command until fixed.
+Also both apps' and both e2e apps' `project.json` (`codegen`/`specs:behavior:coverage`/
+`specs:e2e:coverage` targets, `namedInputs.specs`) and both e2e apps' `playwright.config.ts`
+(`featuresRoot`/`features`) hardcoded the old `specs/apps/baseerah/behavior/baseerah-{be,fe}` path,
+which Phase 6's `git mv` broke — same generalizable rule as the Phase 1/3/4 findings, just for
+project-graph names and path strings instead of markdown links.
+
+**Generalizable rule**: renaming a shared Gherkin/spec tree ahead of its consuming app's step-definition
+files does not merely orphan the one intentionally-changed scenario — it orphans every literal-text-matching
+step touching the renamed strings, and for `playwright-bdd`-based e2e projects it can hard-fail
+`typecheck` itself (via `bddgen`), not just the specs-coverage target. Confirm the full RED footprint
+project-by-project after any such phase, don't assume the plan's own RED callout is complete.
+
 ## Phase 5: `repo-config.yml` path-referencing fields must NOT rename ahead of their physical directory rename
 
 Phase 5's own instructions said to rename `env-contract.surfaces[].root`, `env-injection.apps[].keys-from`

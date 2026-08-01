@@ -2,8 +2,8 @@ import { defineConfig } from "@playwright/test";
 import { defineBddConfig } from "playwright-bdd";
 
 const testDir = defineBddConfig({
-  featuresRoot: "../../specs/apps/baseerah/behavior/baseerah-be/gherkin",
-  features: "../../specs/apps/baseerah/behavior/baseerah-be/gherkin/**/*.feature",
+  featuresRoot: "../../specs/apps/beaver-nest/behavior/beaver-nest-be/gherkin",
+  features: "../../specs/apps/beaver-nest/behavior/beaver-nest-be/gherkin/**/*.feature",
   steps: ["./steps/**/*.ts"],
 });
 
