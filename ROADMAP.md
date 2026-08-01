@@ -1,6 +1,6 @@
 # 🗺️ Development Roadmap
 
-Baseerah is being developed with a **walking-skeleton-first approach** - prove the engineering
+BeaverNest is being developed with a **walking-skeleton-first approach** - prove the engineering
 harness end-to-end with a hello-world quad before any real capability lands:
 
 ```mermaid
@@ -8,8 +8,8 @@ harness end-to-end with a hello-world quad before any real capability lands:
 graph TB
     Start([Start]) --> Phase1
 
-    Phase1["<b>Phase 1</b><br/>Hello-World Quad<br/><i>baseerah-be/fe</i><br/><i>(Current Phase)</i>"]
-    Phase1 --> P1Output["✅ Repository Infrastructure<br/>✅ AI Agents & Governance<br/>✅ baseerah-be health/hello API<br/>✅ baseerah-fe landing page"]
+    Phase1["<b>Phase 1</b><br/>Hello-World Quad<br/><i>beaver-nest-be/fe</i><br/><i>(Current Phase)</i>"]
+    Phase1 --> P1Output["✅ Repository Infrastructure<br/>✅ AI Agents & Governance<br/>✅ beaver-nest-be health/hello API<br/>✅ beaver-nest-fe landing page"]
     P1Output --> Decision1{Harness<br/>Proven?}
     Decision1 -- Yes --> Phase2
 
@@ -55,10 +55,10 @@ with the smallest possible surface, deliberately deferring every product feature
 
 **Product Deliverables:**
 
-- 🔧 `baseerah-be` - Stateless F#/Giraffe REST API backend (port 19320): `GET /api/v1/health`,
+- 🔧 `beaver-nest-be` - Stateless F#/Giraffe REST API backend (port 19320): `GET /api/v1/health`,
   `GET /api/v1/hello`, a 404 handler
-- ⚛️ `baseerah-fe` - Next.js 16 landing page (port 19310) rendering the greeting
-- 🧪 `baseerah-be-e2e`, `baseerah-fe-e2e` - Playwright E2E suites against the local Docker stack
+- ⚛️ `beaver-nest-fe` - Next.js 16 landing page (port 19310) rendering the greeting
+- 🧪 `beaver-nest-be-e2e`, `beaver-nest-fe-e2e` - Playwright E2E suites against the local Docker stack
 - 🦏 **rhino-cli** ([`apps/rhino-cli/`](./apps/rhino-cli/)) - fork of the OSE ecosystem's Rust CLI for
   repository management
 
@@ -82,7 +82,7 @@ with the smallest possible surface, deliberately deferring every product feature
 **Scope:** TBD based on Phase 1 learnings
 
 Builds a real AI assistant on the Phase 1 harness: LLM integration, conversation memory, and an
-assistant-facing UI. This is the first phase where `baseerah-be` gains actual behavior beyond a
+assistant-facing UI. This is the first phase where `beaver-nest-be` gains actual behavior beyond a
 constant greeting.
 
 ## 📝 Phase 3: Content Building (Planned)
@@ -108,6 +108,6 @@ posting, and the workflow automation that ties assistant, content, and posting t
 - 🏗️ **Foundation First** - Phase 1 establishes repository governance and the engineering harness
   before building product capability
 - ⚖️ **Proven Foundation** - Each phase proves the architecture works before adding complexity
-- 🌳 **Ecosystem Inheritance** - Baseerah inherits its governance, development practices, and AI agent
+- 🌳 **Ecosystem Inheritance** - BeaverNest inherits its governance, development practices, and AI agent
   patterns from the [Open Sharia Enterprise ecosystem](./repo-governance/vision/open-sharia-enterprise.md)
   rather than reinventing them

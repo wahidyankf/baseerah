@@ -5,13 +5,13 @@
 
 ## Repository Overview
 
-**Baseerah** (Arabic بصيرة — _insight_, _wawasan_, _kejernihan pandang_) — a personal operating
-layer covering an AI assistant, a content builder, a posting helper, and a personal workflow engine,
-built as an Nx monorepo. Baseerah is a **product within the Open Sharia Enterprise (OSE) ecosystem**,
-not a replacement for it — see [Baseerah Vision](./repo-governance/vision/baseerah.md) and its parent
+**BeaverNest** — a personal operating layer covering an AI assistant, a content builder, a posting
+helper, and a personal workflow engine,
+built as an Nx monorepo. BeaverNest is a **product within the Open Sharia Enterprise (OSE) ecosystem**,
+not a replacement for it — see [BeaverNest Vision](./repo-governance/vision/beaver-nest.md) and its parent
 [Open Sharia Enterprise Vision](./repo-governance/vision/open-sharia-enterprise.md).
 
-**Status**: Walking skeleton (`baseerah-be` + `baseerah-fe` hello world)
+**Status**: Walking skeleton (`beaver-nest-be` + `beaver-nest-fe` hello world)
 **License**: MIT
 **Main Branch**: `main` (Trunk Based Development)
 
@@ -340,8 +340,8 @@ Phase 0 first, `[AI]`/`[HUMAN]` tags, gated phases. See
 
 **Development**: swe-{golang,typescript,e2e,csharp,fsharp,rust}-dev
 
-**Operations**: `apps-baseerah-fe-{content-maker,content-checker,content-fixer,deployer}`,
-`apps-baseerah-be-deployer` — the deployer agents document their intended workflow honestly: no
+**Operations**: `apps-beaver-nest-fe-{content-maker,content-checker,content-fixer,deployer}`,
+`apps-beaver-nest-be-deployer` — the deployer agents document their intended workflow honestly: no
 production/staging deploy target is provisioned yet (see each agent's own file for specifics)
 
 **Content**: pdf-to-md-{maker,checker,fixer}
@@ -376,10 +376,10 @@ modes) serving agents — not a governance layer.
 
 ## Web Sites
 
-| App         | Domain | Port  | Prod Branch |
-| ----------- | ------ | ----- | ----------- |
-| baseerah-fe | TBD    | 19310 | TBD         |
-| baseerah-be | TBD    | 19320 | TBD         |
+| App            | Domain | Port  | Prod Branch |
+| -------------- | ------ | ----- | ----------- |
+| beaver-nest-fe | TBD    | 19310 | TBD         |
+| beaver-nest-be | TBD    | 19320 | TBD         |
 
 Each app README at `apps/[app-name]/README.md` covers framework, deployment, E2E tests, and content
 details.
@@ -420,7 +420,7 @@ details.
 
 ## Related Repositories
 
-This repo (`baseerah`) is a **fourth repository, outside** the three-repo OSE parity loop below —
+This repo (`beaver-nest`) is a **fourth repository, outside** the three-repo OSE parity loop below —
 it scaffolded from that ecosystem but does not participate in cross-repo parity syncs:
 
 - [`ose-public`](https://github.com/wahidyankf/ose-public) — upstream source of truth for
@@ -432,7 +432,7 @@ it scaffolded from that ecosystem but does not participate in cross-repo parity 
 
 Content parity between `ose-public` and `ose-primer` maintained via
 [plan-multi-repo-parity-planning](./repo-governance/workflows/plan/plan-multi-repo-parity-planning.md)
-workflow. `ose-private` and `baseerah` do not participate in the parity loop.
+workflow. `ose-private` and `beaver-nest` do not participate in the parity loop.
 
 `apps/rhino-cli` must be byte-identical (zero carve-outs) across those three parity repos, including
 its Gherkin behavior tree at `specs/apps/rhino/behavior/rhino-cli/gherkin/**`, per the

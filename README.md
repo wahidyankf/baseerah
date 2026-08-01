@@ -1,13 +1,13 @@
-# 🔭 Baseerah
+# 🔭 BeaverNest
 
 ✨ A personal operating layer — an AI assistant, a content builder, a posting helper, and a personal
 workflow engine under one roof, for a single maintainer.
 
-**Baseerah** (Arabic بصيرة) means _insight_, _inner vision_ — in Indonesian, _wawasan_ or
-_kejernihan pandang_. See the [Baseerah Vision](./repo-governance/vision/baseerah.md) for the full
-"why".
+**BeaverNest** is a personal operating layer covering an AI assistant, a content builder, a posting
+helper, and a personal workflow engine under one roof. See the [BeaverNest
+Vision](./repo-governance/vision/beaver-nest.md) for the full "why".
 
-🌳 **Ecosystem**: Baseerah is a product **within** the [Open Sharia Enterprise
+🌳 **Ecosystem**: BeaverNest is a product **within** the [Open Sharia Enterprise
 (OSE)](./repo-governance/vision/open-sharia-enterprise.md) ecosystem, not a replacement for it — it
 inherits OSE's governance hierarchy, development practices, and AI agent fleet, while its own app
 roster, agents, and identity are specific to this product. See the [Vision
@@ -15,8 +15,8 @@ Index](./repo-governance/vision/README.md) for the parent/child relationship.
 
 ## 🚧 Project Status
 
-> ⚠️ **Walking skeleton** — a stateless F#/Giraffe backend (`baseerah-be`) and a Next.js frontend
-> (`baseerah-fe`) proving the engineering harness end-to-end. No assistant, content-building, or
+> ⚠️ **Walking skeleton** — a stateless F#/Giraffe backend (`beaver-nest-be`) and a Next.js frontend
+> (`beaver-nest-fe`) proving the engineering harness end-to-end. No assistant, content-building, or
 > posting capability exists yet; those are the deferred roadmap, not built claims.
 
 See **[ROADMAP.md](./ROADMAP.md)** for complete development phases and strategy.
@@ -39,8 +39,8 @@ npm install
 
 - Node.js & npm (via Volta) — tooling and development infrastructure
 - Golang/Rust — CLI tools ([rhino-cli](./apps/rhino-cli/))
-- F# / Giraffe / ASP.NET 10 — `baseerah-be` (planned, Phase 6)
-- Next.js 16 + TypeScript — `baseerah-fe` (planned, Phase 8)
+- F# / Giraffe / ASP.NET 10 — `beaver-nest-be` (planned, Phase 6)
+- Next.js 16 + TypeScript — `beaver-nest-fe` (planned, Phase 8)
 
 See **[ROADMAP.md](./ROADMAP.md)** for complete tech stack evolution across all phases.
 
@@ -49,7 +49,7 @@ See **[ROADMAP.md](./ROADMAP.md)** for complete tech stack evolution across all 
 This project uses **Nx** to manage applications and libraries:
 
 ```
-baseerah/
+beaver-nest/
 ├── apps/                  # Deployable applications (Nx monorepo)
 ├── libs/                  # Reusable libraries (Nx monorepo, flat structure)
 ├── docs/                  # Project documentation (Diataxis framework)
@@ -71,7 +71,7 @@ baseerah/
 
 - **CLI tools**: [`rhino-cli`](./apps/rhino-cli/) — a fork of the OSE ecosystem tool, not bound by
   the upstream byte-identity rule
-- **`baseerah-be`, `baseerah-fe`**: planned walking-skeleton apps, not yet scaffolded (see
+- **`beaver-nest-be`, `beaver-nest-fe`**: planned walking-skeleton apps, not yet scaffolded (see
   [ROADMAP.md](./ROADMAP.md))
 - **Polyglot demo apps**: extracted 2026-04-18 to the downstream [`ose-primer`](https://github.com/wahidyankf/ose-primer) template repository (Go, Java, Elixir, F#, Python, Rust, Kotlin, TypeScript, C#, Clojure backends + Next.js, TanStack Start, Flutter Web frontends).
 
@@ -117,7 +117,7 @@ See [`docs/README.md`](./docs/README.md) for details.
 
 ## 🔗 Related Repositories
 
-Baseerah is a fourth repository, standing outside the three-repo OSE parity loop (`ose-public`,
+BeaverNest is a fourth repository, standing outside the three-repo OSE parity loop (`ose-public`,
 `ose-primer`, `ose-private`). It scaffolded from that ecosystem but does not participate in
 cross-repo parity syncs. See [Related Repositories reference](./docs/reference/related-repositories.md)
 for the full picture.
@@ -126,7 +126,7 @@ for the full picture.
 
 Personal productivity and content work today is scattered across disconnected tools — a chat
 assistant here, a note-taking app there, a separate posting workflow for each platform, no shared
-memory or workflow engine tying any of it together. Baseerah exists to give one person a coherent,
+memory or workflow engine tying any of it together. BeaverNest exists to give one person a coherent,
 self-owned operating layer for assistant work, content building, and posting, instead of stitching
 together someone else's SaaS tools.
 

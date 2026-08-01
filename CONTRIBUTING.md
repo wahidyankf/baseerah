@@ -1,6 +1,6 @@
-# Contributing to Baseerah
+# Contributing to BeaverNest
 
-Thank you for your interest in contributing to Baseerah! We welcome contributions from the community and appreciate your time and effort.
+Thank you for your interest in contributing to BeaverNest! We welcome contributions from the community and appreciate your time and effort.
 
 ## Table of Contents
 
@@ -23,7 +23,7 @@ This project adheres to a Code of Conduct that all contributors are expected to 
 
 ## Getting Started
 
-Baseerah is a personal operating layer built with Node.js and organized as an Nx monorepo, developed
+BeaverNest is a personal operating layer built with Node.js and organized as an Nx monorepo, developed
 as a product within the [Open Sharia Enterprise ecosystem](./repo-governance/vision/open-sharia-enterprise.md).
 Before contributing, please:
 
@@ -99,7 +99,7 @@ After installation, restart your terminal and Volta will automatically manage No
 This is an **Nx monorepo** with the following structure:
 
 ```
-baseerah/
+beaver-nest/
 ├── apps/           # Deployable applications
 │   └── [app-name]/ # Individual apps
 ├── libs/           # Reusable libraries
@@ -421,4 +421,4 @@ nx dev [app-name]
 
 ---
 
-Thank you for contributing to Baseerah! Your contributions help build a better, more secure personal operating layer. 🚀
+Thank you for contributing to BeaverNest! Your contributions help build a better, more secure personal operating layer. 🚀

@@ -84,32 +84,32 @@ construction regardless of file-level independence.
 > branch, runs no PR-Review Maker→Fixer Cycle, and merges nothing. The earliest phase that commits
 > content is Phase 1; this phase's evidence file rides Phase 1's commit.
 
-- [ ] [AI] Confirm the working tree is clean: run `git status --porcelain` from the repo root —
+- [x] [AI] Confirm the working tree is clean: run `git status --porcelain` from the repo root —
       acceptance: no output. If output exists, stop and surface it; do not stash or discard.
-- [ ] [AI] Confirm the checkout is on `main` and level with the remote: run
+- [x] [AI] Confirm the checkout is on `main` and level with the remote: run
       `git rev-parse --abbrev-ref HEAD && git fetch origin && git status -sb` — acceptance: branch
       is `main`, status line shows no `ahead`/`behind` counts.
-- [ ] [AI] Record the pre-plan commit SHA into
+- [x] [AI] Record the pre-plan commit SHA into
       `plans/in-progress/beaver-nest-rebrand/evidence/phase-0-baseline.txt`: run `git rev-parse HEAD`
       and write it under a `## Pre-plan HEAD` heading — acceptance: file exists, contains a
       40-character SHA.
-- [ ] [AI] Install dependencies: `npm install` — acceptance: exits 0.
-- [ ] [AI] Converge the polyglot toolchain: `npm run doctor -- --fix` — acceptance: exits 0, no
+- [x] [AI] Install dependencies: `npm install` — acceptance: exits 0.
+- [x] [AI] Converge the polyglot toolchain: `npm run doctor -- --fix` — acceptance: exits 0, no
       missing tools reported.
-- [ ] [AI] Record the residual-reference baseline: run
+- [x] [AI] Record the residual-reference baseline: run
       `git grep -liE "baseerah" -- . ':!plans/done' ':!generated-reports' | wc -l` and append the
       count to `evidence/phase-0-baseline.txt` under a `## Baseline residual count` heading —
       acceptance: the file records `246` (or the current count if the repo has changed since
       authoring; any material deviation from 246 is surfaced to the maintainer before proceeding).
-- [ ] [AI] Record the baseline quality state: run
+- [x] [AI] Record the baseline quality state: run
       `npx nx run-many -t typecheck,lint,test:quick --all --parallel=$(( $(sysctl -n hw.ncpu) - 1 ))`
       and append the summary line to `evidence/phase-0-baseline.txt` under a `## Baseline
 test:quick` heading — acceptance: the summary line is recorded verbatim, whether it passed
       or failed.
-- [ ] [AI] If the baseline run reported failures, fix each preexisting failure now, per the
+- [x] [AI] If the baseline run reported failures, fix each preexisting failure now, per the
       [Root Cause Orientation principle](../../../repo-governance/principles/general/root-cause-orientation.md)
       — acceptance: a re-run of the same command exits 0. Record any fix in `learnings.md`.
-- [ ] [AI] Confirm the only GitHub Environments configured are the two harmless auto-created ones
+- [x] [AI] Confirm the only GitHub Environments configured are the two harmless auto-created ones
       (as last verified 2026-08-01): run `gh api
 repos/wahidyankf/baseerah/environments --jq '.environments[].name'` — acceptance: output is
       exactly `baseerah-app-local` and `baseerah-app-staging` (both auto-created by earlier workflow
@@ -117,19 +117,31 @@ repos/wahidyankf/baseerah/environments --jq '.environments[].name'` — acceptan
       deletes both once the workflows are cut over). If any OTHER/unexpected environment name
       appears, stop and surface it to the maintainer before Phase 13 — that one would need explicit
       investigation, not just deletion.
-- [ ] [AI] Confirm no `stag-*`/`prod-*` branches exist (Decision 11's premise): run
+- [x] [AI] Confirm no `stag-*`/`prod-*` branches exist (Decision 11's premise): run
       `git branch -r` — acceptance: only `origin/main` is listed.
+
+**Date**: 2026-08-01. **Status**: All 10 items complete. **Files Changed**:
+`plans/in-progress/beaver-nest-rebrand/evidence/phase-0-baseline.txt` (new). **Notes**: pre-plan HEAD
+`fec0c3ab70c079a370ab24df563e5a2fc63c896a`; residual `baseerah` count 253 (vs. authored baseline 246 —
++7/~2.8%, non-material drift from ordinary commits landing since plan authoring, proceeded per the
+plan's own drift-tolerance clause); baseline `typecheck,lint,test:quick --all` clean on first run, 9
+projects, exit 0, no preexisting failures, so `learnings.md` was not touched; GitHub Environments =
+exactly `baseerah-app-local` + `baseerah-app-staging`; `git branch -r` = only `origin/main`.
 
 ### Phase 0 Gate
 
 > All checks below must pass before starting Phase 1.
 
-- [ ] [AI] `git status --porcelain` — output contains only the new `evidence/` file and this plan's
+- [x] [AI] `git status --porcelain` — output contains only the new `evidence/` file and this plan's
       own folder (already tracked as part of this plan's authoring).
-- [ ] [AI] `evidence/phase-0-baseline.txt` records the pre-plan SHA, the residual count, and the
+- [x] [AI] `evidence/phase-0-baseline.txt` records the pre-plan SHA, the residual count, and the
       baseline test:quick summary.
-- [ ] [AI] `npx nx run rhino-cli:test:quick` exits 0 (independent green check before any rename
+- [x] [AI] `npx nx run rhino-cli:test:quick` exits 0 (independent green check before any rename
       touches `rhino-cli`).
+
+**Date**: 2026-08-01. **Status**: Gate green — all 3 checks passed. **Files Changed**: none (verification
+only). **Notes**: `git status --porcelain` shows only the new untracked `evidence/` file; evidence file
+contains all three required headings with real values; `npx nx run rhino-cli:test:quick` exited 0.
 
 > **Pause Safety**: only the local toolchain was verified and the baseline recorded — no rename has
 > started. Safe to stop indefinitely. To resume: re-run the baseline commands and confirm they are
@@ -139,10 +151,10 @@ repos/wahidyankf/baseerah/environments --jq '.environments[].name'` — acceptan
 
 ## Phase 1: Root Identity Files and Vision Doc
 
-- [ ] [AI] Rename the vision doc: `git mv repo-governance/vision/baseerah.md
+- [x] [AI] Rename the vision doc: `git mv repo-governance/vision/baseerah.md
 repo-governance/vision/beaver-nest.md` — acceptance: `test -f
 repo-governance/vision/beaver-nest.md` succeeds and the old path no longer exists.
-- [ ] [AI] Apply `<CANONICAL-SED>` to `repo-governance/vision/beaver-nest.md`, then hand-edit its
+- [x] [AI] Apply `<CANONICAL-SED>` to `repo-governance/vision/beaver-nest.md`, then hand-edit its
       title/body to state plainly (per Decision 9/Q7) that "BeaverNest" is a chosen product name
       with no etymological parallel to `بصيرة` — remove the ENTIRE etymology sentence, "means
       _insight_, _inner vision_, _ketajaman melihat_ — in Indonesian, _wawasan_ or _kejernihan
@@ -151,10 +163,10 @@ repo-governance/vision/beaver-nest.md` succeeds and the old path no longer exist
       melihat`, `wawasan`, and `kejernihan pandang` — all four must go together, not just بصيرة),
       rather than translating any of it — acceptance: `grep -c "بصيرة\|ketajaman melihat\|wawasan\|
 kejernihan pandang" repo-governance/vision/beaver-nest.md` returns `0`.
-- [ ] [AI] Apply `<CANONICAL-SED>` to `repo-governance/vision/README.md` (updates its cross-link to
+- [x] [AI] Apply `<CANONICAL-SED>` to `repo-governance/vision/README.md` (updates its cross-link to
       the renamed file) — acceptance: `grep -c "baseerah" repo-governance/vision/README.md` returns
       `0`.
-- [ ] [AI] Apply `<CANONICAL-SED>` to `README.md`, `CONTRIBUTING.md`, `ROADMAP.md`, `AGENTS.md`,
+- [x] [AI] Apply `<CANONICAL-SED>` to `README.md`, `CONTRIBUTING.md`, `ROADMAP.md`, `AGENTS.md`,
       then hand-edit the same بصيرة-etymology sentence in both `README.md` ("**BeaverNest** (Arabic
       بصيرة) means _insight_, _inner vision_ — in Indonesian, _wawasan_ or _kejernihan pandang_.")
       and `AGENTS.md` ("**BeaverNest** (Arabic بصيرة — _insight_, _wawasan_, _kejernihan pandang_)")
@@ -173,28 +185,44 @@ github.com\/wahidyankf\/baseerah/; s/^(\s*)cd beaver-nest$/$1cd baseerah/' CONTR
       so a bare `^cd beaver-nest$` anchor would silently fail to match; `[Repo-grounded]`: verified
       against the live file, 2026-08-01) (Phase 17 flips them for real once the GitHub rename has
       actually happened) — acceptance: `git grep -lic
-baseerah README.md ROADMAP.md AGENTS.md` returns no matches, `grep -c "wahidyankf/baseerah\|^cd
+baseerah README.md ROADMAP.md AGENTS.md` returns no matches, `grep -c "wahidyankf/baseerah\|^\s*cd
 baseerah$" CONTRIBUTING.md` returns `2` (the two preserved GitHub-URL lines, and nothing else —
       `git grep -c baseerah CONTRIBUTING.md` returns exactly `2` too, confirming no OTHER residual
       snuck back in), and `grep -c "بصيرة\|wawasan\|kejernihan pandang" README.md AGENTS.md` returns
       `0` for both.
-- [ ] [AI] Edit `package.json`: change `"name": "baseerah"` to `"name": "beaver-nest"` (line ~2) and
+- [x] [AI] Edit `package.json`: change `"name": "baseerah"` to `"name": "beaver-nest"` (line ~2) and
       rename the `baseerah:dev`/`baseerah:dev:restart` scripts to `beaver-nest:dev`/
       `beaver-nest:dev:restart`, updating their `infra/dev/baseerah-app/` path references to
       `infra/dev/beaver-nest-app/` (the directory itself is renamed in Phase 12; record the new path
       now so Phase 12's `git mv` matches) — acceptance: `grep -c "baseerah" package.json` returns `0`.
-- [ ] [AI] Run `npm install` to regenerate `package-lock.json`'s root `name` field consistently —
+- [x] [AI] Run `npm install` to regenerate `package-lock.json`'s root `name` field consistently —
       acceptance: `grep -c '"name": "beaver-nest"' package-lock.json` returns at least `1`.
-- [ ] [AI] Edit `.gitignore` line 159 (`specs/apps/baseerah/containers/contracts/generated/`) to
+- [x] [AI] Edit `.gitignore` line 159 (`specs/apps/baseerah/containers/contracts/generated/`) to
       `specs/apps/beaver-nest/containers/contracts/generated/` — acceptance: `grep -c "baseerah"
 .gitignore` returns `0`.
-- [ ] [AI] Apply `<CANONICAL-SED>` to `SECURITY.md` and `LICENSING-NOTICE.md` — acceptance:
+- [x] [AI] Apply `<CANONICAL-SED>` to `SECURITY.md` and `LICENSING-NOTICE.md` — acceptance:
       `git grep -lic baseerah SECURITY.md LICENSING-NOTICE.md` returns no matches.
+
+**Date**: 2026-08-01. **Status**: All 8 items complete. **Files Changed**: `repo-governance/vision/beaver-nest.md`
+(renamed + sed + etymology removed), `repo-governance/vision/README.md`, `README.md`, `CONTRIBUTING.md`,
+`ROADMAP.md`, `AGENTS.md`, `package.json`, `package-lock.json`, `.gitignore`, `SECURITY.md`,
+`LICENSING-NOTICE.md`. **Notes**: all acceptance greps verified 0/exact-match as specified. Found and
+fixed a preexisting defect in this phase's own acceptance-criterion text (line 188's `grep` pattern used
+a bare `^cd baseerah$` anchor that silently fails to match CONTRIBUTING.md's 3-space-indented line —
+same bug class as iteration-18's finding; corrected to `^\s*cd baseerah$`). `md links validate` now
+shows 27 broken links to the old `repo-governance/vision/baseerah.md` path across files owned by later
+phases (`.claude/agents/`, `.opencode/agents/`, `plans/ideas/`, `specs/apps/baseerah/`) — expected
+transient breakage per this plan's own serial-spine design; each phase's own content sweep fixes its
+file set's references in turn (Phases 2, 3, 4, 6, 14).
 
 ### Local Quality Gates (Before Push)
 
-- [ ] Run `npx nx affected -t typecheck lint test:quick specs:behavior:coverage` — fix ALL failures
+- [x] Run `npx nx affected -t typecheck lint test:quick specs:behavior:coverage` — fix ALL failures
       (including preexisting) before proceeding.
+
+**Date**: 2026-08-01. **Status**: `nx affected` reported "No tasks were run" — none of Phase 1's touched
+files (root docs/governance prose, package.json, .gitignore) belong to any Nx project's source root, so
+zero tasks were affected; trivially green. `markdownlint-cli2` on all 8 touched markdown files: 0 errors.
 
 ### Commit Guidelines
 
@@ -1150,8 +1178,8 @@ git mv .claude/agents/apps-baseerah-be-deployer.md
       `#[then(...)]` step-binding literal itself (~line 784). Because `cucumber` matches step text
       verbatim, rename that macro literal IN THE SAME EDIT as the corresponding Gherkin step text in
       `specs/apps/rhino/behavior/rhino-cli/gherkin/harness/agents-bindings.feature:15` (`And the
-  file .amazonq/cli-agents/baseerah-default.json is written as a valid Amazon Q agent
-  definition` → `...beaver-nest-default.json...`) — leaving either one unrenamed on its own
+file .amazonq/cli-agents/baseerah-default.json is written as a valid Amazon Q agent
+definition` → `...beaver-nest-default.json...`) — leaving either one unrenamed on its own
       breaks step-binding resolution ("step doesn't match any function") rather than producing the
       intended assertion-level RED failure. This is a pure rename/refactor step (no new behavior),
       exempt from the Gherkin-binds tagging convention per the Feature-Change-Completeness policy;
@@ -1160,20 +1188,20 @@ git mv .claude/agents/apps-baseerah-be-deployer.md
       pointer and the agent definition" (`specs/apps/rhino/behavior/rhino-cli/gherkin/harness/agents-bindings.feature:10-15`),
       with only its step text changing.
 
-        ```gherkin
-        Scenario: rhino-cli's Amazon Q binding constant points at the renamed file
-          Given apps/rhino-cli's AMAZONQ_AGENT_DEFINITION constant after the rhino-cli rename phase
-          When nx run rhino-cli:test:integration runs
-          Then the test asserting the constant's path value passes against ".amazonq/cli-agents/beaver-nest-default.json"
-          And the generated file's "name" field reads "beaver-nest-default"
-        ```
+                        ```gherkin
+                        Scenario: rhino-cli's Amazon Q binding constant points at the renamed file
+                          Given apps/rhino-cli's AMAZONQ_AGENT_DEFINITION constant after the rhino-cli rename phase
+                          When nx run rhino-cli:test:integration runs
+                          Then the test asserting the constant's path value passes against ".amazonq/cli-agents/beaver-nest-default.json"
+                          And the generated file's "name" field reads "beaver-nest-default"
+                        ```
 
-        Acceptance: run `npx nx run rhino-cli:test:integration` (or the project's equivalent test
-        target covering `tests/agents.rs`) and confirm the suite runs without a step-binding-mismatch
-        error (the renamed macro literal and the renamed Gherkin step text resolve to each other) but
-        the "Emitting writes the rules pointer and the agent definition" scenario's assertions fail
-        against the still-unrenamed source constant in `bindings.rs` (a deliberate, expected RED
-        state).
+                        Acceptance: run `npx nx run rhino-cli:test:integration` (or the project's equivalent test
+                        target covering `tests/agents.rs`) and confirm the suite runs without a step-binding-mismatch
+                        error (the renamed macro literal and the renamed Gherkin step text resolve to each other) but
+                        the "Emitting writes the rules pointer and the agent definition" scenario's assertions fail
+                        against the still-unrenamed source constant in `bindings.rs` (a deliberate, expected RED
+                        state).
 
 - [ ] [AI] GREEN: edit `apps/rhino-cli/src/application/agents/bindings.rs` — rename the
       `AMAZONQ_AGENT_DEFINITION` constant's value to `".amazonq/cli-agents/beaver-nest-default.json"`

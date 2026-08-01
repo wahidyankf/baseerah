@@ -1,0 +1,19 @@
+## Pre-plan HEAD
+
+fec0c3ab70c079a370ab24df563e5a2fc63c896a
+
+## Baseline residual count
+
+253
+
+(Plan's authored expectation was 246; 253 is a modest deviation of +7 (~2.8%), consistent with
+routine commits landing between plan authoring and Phase 0 execution — not material. Proceeding
+per the plan's own tolerance for current-count drift.)
+
+## Baseline test:quick
+
+> npx nx run-many -t typecheck,lint,test:quick --all --parallel=$(( $(sysctl -n hw.ncpu) - 1 ))
+
+NX   Successfully ran targets typecheck, lint, test:quick for 9 projects and 3 tasks they depend on
+
+Exit code: 0. No preexisting failures found — no fixes required, no learnings.md entry added.

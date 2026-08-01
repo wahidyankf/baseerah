@@ -97,4 +97,4 @@ We appreciate security researchers who help us maintain the security of our proj
 - CONTRIBUTORS.md file
 - Release notes
 
-Thank you for helping keep Baseerah secure!
+Thank you for helping keep BeaverNest secure!

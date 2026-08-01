@@ -1,5 +1,5 @@
 {
-  "name": "baseerah",
+  "name": "beaver-nest",
   "version": "1.0.0",
   "description": "Personal operating layer (assistant, content, posting) monorepo",
   "private": true,
@@ -18,8 +18,8 @@
     "affected:build": "nx affected -t build",
     "affected:test": "nx affected -t test:quick",
     "affected:lint": "nx affected -t lint",
-    "baseerah:dev": "docker compose -f infra/dev/baseerah-app/docker-compose.yml up --build",
-    "baseerah:dev:restart": "docker compose -f infra/dev/baseerah-app/docker-compose.yml down -v && docker compose -f infra/dev/baseerah-app/docker-compose.yml up --build",
+    "beaver-nest:dev": "docker compose -f infra/dev/beaver-nest-app/docker-compose.yml up --build",
+    "beaver-nest:dev:restart": "docker compose -f infra/dev/beaver-nest-app/docker-compose.yml down -v && docker compose -f infra/dev/beaver-nest-app/docker-compose.yml up --build",
     "graph": "nx graph",
     "nx": "nx",
     "prepare": "husky",

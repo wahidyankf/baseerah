@@ -102,9 +102,9 @@ The foundational vision document answering WHY we exist and WHAT change we seek.
 - **Target Audience**: Developers, businesses, individuals seeking ethical finance
 - **Success Vision**: What the world looks like when we succeed
 
-### [Baseerah Vision](./baseerah.md) — Child (Product)
+### [BeaverNest Vision](./beaver-nest.md) — Child (Product)
 
-The product vision for **Baseerah**, a personal operating layer (assistant, content building,
+The product vision for **BeaverNest**, a personal operating layer (assistant, content building,
 posting) built as a product **within** the OSE ecosystem above, not a replacement for it.
 
 ## How Vision Governs Everything

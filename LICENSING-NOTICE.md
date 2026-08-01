@@ -11,8 +11,8 @@ The root [LICENSE](./LICENSE) is MIT. `specs/`, `libs/rust-commons/`, `libs/web-
 that subtree. All per-directory LICENSE files currently contain identical MIT text; the override
 mechanism is preserved so future maintainers can relicense specific subdirectories independently if
 needed. `apps/rhino-cli/` and E2E test suites (`apps/*-e2e/`) do not carry per-directory LICENSE
-files and fall back to the root LICENSE — this applies equally to the planned `baseerah-be`,
-`baseerah-fe`, `baseerah-be-e2e`, `baseerah-fe-e2e` apps (plus the `baseerah-contracts` project)
+files and fall back to the root LICENSE — this applies equally to the planned `beaver-nest-be`,
+`beaver-nest-fe`, `beaver-nest-be-e2e`, `beaver-nest-fe-e2e` apps (plus the `beaver-nest-contracts` project)
 once they exist. See [Licensing Convention](./repo-governance/conventions/structure/licensing.md)
 for the complete exemption list.
 
