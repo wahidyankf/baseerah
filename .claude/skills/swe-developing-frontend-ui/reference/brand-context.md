@@ -2,20 +2,20 @@
 
 Per-app brand guidance for UI development decisions.
 
-## baseerah-fe
+## beaver-nest-fe
 
-- **Product**: Baseerah — a personal operating layer (AI assistant, content builder, posting
+- **Product**: BeaverNest — a personal operating layer (AI assistant, content builder, posting
   helper, personal workflow engine)
-- **URL**: TBD (walking-skeleton phase; see [Baseerah Vision](../../../../repo-governance/vision/beaver-nest.md))
+- **URL**: TBD (walking-skeleton phase; see [BeaverNest Vision](../../../../repo-governance/vision/beaver-nest.md))
 - **Audience**: One maintainer (single-tenant, personal tool — not multi-tenant SaaS)
-- **Personality**: Clear, insightful, self-owned — بصيرة (insight, inner vision)
+- **Personality**: Clear, insightful, self-owned
 - **Tone**: Direct, personal, no marketing gloss
 - **Palette**: Indigo-violet OKLCH — `--color-primary: var(--hue-sky)` (hue 265, insight/clarity);
-  see `libs/web-ui-token/src/baseerah.css`
+  see `libs/web-ui-token/src/beaver-nest.css`
 - **Typography**: Shared `web-ui-token` typography scale; font loading via next/font
 - **Unique tokens**: none yet — the hello-world page uses only the shared semantic tokens
 - **UI character**: Minimal — current scope is a single landing page (header/main/footer shell)
-  rendering a greeting fetched from `baseerah-be`
+  rendering a greeting fetched from `beaver-nest-be`
 - **Framework**: Next.js 16, Tailwind v4, shadcn/ui
 
 ## ayokoding-web

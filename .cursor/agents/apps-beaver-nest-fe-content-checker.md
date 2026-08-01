@@ -1,18 +1,10 @@
 ---
-name: apps-baseerah-fe-content-checker
-description: Validates baseerah-fe landing-page content quality, including accessibility, token usage, and adherence to the documented content surface.
-tools: Read, Glob, Grep, Write, Bash
-model: sonnet
-color: green
-skills:
-  - docs-applying-content-quality
-  - apps-baseerah-fe-developing-content
-  - repo-generating-validation-reports
-  - repo-assessing-criticality-confidence
-  - repo-applying-maker-checker-fixer
+name: apps-beaver-nest-fe-content-checker
+description: Validates beaver-nest-fe landing-page content quality, including accessibility, token usage, and adherence to the documented content surface.
+model: composer-2.5
 ---
 
-# Content Checker for baseerah-fe
+# Content Checker for beaver-nest-fe
 
 ## Agent Metadata
 
@@ -38,16 +30,15 @@ skills:
 
 **Model Selection Justification**: This agent uses `model: sonnet` because it requires:
 
-- Reasoning to validate baseerah-fe content against the documented content surface and rules
+- Reasoning to validate beaver-nest-fe content against the documented content surface and rules
 - Pattern recognition for token usage, JSX-attribute entity pitfalls, and accessibility landmarks
 - Complex decision-making for content structure assessment
-- Understanding of the bilingual/trilingual brand-chip constraint
 
-Validate baseerah-fe content quality.
+Validate beaver-nest-fe content quality.
 
 ## Temporary Reports
 
-Pattern: `baseerah-fe-content__{uuid-chain}__{YYYY-MM-DD--HH-MM}__audit.md`
+Pattern: `beaver-nest-fe-content__{uuid-chain}__{YYYY-MM-DD--HH-MM}__audit.md`
 Skill: `repo-generating-validation-reports`
 
 ## Convergence Safeguards
@@ -61,20 +52,20 @@ See `repo-applying-maker-checker-fixer` Skill for:
 
 ## Reference
 
-- [Baseerah Vision](../../repo-governance/vision/beaver-nest.md)
-- Skills: `apps-baseerah-fe-developing-content`, `repo-assessing-criticality-confidence`, `repo-generating-validation-reports`
+- [BeaverNest Vision](../../repo-governance/vision/beaver-nest.md)
+- Skills: `apps-beaver-nest-fe-developing-content`, `repo-assessing-criticality-confidence`, `repo-generating-validation-reports`
 
 ## Reference Documentation
 
 **Project Guidance**:
 
 - [CLAUDE.md](../../CLAUDE.md) - Primary guidance
-- [Baseerah Vision](../../repo-governance/vision/beaver-nest.md)
+- [BeaverNest Vision](../../repo-governance/vision/beaver-nest.md)
 
 **Related Agents**:
 
-- `apps-baseerah-fe-content-maker` - Creates content this checker validates
-- `apps-baseerah-fe-content-fixer` - Fixes issues found by this checker
+- `apps-beaver-nest-fe-content-maker` - Creates content this checker validates
+- `apps-beaver-nest-fe-content-fixer` - Fixes issues found by this checker
 
 **Related Conventions**:
 

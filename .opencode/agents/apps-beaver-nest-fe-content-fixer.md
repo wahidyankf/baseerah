@@ -1,10 +1,23 @@
 ---
-name: apps-baseerah-fe-content-fixer
-description: Applies validated fixes from apps-baseerah-fe-content-checker audit reports. Re-validates before applying changes.
-model: composer-2.5
+description: Applies validated fixes from apps-beaver-nest-fe-content-checker audit reports. Re-validates before applying changes.
+model: zai-coding-plan/glm-5.2
+permission:
+  bash: allow
+  edit: allow
+  glob: allow
+  grep: allow
+  read: allow
+  write: allow
+color: warning
+skills:
+  - docs-applying-content-quality
+  - apps-beaver-nest-fe-developing-content
+  - repo-assessing-criticality-confidence
+  - repo-applying-maker-checker-fixer
+  - repo-generating-validation-reports
 ---
 
-# Content Fixer for baseerah-fe
+# Content Fixer for beaver-nest-fe
 
 ## Agent Metadata
 
@@ -27,10 +40,10 @@ See `repo-assessing-criticality-confidence` Skill for complete priority matrix a
 
 **Model Selection Justification**: This agent uses `model: sonnet` because it requires:
 
-- Reasoning to re-validate baseerah-fe content findings against the documented content surface
+- Reasoning to re-validate beaver-nest-fe content findings against the documented content surface
 - Pattern recognition to detect false positives
 - Complex decision-making for confidence assessment
-- Understanding of the bilingual/trilingual brand-chip constraint and shared-chrome (`AppFrame`) rule
+- Understanding of the shared-chrome (`AppFrame`) rule
 
 Validate content-checker findings before applying fixes.
 
@@ -41,7 +54,7 @@ Validate content-checker findings before applying fixes.
 
 ## Reference
 
-Skills: `apps-baseerah-fe-developing-content`, `repo-assessing-criticality-confidence`, `repo-applying-maker-checker-fixer`, `repo-generating-validation-reports`
+Skills: `apps-beaver-nest-fe-developing-content`, `repo-assessing-criticality-confidence`, `repo-applying-maker-checker-fixer`, `repo-generating-validation-reports`
 
 ## Convergence Safeguards
 
@@ -56,12 +69,12 @@ See `repo-applying-maker-checker-fixer` Skill for:
 **Project Guidance**:
 
 - [CLAUDE.md](../../CLAUDE.md) - Primary guidance
-- [Baseerah Vision](../../repo-governance/vision/beaver-nest.md)
+- [BeaverNest Vision](../../repo-governance/vision/beaver-nest.md)
 
 **Related Agents**:
 
-- `apps-baseerah-fe-content-checker` - Generates audit reports this fixer processes
-- `apps-baseerah-fe-content-maker` - Creates content
+- `apps-beaver-nest-fe-content-checker` - Generates audit reports this fixer processes
+- `apps-beaver-nest-fe-content-maker` - Creates content
 
 **Related Conventions**:
 
