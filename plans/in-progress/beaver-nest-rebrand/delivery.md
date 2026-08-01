@@ -327,21 +327,28 @@ Checker for baseerah-fe` title-pattern example, its "`baseerah-fe` matches `apps
 
 ### Commit Guidelines
 
-- [ ] [AI] Commit: `chore(rebrand): rename baseerah references across repo-governance/`
+- [x] [AI] Commit: `chore(rebrand): rename baseerah references across repo-governance/`
+      **Done 2026-08-01**: commit `86bdcf60b`.
 
 ### Post-Push CI Verification
 
-- [ ] [AI] Commit and push to origin main; monitor CI; fix and re-push on any failure.
+- [x] [AI] Commit and push to origin main; monitor CI; fix and re-push on any failure.
+      **Done 2026-08-01**: pushed to origin main; all 3 workflows (validate-env, publish-images,
+      pr-quality-gate) green on commit `86bdcf60b`, no re-push needed.
 
 ### Phase 2 Gate
 
-- [ ] [AI] `git grep -l "baseerah-repo-reset" -- repo-governance/ | diff -
+- [x] [AI] `git grep -l "baseerah-repo-reset" -- repo-governance/ | diff -
       local-temp/rebrand-citations-phase2.txt` reports no differences, and `git grep -lic baseerah
 repo-governance/` returns only that same captured file set **plus**
       `repo-governance/workflows/infra/development-environment-setup.md` (Decision 12's preserved
       GitHub-URL file, per the step above) — no other `baseerah` residue.
-- [ ] [AI] `npx nx run rhino-cli:test:quick` still exits 0 (governance-doc changes never touch code,
+      **Done 2026-08-01**: diff clean; `git grep -lic baseerah repo-governance/` returns exactly
+      `pdf-to-md-quality-gate.md` + `development-environment-setup.md`; dev-env-setup count = 4.
+- [x] [AI] `npx nx run rhino-cli:test:quick` still exits 0 (governance-doc changes never touch code,
       but this confirms no accidental cross-contamination).
+      **Done 2026-08-01**: exits 0 (373 scenarios, 1552 steps, all covered; specs structure validate
+      0 findings).
 
 > **Pause Safety**: `repo-governance/` is fully clean of `baseerah` residue outside the preserved
 > historical citations (Decision 6) and pushed. Safe to stop. To resume: confirm level with
@@ -1226,20 +1233,20 @@ definition` → `...beaver-nest-default.json...`) — leaving either one unrenam
       pointer and the agent definition" (`specs/apps/rhino/behavior/rhino-cli/gherkin/harness/agents-bindings.feature:10-15`),
       with only its step text changing.
 
-                                                      ```gherkin
-                                                      Scenario: rhino-cli's Amazon Q binding constant points at the renamed file
-                                                        Given apps/rhino-cli's AMAZONQ_AGENT_DEFINITION constant after the rhino-cli rename phase
-                                                        When nx run rhino-cli:test:integration runs
-                                                        Then the test asserting the constant's path value passes against ".amazonq/cli-agents/beaver-nest-default.json"
-                                                        And the generated file's "name" field reads "beaver-nest-default"
-                                                      ```
+                                                          ```gherkin
+                                                          Scenario: rhino-cli's Amazon Q binding constant points at the renamed file
+                                                            Given apps/rhino-cli's AMAZONQ_AGENT_DEFINITION constant after the rhino-cli rename phase
+                                                            When nx run rhino-cli:test:integration runs
+                                                            Then the test asserting the constant's path value passes against ".amazonq/cli-agents/beaver-nest-default.json"
+                                                            And the generated file's "name" field reads "beaver-nest-default"
+                                                          ```
 
-                                                      Acceptance: run `npx nx run rhino-cli:test:integration` (or the project's equivalent test
-                                                      target covering `tests/agents.rs`) and confirm the suite runs without a step-binding-mismatch
-                                                      error (the renamed macro literal and the renamed Gherkin step text resolve to each other) but
-                                                      the "Emitting writes the rules pointer and the agent definition" scenario's assertions fail
-                                                      against the still-unrenamed source constant in `bindings.rs` (a deliberate, expected RED
-                                                      state).
+                                                          Acceptance: run `npx nx run rhino-cli:test:integration` (or the project's equivalent test
+                                                          target covering `tests/agents.rs`) and confirm the suite runs without a step-binding-mismatch
+                                                          error (the renamed macro literal and the renamed Gherkin step text resolve to each other) but
+                                                          the "Emitting writes the rules pointer and the agent definition" scenario's assertions fail
+                                                          against the still-unrenamed source constant in `bindings.rs` (a deliberate, expected RED
+                                                          state).
 
 - [ ] [AI] GREEN: edit `apps/rhino-cli/src/application/agents/bindings.rs` — rename the
       `AMAZONQ_AGENT_DEFINITION` constant's value to `".amazonq/cli-agents/beaver-nest-default.json"`
