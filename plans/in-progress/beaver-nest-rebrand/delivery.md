@@ -793,65 +793,86 @@ libs/web-ui-token/README.md` returns `0`.
 
 ## Phase 8: `beaver-nest-be` (F#)
 
-- [ ] [AI] Rename the app directory: `git mv apps/baseerah-be apps/beaver-nest-be` — acceptance:
+- [x] [AI] Rename the app directory: `git mv apps/baseerah-be apps/beaver-nest-be` — acceptance:
       `test -d apps/beaver-nest-be` succeeds. **Also**: Phase 5 deliberately left
       `repo-config.yml`'s `env-contract.surfaces[].root: apps/baseerah-be`,
       `env-injection.apps[].app: baseerah-be` / `keys-from: apps/baseerah-be/.env.example`, and the
       `BASEERAH_BE_CORS_ORIGINS` allowlist entry unrenamed (renaming them early broke `env validate`
       — see [learnings.md](./learnings.md)) — flip all four to their `beaver-nest-be`/
       `BEAVER_NEST_BE_CORS_ORIGINS` forms in this same phase, now that the directory and env vars
-      actually move together.
-- [ ] [AI] Rename the F# source directory: `git mv apps/beaver-nest-be/src/BaseerahBe
+      actually move together. **Done 2026-08-01**: dir moved; `repo-config.yml`'s 4 be-scoped fields
+      flipped to `beaver-nest-be`/`BEAVER_NEST_BE_CORS_ORIGINS`; `env validate` clean (no drift).
+- [x] [AI] Rename the F# source directory: `git mv apps/beaver-nest-be/src/BaseerahBe
 apps/beaver-nest-be/src/BeaverNestBe` — acceptance: `test -d
-apps/beaver-nest-be/src/BeaverNestBe` succeeds.
-- [ ] [AI] Rename project files: `git mv
+apps/beaver-nest-be/src/BeaverNestBe` succeeds. **Done 2026-08-01**.
+- [x] [AI] Rename project files: `git mv
 apps/beaver-nest-be/src/BeaverNestBe/BaseerahBe.fsproj
 apps/beaver-nest-be/src/BeaverNestBe/BeaverNestBe.fsproj && git mv
 apps/beaver-nest-be/tests/unit/BaseerahBe.UnitTests.fsproj
 apps/beaver-nest-be/tests/unit/BeaverNestBe.UnitTests.fsproj && git mv
 apps/beaver-nest-be/tests/integration/BaseerahBe.IntegrationTests.fsproj
 apps/beaver-nest-be/tests/integration/BeaverNestBe.IntegrationTests.fsproj` — acceptance: all
-      three new paths exist.
-- [ ] [AI] Rename the solution file: `git mv baseerah.sln beaver-nest.sln` — acceptance: `test -f
-beaver-nest.sln` succeeds.
-- [ ] [AI] Apply `<CANONICAL-SED>` to every file under `apps/beaver-nest-be/` and to
+      three new paths exist. **Done 2026-08-01**.
+- [x] [AI] Rename the solution file: `git mv baseerah.sln beaver-nest.sln` — acceptance: `test -f
+beaver-nest.sln` succeeds. **Done 2026-08-01**.
+- [x] [AI] Apply `<CANONICAL-SED>` to every file under `apps/beaver-nest-be/` and to
       `beaver-nest.sln` — this rewrites `BaseerahBe` → `BeaverNestBe` in every `.fs`/`.fsproj` file
       (namespace declarations, `open` statements, project references), `BASEERAH_BE_PORT`/
       `BASEERAH_BE_CORS_ORIGINS` → `BEAVER_NEST_BE_PORT`/`BEAVER_NEST_BE_CORS_ORIGINS` in
       `Program.fs`, `.env.example`, `Dockerfile`, and `README.md`, and the `project.json` `"name"`
       and `"domain:baseerah"` tag — acceptance: `git grep -lic baseerah apps/beaver-nest-be/
-beaver-nest.sln` returns no matches.
-- [ ] [AI] Edit `apps/beaver-nest-be/project.json`'s `codegen` target: confirm the
+beaver-nest.sln` returns no matches. **Done 2026-08-01**: confirmed 0 matches. **Also**: forward-fixed
+      stale `implicitDependencies`/path references left over from Phase 6 in
+      `apps/baseerah-be-e2e/project.json` (`"baseerah-be"` → `"beaver-nest-be"`, and the
+      `run-e2e.sh` command path) and `apps/baseerah-fe-e2e/project.json` (same
+      `implicitDependencies` fix) — same generalizable rule as Phase 6's Nx-graph-break finding.
+- [x] [AI] Edit `apps/beaver-nest-be/project.json`'s `codegen` target: confirm the
       `openapi-generator-cli` invocation now reads
       `specs/apps/beaver-nest/containers/contracts/generated/openapi-bundled.yaml` and
       `--model-package BeaverNestBe.Contracts` (both should already be correct from the sed pass;
       this step is a manual verification, not a fix) — acceptance: manual read confirms both.
-- [ ] [AI] Regenerate the OpenAPI contracts under the new package name (this is a rename-refactor
+      **Done 2026-08-01**: confirmed both correct.
+- [x] [AI] Regenerate the OpenAPI contracts under the new package name (this is a rename-refactor
       verification, not a TDD cycle — no new behavior is introduced): run `npx nx run
 beaver-nest-be:codegen` — acceptance: exits 0 and
       `apps/beaver-nest-be/generated-contracts/OpenAPI/src/BeaverNestBe.Contracts/` exists
-      (gitignored, not committed).
-- [ ] [AI] Verify the existing unit test suite stays green under the renamed namespace: run `npx nx
+      (gitignored, not committed). **Done 2026-08-01**: exits 0, dir exists.
+- [x] [AI] Verify the existing unit test suite stays green under the renamed namespace: run `npx nx
 run beaver-nest-be:test:unit` — acceptance: exits 0, all prior `BaseerahBe` test assertions now
-      pass under `BeaverNestBe`.
-- [ ] [AI] Run `npx nx run beaver-nest-be:test:integration` — acceptance: exits 0.
+      pass under `BeaverNestBe`. **Done 2026-08-01**: 9/9 pass.
+- [x] [AI] Run `npx nx run beaver-nest-be:test:integration` — acceptance: exits 0. **Done 2026-08-01**:
+      1/1 pass.
 
 ### Local Quality Gates (Before Push)
 
-- [ ] Run `npx nx affected -t typecheck lint test:quick` — fix ALL failures.
+- [x] Run `npx nx affected -t typecheck lint test:quick` — fix ALL failures. **Done 2026-08-01**:
+      `beaver-nest-be:test:quick` (incl. `specs:behavior:coverage`) fully green — resolves the Phase
+      6 RED for this project as designed. **Discovery**: stale gitignored `bin`/`obj`/`dist` dirs
+      under `apps/beaver-nest-be` (untouched by `git mv`) retained old `BaseerahBe`-named binaries
+      alongside the new `BeaverNestBe` ones, causing `coverlet` to report a bogus 2-assembly
+      aggregate and fail the 90% line-coverage gate (19.04% reported). Fix:
+      `find apps/beaver-nest-be -type d \( -name bin -o -name obj -o -name dist \) -exec rm -rf {} +`,
+      removed stale `generated-contracts/`, re-ran codegen + tests fresh — fully green after. Only
+      remaining affected-RED after this phase: `baseerah-be-e2e`, `baseerah-fe`, `baseerah-fe-e2e`
+      (Phase 9/10/11 territory, confirmed via `nx affected`).
 
 ### Commit Guidelines
 
-- [ ] [AI] Commit: `chore(rebrand): rename baseerah-be to beaver-nest-be`
+- [x] [AI] Commit: `chore(rebrand): rename baseerah-be to beaver-nest-be`
 
 ### Post-Push CI Verification
 
-- [ ] [AI] Commit and push to origin main; monitor CI; fix and re-push on any failure.
+- [ ] [AI] Commit and push to origin main; monitor CI; fix and re-push on any failure. **Deferred
+      2026-08-01 (plan amendment, user-directed)**: per the Phase 6 push-collapse decision (see
+      [learnings.md](./learnings.md)), this commit stays local; push happens once for the whole
+      Phase 6-11 stretch once `nx affected -t test:quick` is fully clean (tracked as harness task
+      #360).
 
 ### Phase 8 Gate
 
-- [ ] [AI] `git grep -lic baseerah apps/beaver-nest-be/ beaver-nest.sln` returns no matches.
-- [ ] [AI] `npx nx run beaver-nest-be:test:quick` exits 0.
+- [x] [AI] `git grep -lic baseerah apps/beaver-nest-be/ beaver-nest.sln` returns no matches.
+      **Done 2026-08-01**.
+- [x] [AI] `npx nx run beaver-nest-be:test:quick` exits 0. **Done 2026-08-01**.
 
 > **Pause Safety**: `beaver-nest-be` builds, tests, and boots under its new name. Safe to stop. To
 > resume: confirm level with `origin/main`, then start Phase 9.
@@ -1382,20 +1403,20 @@ definition` → `...beaver-nest-default.json...`) — leaving either one unrenam
       pointer and the agent definition" (`specs/apps/rhino/behavior/rhino-cli/gherkin/harness/agents-bindings.feature:10-15`),
       with only its step text changing.
 
-                                                                                                      ```gherkin
-                                                                                                      Scenario: rhino-cli's Amazon Q binding constant points at the renamed file
-                                                                                                        Given apps/rhino-cli's AMAZONQ_AGENT_DEFINITION constant after the rhino-cli rename phase
-                                                                                                        When nx run rhino-cli:test:integration runs
-                                                                                                        Then the test asserting the constant's path value passes against ".amazonq/cli-agents/beaver-nest-default.json"
-                                                                                                        And the generated file's "name" field reads "beaver-nest-default"
-                                                                                                      ```
+                                                                                                          ```gherkin
+                                                                                                          Scenario: rhino-cli's Amazon Q binding constant points at the renamed file
+                                                                                                            Given apps/rhino-cli's AMAZONQ_AGENT_DEFINITION constant after the rhino-cli rename phase
+                                                                                                            When nx run rhino-cli:test:integration runs
+                                                                                                            Then the test asserting the constant's path value passes against ".amazonq/cli-agents/beaver-nest-default.json"
+                                                                                                            And the generated file's "name" field reads "beaver-nest-default"
+                                                                                                          ```
 
-                                                                                                      Acceptance: run `npx nx run rhino-cli:test:integration` (or the project's equivalent test
-                                                                                                      target covering `tests/agents.rs`) and confirm the suite runs without a step-binding-mismatch
-                                                                                                      error (the renamed macro literal and the renamed Gherkin step text resolve to each other) but
-                                                                                                      the "Emitting writes the rules pointer and the agent definition" scenario's assertions fail
-                                                                                                      against the still-unrenamed source constant in `bindings.rs` (a deliberate, expected RED
-                                                                                                      state).
+                                                                                                          Acceptance: run `npx nx run rhino-cli:test:integration` (or the project's equivalent test
+                                                                                                          target covering `tests/agents.rs`) and confirm the suite runs without a step-binding-mismatch
+                                                                                                          error (the renamed macro literal and the renamed Gherkin step text resolve to each other) but
+                                                                                                          the "Emitting writes the rules pointer and the agent definition" scenario's assertions fail
+                                                                                                          against the still-unrenamed source constant in `bindings.rs` (a deliberate, expected RED
+                                                                                                          state).
 
 - [ ] [AI] GREEN: edit `apps/rhino-cli/src/application/agents/bindings.rs` — rename the
       `AMAZONQ_AGENT_DEFINITION` constant's value to `".amazonq/cli-agents/beaver-nest-default.json"`

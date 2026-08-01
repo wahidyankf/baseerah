@@ -5,21 +5,21 @@ VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "apps", "apps", "{1787FE1D-075E-9E68-7218-25F1BD1BBEAB}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "baseerah-be", "baseerah-be", "{B7C85CCD-DA73-D999-C392-57EAB472E798}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "beaver-nest-be", "beaver-nest-be", "{B7C85CCD-DA73-D999-C392-57EAB472E798}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{83A4CFEE-1B06-1207-2B7F-C7F73B04BB91}"
 EndProject
-Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "BaseerahBe", "apps\baseerah-be\src\BaseerahBe\BaseerahBe.fsproj", "{05FFF83E-BBB3-40C6-BCC0-F48C655E876E}"
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "BeaverNestBe", "apps\beaver-nest-be\src\BeaverNestBe\BeaverNestBe.fsproj", "{05FFF83E-BBB3-40C6-BCC0-F48C655E876E}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{9D7DD7C2-518E-24F6-C5AB-5FF873396627}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "unit", "unit", "{39DDD4C5-1C77-16B7-717D-CD3A7C57EE2E}"
 EndProject
-Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "BaseerahBe.UnitTests", "apps\baseerah-be\tests\unit\BaseerahBe.UnitTests.fsproj", "{D7A9A4B4-F8B3-4839-9759-8806230DF4C4}"
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "BeaverNestBe.UnitTests", "apps\beaver-nest-be\tests\unit\BeaverNestBe.UnitTests.fsproj", "{D7A9A4B4-F8B3-4839-9759-8806230DF4C4}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "integration", "integration", "{020D10B8-9ECA-9C25-B83E-ADCF7AB00E41}"
 EndProject
-Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "BaseerahBe.IntegrationTests", "apps\baseerah-be\tests\integration\BaseerahBe.IntegrationTests.fsproj", "{059BBCED-8763-4452-8C07-A37CE20C702A}"
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "BeaverNestBe.IntegrationTests", "apps\beaver-nest-be\tests\integration\BeaverNestBe.IntegrationTests.fsproj", "{059BBCED-8763-4452-8C07-A37CE20C702A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

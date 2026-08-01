@@ -162,14 +162,13 @@ env-contract:
   #   lang      — "rust" or "typescript" (app kind only)
   #   allowlist — keys exempt from drift detection (framework-injected, test-only, etc.)
   surfaces:
-    - root: apps/baseerah-be
+    - root: apps/beaver-nest-be
       kind: app
       lang: fsharp
       allowlist:
         # Forward-declared config not yet consumed by the Phase 1 F# shell
         # (browser-facing CORS isn't needed yet — beaver-nest-fe fetches server-side).
-        # NOTE: still BASEERAH_BE_ prefix pending Phase 8's env-var rename inside apps/baseerah-be/
-        - BASEERAH_BE_CORS_ORIGINS
+        - BEAVER_NEST_BE_CORS_ORIGINS
 
     - root: apps/baseerah-fe
       kind: app
@@ -190,8 +189,8 @@ env-injection:
   #   vercel-production  — Vercel project env, Production scope (prod-*-www / prod-*-app-web)
   #   k3s-coralpolyp     — ose-private coralpolyp secret store (backend k3s rollout)
   apps:
-    - app: baseerah-be
-      keys-from: apps/baseerah-be/.env.example
+    - app: beaver-nest-be
+      keys-from: apps/beaver-nest-be/.env.example
       runtime: { local-ci: compose }
 
     - app: baseerah-fe

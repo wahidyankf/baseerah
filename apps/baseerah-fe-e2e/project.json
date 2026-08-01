@@ -141,7 +141,7 @@
     }
   },
   "tags": ["type:e2e", "platform:playwright", "lang:ts", "domain:baseerah"],
-  "implicitDependencies": ["baseerah-fe", "baseerah-be"],
+  "implicitDependencies": ["baseerah-fe", "beaver-nest-be"],
   "namedInputs": {
     "specs": ["{workspaceRoot}/specs/apps/beaver-nest/behavior/beaver-nest-fe/gherkin/**/*.feature"]
   }

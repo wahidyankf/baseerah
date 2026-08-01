@@ -58,7 +58,7 @@
     "test:e2e": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "apps/baseerah-be/scripts/run-e2e.sh"
+        "command": "apps/beaver-nest-be/scripts/run-e2e.sh"
       }
     },
     "test:e2e:ui": {
@@ -148,5 +148,5 @@
     "specs": ["{workspaceRoot}/specs/apps/beaver-nest/behavior/beaver-nest-be/gherkin/**/*.feature"]
   },
   "tags": ["type:e2e", "platform:playwright", "lang:ts", "domain:baseerah"],
-  "implicitDependencies": ["baseerah-be"]
+  "implicitDependencies": ["beaver-nest-be"]
 }
