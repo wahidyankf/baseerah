@@ -1334,7 +1334,7 @@ gh api -X DELETE repos/wahidyankf/baseerah/environments/baseerah-app-staging` �
 
 ### Commit Guidelines
 
-- [ ] [AI] Commit: `chore(rebrand): rename CI workflows and cut over GHCR image to beaver-nest-be`
+- [x] [AI] Commit: `chore(rebrand): rename CI workflows and cut over GHCR image to beaver-nest-be`
 
 ### Post-Push CI Verification
 
@@ -1387,7 +1387,7 @@ gh api -X DELETE repos/wahidyankf/baseerah/environments/baseerah-app-staging` �
 > together, in the same phase, so the generator and the manual rename never drift apart even
 > momentarily. (brd.md's risk table already documents Phase 15 as the home for this constant.)
 
-- [ ] [AI] Rename the five `.claude/agents/` files: `git mv
+- [x] [AI] Rename the five `.claude/agents/` files: `git mv
 .claude/agents/apps-baseerah-fe-content-checker.md
 .claude/agents/apps-beaver-nest-fe-content-checker.md && git mv
 .claude/agents/apps-baseerah-fe-content-fixer.md
@@ -1397,25 +1397,25 @@ gh api -X DELETE repos/wahidyankf/baseerah/environments/baseerah-app-staging` �
 .claude/agents/apps-baseerah-fe-deployer.md .claude/agents/apps-beaver-nest-fe-deployer.md &&
 git mv .claude/agents/apps-baseerah-be-deployer.md
 .claude/agents/apps-beaver-nest-be-deployer.md` — acceptance: all five new paths exist.
-- [ ] [AI] Apply `<CANONICAL-SED>` to the five renamed files and to `.claude/agents/README.md`'s
+- [x] [AI] Apply `<CANONICAL-SED>` to the five renamed files and to `.claude/agents/README.md`'s
       catalog (name, description, and table-row references) — acceptance: `git grep -lic baseerah
 .claude/agents/` returns no matches.
-- [ ] [AI] Rename the skill directory: `git mv
+- [x] [AI] Rename the skill directory: `git mv
 .claude/skills/apps-baseerah-fe-developing-content
 .claude/skills/apps-beaver-nest-fe-developing-content` — acceptance: `test -d
 .claude/skills/apps-beaver-nest-fe-developing-content` succeeds.
-- [ ] [AI] Apply `<CANONICAL-SED>` to
+- [x] [AI] Apply `<CANONICAL-SED>` to
       `.claude/skills/apps-beaver-nest-fe-developing-content/SKILL.md` (including its `name:`
       frontmatter field) and to
       `.claude/skills/swe-developing-frontend-ui/reference/brand-context.md` — acceptance:
       `git grep -lic baseerah .claude/skills/` returns no matches.
-- [ ] [AI] Mirror the same five renames into `.opencode/agents/` and `.cursor/agents/`: `git mv
+- [x] [AI] Mirror the same five renames into `.opencode/agents/` and `.cursor/agents/`: `git mv
 .opencode/agents/apps-baseerah-fe-content-checker.md
 .opencode/agents/apps-beaver-nest-fe-content-checker.md` (repeat for the remaining four in
       each of `.opencode/agents/` and `.cursor/agents/`), then apply `<CANONICAL-SED>` to all ten
       resulting files — acceptance: `git grep -lic baseerah .opencode/agents/ .cursor/agents/`
       returns no matches.
-- [ ] [AI] Hand-edit the brand-chip-specific content guidance the `<CANONICAL-SED>` steps above
+- [x] [AI] Hand-edit the brand-chip-specific content guidance the `<CANONICAL-SED>` steps above
       cannot touch (none of it contains the literal string `baseerah`, so no sed pass catches it —
       `[Repo-grounded]`: verified 2026-08-01, this is the complete list): in
       `.claude/agents/apps-beaver-nest-fe-content-maker.md`, drop "brand chip" from the
@@ -1460,25 +1460,25 @@ git mv .claude/agents/apps-baseerah-be-deployer.md
 
 ### Local Quality Gates (Before Push)
 
-- [ ] Run `npx nx affected -t typecheck lint test:quick` — fix ALL failures.
+- [x] Run `npx nx affected -t typecheck lint test:quick` — fix ALL failures.
 
 ### Commit Guidelines
 
-- [ ] [AI] Commit: `chore(rebrand): rename baseerah agent fleet and skill directory`
+- [x] [AI] Commit: `chore(rebrand): rename baseerah agent fleet and skill directory`
 
 ### Post-Push CI Verification
 
-- [ ] [AI] Commit and push to origin main; monitor CI; fix and re-push on any failure.
+- [x] [AI] Commit and push to origin main; monitor CI; fix and re-push on any failure.
 
 ### Phase 14 Gate
 
-- [ ] [AI] `git grep -lic baseerah .claude/ .opencode/ .cursor/` returns no matches.
-- [ ] [AI] `git grep -lic "brand.chip" .claude/agents/ .claude/skills/apps-beaver-nest-fe-developing-content/
+- [x] [AI] `git grep -lic baseerah .claude/ .opencode/ .cursor/` returns no matches.
+- [x] [AI] `git grep -lic "brand.chip" .claude/agents/ .claude/skills/apps-beaver-nest-fe-developing-content/
 .claude/skills/swe-developing-frontend-ui/reference/brand-context.md .opencode/agents/
 .cursor/agents/` returns no matches (the `.` matches either the space or hyphen variant), and
       `grep -c "بصيرة" .claude/skills/swe-developing-frontend-ui/reference/brand-context.md` returns
       `0`.
-- [ ] [AI] `grep -c "brand moment\|chip phrasing" .claude/agents/apps-beaver-nest-fe-content-maker.md`
+- [x] [AI] `grep -c "brand moment\|chip phrasing" .claude/agents/apps-beaver-nest-fe-content-maker.md`
       returns `0`.
 
 > **Pause Safety**: the agent fleet and skill directories are fully renamed and internally
@@ -1490,7 +1490,7 @@ git mv .claude/agents/apps-baseerah-be-deployer.md
 
 ## Phase 15: `rhino-cli` Functional Couplings and the `.amazonq` Binding
 
-- [ ] [AI] RED: edit `apps/rhino-cli/tests/agents.rs` — update all seven assertions referencing
+- [x] [AI] RED: edit `apps/rhino-cli/tests/agents.rs` — update all seven assertions referencing
       `.amazonq/cli-agents/baseerah-default.json` and/or `"baseerah-default"` to
       `.amazonq/cli-agents/beaver-nest-default.json` and `"beaver-nest-default"`: two fixture-setup
       path-string assertions (~line 698, ~line 731), two path-string assertions inside
@@ -1509,37 +1509,37 @@ definition` → `...beaver-nest-default.json...`) — leaving either one unrenam
       pointer and the agent definition" (`specs/apps/rhino/behavior/rhino-cli/gherkin/harness/agents-bindings.feature:10-15`),
       with only its step text changing.
 
-                                                        ```gherkin
-                                                        Scenario: rhino-cli's Amazon Q binding constant points at the renamed file
-                                                          Given apps/rhino-cli's AMAZONQ_AGENT_DEFINITION constant after the rhino-cli rename phase
-                                                          When nx run rhino-cli:test:integration runs
-                                                          Then the test asserting the constant's path value passes against ".amazonq/cli-agents/beaver-nest-default.json"
-                                                          And the generated file's "name" field reads "beaver-nest-default"
-                                                        ```
+                                                          ```gherkin
+                                                          Scenario: rhino-cli's Amazon Q binding constant points at the renamed file
+                                                            Given apps/rhino-cli's AMAZONQ_AGENT_DEFINITION constant after the rhino-cli rename phase
+                                                            When nx run rhino-cli:test:integration runs
+                                                            Then the test asserting the constant's path value passes against ".amazonq/cli-agents/beaver-nest-default.json"
+                                                            And the generated file's "name" field reads "beaver-nest-default"
+                                                          ```
 
-                                                        Acceptance: run `npx nx run rhino-cli:test:integration` (or the project's equivalent test
-                                                        target covering `tests/agents.rs`) and confirm the suite runs without a step-binding-mismatch
-                                                        error (the renamed macro literal and the renamed Gherkin step text resolve to each other) but
-                                                        the "Emitting writes the rules pointer and the agent definition" scenario's assertions fail
-                                                        against the still-unrenamed source constant in `bindings.rs` (a deliberate, expected RED
-                                                        state).
+                                                          Acceptance: run `npx nx run rhino-cli:test:integration` (or the project's equivalent test
+                                                          target covering `tests/agents.rs`) and confirm the suite runs without a step-binding-mismatch
+                                                          error (the renamed macro literal and the renamed Gherkin step text resolve to each other) but
+                                                          the "Emitting writes the rules pointer and the agent definition" scenario's assertions fail
+                                                          against the still-unrenamed source constant in `bindings.rs` (a deliberate, expected RED
+                                                          state).
 
-- [ ] [AI] GREEN: edit `apps/rhino-cli/src/application/agents/bindings.rs` — rename the
+- [x] [AI] GREEN: edit `apps/rhino-cli/src/application/agents/bindings.rs` — rename the
       `AMAZONQ_AGENT_DEFINITION` constant's value to `".amazonq/cli-agents/beaver-nest-default.json"`
       and `AGENT_DEFINITION_CONTENT`'s embedded `"name": "baseerah-default"` to `"name":
 "beaver-nest-default"`, and update its own three in-file test assertions to match — acceptance:
       `npx nx run rhino-cli:test:integration` now passes.
-- [ ] [AI] Rename the Amazon Q binding file to match the just-renamed constant (deferred here from
+- [x] [AI] Rename the Amazon Q binding file to match the just-renamed constant (deferred here from
       Phase 14 — see the note at the top of Phase 14): `git mv
 .amazonq/cli-agents/baseerah-default.json .amazonq/cli-agents/beaver-nest-default.json` and
       edit its `"name"` field to `"beaver-nest-default"` — acceptance: `jq -r .name
 .amazonq/cli-agents/beaver-nest-default.json` returns `beaver-nest-default`.
-- [ ] [AI] Verify the generator agrees with the manual rename: run `npm run generate:bindings` —
+- [x] [AI] Verify the generator agrees with the manual rename: run `npm run generate:bindings` —
       acceptance: `git status --porcelain` reports no diff beyond what this phase already staged
       (confirms no drift between the hand-renamed `.amazonq` file and what `rhino-cli` regenerates
       from the now-renamed `bindings.rs` constants; any diff here is a defect to fix before the
       phase gate, not a file to blindly accept).
-- [ ] [AI] REFACTOR: apply `<CANONICAL-SED>` to
+- [x] [AI] REFACTOR: apply `<CANONICAL-SED>` to
       `apps/rhino-cli/src/application/domain_coverage/mod.rs`,
       `apps/rhino-cli/src/commands/specs_validate_counts.rs`,
       `apps/rhino-cli/src/application/repo_governance/frontmatter_audit.rs`, and
@@ -1548,36 +1548,36 @@ definition` → `...beaver-nest-default.json...`) — leaving either one unrenam
       `"apps/beaver-nest-fe/content/post.md"`) — acceptance: `npx nx run rhino-cli:test:unit` exits 0
       (covers the first three, `src/`-embedded fixtures) and `npx nx run rhino-cli:test:integration`
       exits 0 (covers `tests/docs.rs`, which `test:unit`'s explicit `--test` list does not include).
-- [ ] [AI] Preserve the historical citation (Decision 6): confirm
+- [x] [AI] Preserve the historical citation (Decision 6): confirm
       `apps/rhino-cli/src/commands/specs_coverage.rs`'s comment citing "the baseerah-repo-reset plan"
       is left unchanged — acceptance: `grep -c "baseerah-repo-reset"
 apps/rhino-cli/src/commands/specs_coverage.rs` returns `1`.
-- [ ] [AI] Update the comment in `apps/rhino-cli/src/application/docs/naming.rs` referencing "a
+- [x] [AI] Update the comment in `apps/rhino-cli/src/application/docs/naming.rs` referencing "a
       Baseerah-identity rewrite" to "a BeaverNest-identity rewrite" (prose only, no functional
       change) — acceptance: `grep -c "Baseerah" apps/rhino-cli/src/application/docs/naming.rs`
       returns `0`.
-- [ ] [AI] Run the full `rhino-cli` quality gate: `npx nx run rhino-cli:test:quick` — acceptance:
+- [x] [AI] Run the full `rhino-cli` quality gate: `npx nx run rhino-cli:test:quick` — acceptance:
       exits 0.
 
 ### Local Quality Gates (Before Push)
 
-- [ ] Run `npx nx affected -t typecheck lint test:quick specs:behavior:coverage` — fix ALL failures.
+- [x] Run `npx nx affected -t typecheck lint test:quick specs:behavior:coverage` — fix ALL failures.
 
 ### Commit Guidelines
 
-- [ ] [AI] Commit: `chore(rebrand): rename baseerah references in rhino-cli source, tests, and the
+- [x] [AI] Commit: `chore(rebrand): rename baseerah references in rhino-cli source, tests, and the
 amazonq binding`
 
 ### Post-Push CI Verification
 
-- [ ] [AI] Commit and push to origin main; monitor CI; fix and re-push on any failure.
+- [x] [AI] Commit and push to origin main; monitor CI; fix and re-push on any failure.
 
 ### Phase 15 Gate
 
-- [ ] [AI] `npx nx run rhino-cli:test:quick` exits 0.
-- [ ] [AI] `npx nx run rhino-cli:test:integration` exits 0 (this is the target that actually
+- [x] [AI] `npx nx run rhino-cli:test:quick` exits 0.
+- [x] [AI] `npx nx run rhino-cli:test:integration` exits 0 (this is the target that actually
       executes `tests/agents.rs`'s cucumber suite; `test:quick`'s constituent targets do not run it).
-- [ ] [AI] `git grep -lic baseerah apps/rhino-cli/ specs/apps/rhino/ .amazonq/ | grep -v
+- [x] [AI] `git grep -lic baseerah apps/rhino-cli/ specs/apps/rhino/ .amazonq/ | grep -v
 specs_coverage.rs` returns no matches (the one preserved historical citation in
       `specs_coverage.rs` is the sole expected exception).
 
@@ -1589,7 +1589,7 @@ specs_coverage.rs` returns no matches (the one preserved historical citation in
 
 ## Phase 16: Cross-Cutting Docs, Repo-Wide Residual Sweep, and Verification
 
-- [ ] [AI] Apply `<CANONICAL-SED>` to `apps/README.md` (which references every renamed app by name
+- [x] [AI] Apply `<CANONICAL-SED>` to `apps/README.md` (which references every renamed app by name
       and the deployment-branch prose, and was intentionally deferred until every app rename
       landed), then run the same scoped follow-up revert Phase 7 used for `libs/README.md` to
       restore the one historical citation the catch-all rule just mangled:
@@ -1598,7 +1598,7 @@ specs_coverage.rs` returns no matches (the one preserved historical citation in
       sed-mangled form of the preserved `2026-07-31__baseerah-repo-reset` citation link (per
       Decision 6) — acceptance: `grep -c "baseerah" apps/README.md` returns exactly `1` (the
       preserved citation).
-- [ ] [AI] Run the full repo-wide residual check: `git grep -liE "baseerah" -- . ':!plans/done'
+- [x] [AI] Run the full repo-wide residual check: `git grep -liE "baseerah" -- . ':!plans/done'
 ':!generated-reports' ':!plans/in-progress/beaver-nest-rebrand'` — this plan's own folder is
       excluded because its narrative prose necessarily discusses the old name it is renaming from;
       it is renamed and moved to `plans/done/` only in the final Plan Archival step, after this
@@ -1613,16 +1613,16 @@ specs_coverage.rs` returns no matches (the one preserved historical citation in
       `apps/beaver-nest-fe/src/app/page.test.tsx` (deferred to Phase 17's flip, not a residual to fix
       here). Any match NOT in class (a) or (b) is a defect — fix it and re-run until the condition
       holds.
-- [ ] [AI] Run `md links validate` as an independent cross-check the `git grep`-based mechanism
+- [x] [AI] Run `md links validate` as an independent cross-check the `git grep`-based mechanism
       above cannot fully replace: `cargo run --release --quiet --manifest-path
 apps/rhino-cli/Cargo.toml -- md links validate --exclude plans/done` — acceptance: exits 0 with
       zero broken-link findings (a broken relative link here would indicate a historical citation
       whose target _shape_ changed without still matching the literal `baseerah-repo-reset`
       substring — a class of breakage the grep-based revert mechanism cannot detect on its own).
-- [ ] [AI] Run the full quality gate across every renamed project: `npx nx run-many -t typecheck,
+- [x] [AI] Run the full quality gate across every renamed project: `npx nx run-many -t typecheck,
 lint,test:quick,specs:behavior:coverage --projects=beaver-nest-be,beaver-nest-be-e2e,beaver-nest-fe,
 beaver-nest-fe-e2e,beaver-nest-contracts,rhino-cli` — acceptance: exits 0 for every project.
-- [ ] [AI] Run `npx nx affected -t typecheck lint test:quick specs:behavior:coverage` across the whole
+- [x] [AI] Run `npx nx affected -t typecheck lint test:quick specs:behavior:coverage` across the whole
       affected graph (catches any file outside the explicit project list above that still references
       a renamed path) — acceptance: exits 0.
 
@@ -2049,15 +2049,15 @@ maintainer confirmation requested before promoting to `specs-maker`):
 
 ### Commit Guidelines
 
-- [ ] [AI] Commit: `chore(rebrand): rename apps/README.md, close out residual sweep and evidence`
+- [x] [AI] Commit: `chore(rebrand): rename apps/README.md, close out residual sweep and evidence`
 
 ### Post-Push CI Verification
 
-- [ ] [AI] Commit and push to origin main; monitor CI; fix and re-push on any failure.
+- [x] [AI] Commit and push to origin main; monitor CI; fix and re-push on any failure.
 
 ### Phase 16 Gate
 
-- [ ] [AI] `git grep -liE "baseerah" -- . ':!plans/done' ':!generated-reports'
+- [x] [AI] `git grep -liE "baseerah" -- . ':!plans/done' ':!generated-reports'
 ':!plans/in-progress/beaver-nest-rebrand'` returns only files falling into one of the two
       expected-residual classes defined in the step above: (a) files also appearing in `git grep -l
 "baseerah-repo-reset" -- . ':!plans/done' ':!generated-reports'
@@ -2066,11 +2066,11 @@ maintainer confirmation requested before promoting to `specs-maker`):
       `apps/beaver-nest-fe/Dockerfile`, `apps/beaver-nest-fe/src/components/AppShell.tsx`, and
       `apps/beaver-nest-fe/src/app/page.test.tsx` (Decision 12's preserved GitHub-URL files, deferred
       to Phase 17). Any match outside both (a) and (b) is a defect.
-- [ ] [AI] `cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- md links
+- [x] [AI] `cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- md links
 validate --exclude plans/done` exits 0.
-- [ ] [AI] Every rule-15 and rule-16 defect finding is fixed (ticked) or explicitly deferred with
+- [x] [AI] Every rule-15 and rule-16 defect finding is fixed (ticked) or explicitly deferred with
       recorded user permission.
-- [ ] [AI] `npx nx run-many -t typecheck,lint,test:quick,specs:behavior:coverage --all` exits 0.
+- [x] [AI] `npx nx run-many -t typecheck,lint,test:quick,specs:behavior:coverage --all` exits 0.
 
 > **Pause Safety**: the repository is fully rebranded in content, every quality gate is green, and
 > manual verification evidence is committed. Only the two `[HUMAN]` external-identity phases and
@@ -2167,37 +2167,37 @@ git@github.com:wahidyankf/beaver-nest.git` (or the equivalent HTTPS URL, matchin
 > _Triage every surviving `learnings.md` entry before archival. See the
 > [Knowledge Capture Convention](../../../repo-governance/development/quality/knowledge-capture.md)._
 
-- [ ] [AI] Apply the litmus test to every `learnings.md` entry — keep only if a durable surface
+- [x] [AI] Apply the litmus test to every `learnings.md` entry — keep only if a durable surface
       would catch this automatically next time; discard the rest with a one-line reason —
       acceptance: every entry has either a route or a discard reason.
-- [ ] [AI] Apply the **secret/sensitivity gate** to every surviving entry — sanitize any secret,
+- [x] [AI] Apply the **secret/sensitivity gate** to every surviving entry — sanitize any secret,
       credential, token, or private hostname to a `<placeholder>` token, or discard if
       unsanitizable — acceptance: `learnings.md` contains no raw secret.
-- [ ] [AI] Apply the **repo-relevance gate** to every surviving entry — acceptance: no infra-private
+- [x] [AI] Apply the **repo-relevance gate** to every surviving entry — acceptance: no infra-private
       content appears in this repo's routed output (not applicable here — this repo has no
       `ose-private`-style infra content, but the check is still run for completeness).
-- [ ] [AI] Route each surviving learning to exactly one durable home per the open-ended routing
+- [x] [AI] Route each surviving learning to exactly one durable home per the open-ended routing
       matrix — non-code homes may land inline (small edit) or as a `plans/backlog/` follow-up
       (large); code homes (`apps/`, `libs/`, tests) are ALWAYS filed as a separate
       `plans/backlog/<slug>/` plan and NEVER landed inline — acceptance: every `learnings.md` entry
       records its terminal routing state.
-- [ ] [AI] If no generalizable learning surfaced, record the explicit escape in `learnings.md`:
+- [x] [AI] If no generalizable learning surfaced, record the explicit escape in `learnings.md`:
       `No generalizable learnings — <one-line reason>` — acceptance: `learnings.md` is never
       silently empty.
 
 ### Phase 19 Gate
 
-- [ ] [AI] Every `learnings.md` entry is in a terminal state (routed inline, filed as backlog, or
+- [x] [AI] Every `learnings.md` entry is in a terminal state (routed inline, filed as backlog, or
       discarded with reason), or the file records the explicit "none" escape.
-- [ ] [AI] No code-homed learning landed inline in this plan's own commits.
+- [x] [AI] No code-homed learning landed inline in this plan's own commits.
 
 ### Commit Guidelines
 
-- [ ] [AI] Commit: `docs(plans): triage learnings for beaver-nest-rebrand`
+- [x] [AI] Commit: `docs(plans): triage learnings for beaver-nest-rebrand`
 
 ### Post-Push CI Verification
 
-- [ ] [AI] Commit and push to origin main; monitor CI; fix and re-push on any failure.
+- [x] [AI] Commit and push to origin main; monitor CI; fix and re-push on any failure.
 
 > **Pause Safety**: `learnings.md` is fully triaged; no future process depends on querying it later.
 > Safe to stop. To resume: re-read `learnings.md` and confirm every entry is terminal, then proceed
@@ -2207,25 +2207,34 @@ git@github.com:wahidyankf/beaver-nest.git` (or the equivalent HTTPS URL, matchin
 
 ### Plan Archival
 
-- [ ] Verify ALL delivery checklist items above are ticked.
-- [ ] Verify the Knowledge Capture phase is complete — every `learnings.md` entry reached a terminal
+- [x] Verify ALL delivery checklist items above are ticked. **Done 2026-08-01**: found 59 unchecked
+      boxes across Phases 13-16/19 whose underlying work was genuinely done (cross-referenced every
+      commit SHA against `git log --all`) but never checkbox-flipped; bulk-fixed.
+- [x] Verify the Knowledge Capture phase is complete — every `learnings.md` entry reached a terminal
       state or the file records the explicit `No generalizable learnings — <reason>` escape.
-- [ ] Verify ALL quality gates pass (local + CI) for every renamed project.
-- [ ] Verify ALL manual assertions pass (Playwright MCP / curl) with committed evidence in
-      `evidence/`.
-- [ ] Verify every rule-15 EWT/UWT/DWT defect finding is fixed (ticked) — deferral requires explicit
+      **Done**: all 14 entries carry a terminal `**Routing**:` line, committed as `60d9e726a`.
+- [x] Verify ALL quality gates pass (local + CI) for every renamed project. **Done**: confirmed via
+      `validate-env`, `pr-quality-gate`, `publish-images` all `conclusion: success` across every
+      push this plan (last: `60d9e726a`).
+- [x] Verify ALL manual assertions pass (Playwright MCP / curl) with committed evidence in
+      `evidence/`. **Done** in Phase 16.
+- [x] Verify every rule-15 EWT/UWT/DWT defect finding is fixed (ticked) — deferral requires explicit
       user permission (only when genuinely impossible) for defect findings; `SG-###`/`USS-###`
-      proposals may be triaged or deferred.
-- [ ] Verify every rule-16 AET defect finding is fixed (ticked) — deferral requires explicit user
+      proposals may be triaged or deferred. **Done**: no open rule-15 defect findings.
+- [x] Verify every rule-16 AET defect finding is fixed (ticked) — deferral requires explicit user
       permission (only when genuinely impossible); `SG-###` spec-gap proposals may be triaged or
-      deferred.
-- [ ] Verify Phase 17 and Phase 18's `[HUMAN]` gates both passed (GitHub repo renamed, local folder
-      renamed and remote re-pointed).
-- [ ] Rename and move: `git mv plans/in-progress/beaver-nest-rebrand/
+      deferred. **Done**: AET-001 (null-byte path error envelope) deferred to backlog idea
+      `plans/ideas/beaver-nest-be-nullbyte-path-error-envelope.md` per Phase 16.
+- [x] Verify Phase 17 and Phase 18's `[HUMAN]` gates both passed (GitHub repo renamed, local folder
+      renamed and remote re-pointed). **Done**: both flipped `[x]` in delivery.md with evidence.
+- [x] Rename and move: `git mv plans/in-progress/beaver-nest-rebrand/
 plans/done/YYYY-MM-DD__beaver-nest-rebrand/` using today's date as the completion date (NOT
       the creation date) — run this from whatever the checkout's current path is post-Phase-18.
-- [ ] Update `plans/in-progress/README.md` — remove this plan's entry.
-- [ ] Update `plans/done/README.md` — add this plan's entry with its completion date.
-- [ ] Update any other READMEs that reference this plan (e.g., `plans/README.md`).
-- [ ] Commit the archival (the `evidence/` subfolder moves with the plan):
+      **Done 2026-08-01**: `git mv` to `plans/done/2026-08-01__beaver-nest-rebrand/`.
+- [x] Update `plans/in-progress/README.md` — remove this plan's entry. **Done.**
+- [x] Update `plans/done/README.md` — add this plan's entry with its completion date. **Done.**
+- [x] Update any other READMEs that reference this plan (e.g., `plans/README.md`). **Done**:
+      `plans/README.md` has no per-plan entries; `plans/ideas/beaver-nest-be-nullbyte-path-error-envelope.md`
+      cites this plan by name only (no path/link), left as-is.
+- [x] Commit the archival (the `evidence/` subfolder moves with the plan):
       `chore(plans): move beaver-nest-rebrand to done`, then commit and push to origin main.
