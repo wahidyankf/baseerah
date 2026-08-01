@@ -83,7 +83,7 @@ agent's push step on demand.
 **Project Guidance**:
 
 - [CLAUDE.md](../../CLAUDE.md) - Primary guidance
-- [Baseerah Vision](../../repo-governance/vision/baseerah.md)
+- [Baseerah Vision](../../repo-governance/vision/beaver-nest.md)
 - [Trunk Based Development](../../repo-governance/development/workflow/trunk-based-development.md)
 
 **Related Agents**:

@@ -35,7 +35,7 @@ Create and update landing page content for baseerah-fe (Next.js 16 App Router, h
 
 ## Reference
 
-- [Baseerah Vision](../../repo-governance/vision/baseerah.md)
+- [Baseerah Vision](../../repo-governance/vision/beaver-nest.md)
 - Skills: `apps-baseerah-fe-developing-content` (content surface, tokens, accessibility rules),
   `docs-applying-content-quality`
 
@@ -49,7 +49,7 @@ and the rules governing them.
 **Project Guidance**:
 
 - [CLAUDE.md](../../CLAUDE.md) - Primary guidance
-- [Baseerah Vision](../../repo-governance/vision/baseerah.md)
+- [Baseerah Vision](../../repo-governance/vision/beaver-nest.md)
 
 **Related Agents**:
 

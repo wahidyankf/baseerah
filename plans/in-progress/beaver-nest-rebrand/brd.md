@@ -10,7 +10,7 @@ name, container images) is consistent and no longer carries a placeholder name.
 ## Business Impact
 
 **Pain point**: The repository was scaffolded quickly under a working name chosen to unblock the
-walking-skeleton build (see [Baseerah Vision](../../../repo-governance/vision/baseerah.md)). The
+walking-skeleton build (see [Baseerah Vision](../../../repo-governance/vision/beaver-nest.md)). The
 maintainer has since settled on a permanent name and wants the rename done now, before the surface
 area grows further. `[Judgment call]`: every week this rename is deferred, more files, agents, CI
 workflows, and specs accrue references to the old name, and the eventual rename gets strictly more

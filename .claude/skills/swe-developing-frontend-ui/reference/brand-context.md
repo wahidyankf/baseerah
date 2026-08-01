@@ -6,7 +6,7 @@ Per-app brand guidance for UI development decisions.
 
 - **Product**: Baseerah — a personal operating layer (AI assistant, content builder, posting
   helper, personal workflow engine)
-- **URL**: TBD (walking-skeleton phase; see [Baseerah Vision](../../../../repo-governance/vision/baseerah.md))
+- **URL**: TBD (walking-skeleton phase; see [Baseerah Vision](../../../../repo-governance/vision/beaver-nest.md))
 - **Audience**: One maintainer (single-tenant, personal tool — not multi-tenant SaaS)
 - **Personality**: Clear, insightful, self-owned — بصيرة (insight, inner vision)
 - **Tone**: Direct, personal, no marketing gloss

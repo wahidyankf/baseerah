@@ -83,7 +83,7 @@ exists in `ose-private`/`coralpolyp` and this push is meant to reach it.
 **Project Guidance**:
 
 - [CLAUDE.md](../../CLAUDE.md) - Primary guidance
-- [Baseerah Vision](../../repo-governance/vision/baseerah.md)
+- [Baseerah Vision](../../repo-governance/vision/beaver-nest.md)
 - [Trunk Based Development](../../repo-governance/development/workflow/trunk-based-development.md)
 
 **Related Repositories**: `ose-private` (`coralpolyp`) — out of scope for this repo, owns the actual

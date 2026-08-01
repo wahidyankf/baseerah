@@ -69,7 +69,7 @@ See `repo-applying-maker-checker-fixer` Skill for:
 **Project Guidance**:
 
 - [CLAUDE.md](../../CLAUDE.md) - Primary guidance
-- [Baseerah Vision](../../repo-governance/vision/baseerah.md)
+- [Baseerah Vision](../../repo-governance/vision/beaver-nest.md)
 
 **Related Agents**:
 

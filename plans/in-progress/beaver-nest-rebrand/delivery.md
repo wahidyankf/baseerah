@@ -209,11 +209,18 @@ baseerah$" CONTRIBUTING.md` returns `2` (the two preserved GitHub-URL lines, and
 `LICENSING-NOTICE.md`. **Notes**: all acceptance greps verified 0/exact-match as specified. Found and
 fixed a preexisting defect in this phase's own acceptance-criterion text (line 188's `grep` pattern used
 a bare `^cd baseerah$` anchor that silently fails to match CONTRIBUTING.md's 3-space-indented line —
-same bug class as iteration-18's finding; corrected to `^\s*cd baseerah$`). `md links validate` now
-shows 27 broken links to the old `repo-governance/vision/baseerah.md` path across files owned by later
-phases (`.claude/agents/`, `.opencode/agents/`, `plans/ideas/`, `specs/apps/baseerah/`) — expected
-transient breakage per this plan's own serial-spine design; each phase's own content sweep fixes its
-file set's references in turn (Phases 2, 3, 4, 6, 14).
+same bug class as iteration-18's finding; corrected to `^\s*cd baseerah$`). Discovered mid-phase: the
+repo's pre-push hook runs `md links validate` repo-wide and blocks the push on ANY broken link, not
+scoped to this phase's file set — so renaming `vision/baseerah.md` broke 27 inbound links from files
+outside Phase 1's scope (`.claude/agents/`, `.cursor/agents/`, `.opencode/agents/`, `plans/ideas/`,
+`specs/apps/baseerah/product/README.md`, and this plan's own `README.md`/`brd.md`). This means the
+plan's "each phase pushes independently" assumption needs a small addendum: **every phase that
+`git mv`s a path must also repoint (not fully content-sweep) all repo-wide inbound links to that path
+in the SAME commit**, even though the referencing file's full `baseerah`→`beaver-nest` content sweep
+stays deferred to its own designated phase. Applied here via a targeted single-string sed
+(`repo-governance/vision/baseerah\.md` → `repo-governance/vision/beaver-nest.md`) across exactly the
+27 files `git grep -l` found, touching nothing else in them. Logged to `learnings.md` as a
+generalizable pattern for every later phase that renames a path (Phases 6, 8, 9, 10, 11, 12).
 
 ### Local Quality Gates (Before Push)
 
@@ -1188,20 +1195,20 @@ definition` → `...beaver-nest-default.json...`) — leaving either one unrenam
       pointer and the agent definition" (`specs/apps/rhino/behavior/rhino-cli/gherkin/harness/agents-bindings.feature:10-15`),
       with only its step text changing.
 
-                        ```gherkin
-                        Scenario: rhino-cli's Amazon Q binding constant points at the renamed file
-                          Given apps/rhino-cli's AMAZONQ_AGENT_DEFINITION constant after the rhino-cli rename phase
-                          When nx run rhino-cli:test:integration runs
-                          Then the test asserting the constant's path value passes against ".amazonq/cli-agents/beaver-nest-default.json"
-                          And the generated file's "name" field reads "beaver-nest-default"
-                        ```
+                                ```gherkin
+                                Scenario: rhino-cli's Amazon Q binding constant points at the renamed file
+                                  Given apps/rhino-cli's AMAZONQ_AGENT_DEFINITION constant after the rhino-cli rename phase
+                                  When nx run rhino-cli:test:integration runs
+                                  Then the test asserting the constant's path value passes against ".amazonq/cli-agents/beaver-nest-default.json"
+                                  And the generated file's "name" field reads "beaver-nest-default"
+                                ```
 
-                        Acceptance: run `npx nx run rhino-cli:test:integration` (or the project's equivalent test
-                        target covering `tests/agents.rs`) and confirm the suite runs without a step-binding-mismatch
-                        error (the renamed macro literal and the renamed Gherkin step text resolve to each other) but
-                        the "Emitting writes the rules pointer and the agent definition" scenario's assertions fail
-                        against the still-unrenamed source constant in `bindings.rs` (a deliberate, expected RED
-                        state).
+                                Acceptance: run `npx nx run rhino-cli:test:integration` (or the project's equivalent test
+                                target covering `tests/agents.rs`) and confirm the suite runs without a step-binding-mismatch
+                                error (the renamed macro literal and the renamed Gherkin step text resolve to each other) but
+                                the "Emitting writes the rules pointer and the agent definition" scenario's assertions fail
+                                against the still-unrenamed source constant in `bindings.rs` (a deliberate, expected RED
+                                state).
 
 - [ ] [AI] GREEN: edit `apps/rhino-cli/src/application/agents/bindings.rs` — rename the
       `AMAZONQ_AGENT_DEFINITION` constant's value to `".amazonq/cli-agents/beaver-nest-default.json"`

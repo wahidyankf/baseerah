@@ -86,7 +86,7 @@ See [delivery.md](./delivery.md) for the full phased checklist, `## Worktree` de
 
 ## Related Documentation
 
-- [Baseerah Vision](../../../repo-governance/vision/baseerah.md) — the document this plan replaces
+- [Baseerah Vision](../../../repo-governance/vision/beaver-nest.md) — the document this plan replaces
   with `beaver-nest.md`
 - [Baseerah Repo Reset](../../done/2026-07-31__baseerah-repo-reset/README.md) — the plan that
   created the walking skeleton this rename now relabels

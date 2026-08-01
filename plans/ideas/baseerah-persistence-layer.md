@@ -11,7 +11,7 @@ greeting is a hardcoded constant.
 skeleton: "No persistence. No database, no in-memory store, no state of any kind. The greeting is a
 constant." That was the right scope for a walking skeleton, but it means Baseerah has zero
 capability to remember anything — no notes, no captures, no user data — which is the entire point
-of the product per [Baseerah Vision](../../repo-governance/vision/baseerah.md).
+of the product per [Baseerah Vision](../../repo-governance/vision/beaver-nest.md).
 
 ## Why now
 

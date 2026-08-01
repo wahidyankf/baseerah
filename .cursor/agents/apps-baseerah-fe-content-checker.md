@@ -53,7 +53,7 @@ See `repo-applying-maker-checker-fixer` Skill for:
 
 ## Reference
 
-- [Baseerah Vision](../../repo-governance/vision/baseerah.md)
+- [Baseerah Vision](../../repo-governance/vision/beaver-nest.md)
 - Skills: `apps-baseerah-fe-developing-content`, `repo-assessing-criticality-confidence`, `repo-generating-validation-reports`
 
 ## Reference Documentation
@@ -61,7 +61,7 @@ See `repo-applying-maker-checker-fixer` Skill for:
 **Project Guidance**:
 
 - [CLAUDE.md](../../CLAUDE.md) - Primary guidance
-- [Baseerah Vision](../../repo-governance/vision/baseerah.md)
+- [Baseerah Vision](../../repo-governance/vision/beaver-nest.md)
 
 **Related Agents**:
 

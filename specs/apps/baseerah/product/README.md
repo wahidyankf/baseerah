@@ -37,5 +37,5 @@ See [ROADMAP.md](../../../../ROADMAP.md) for the full phase sequence.
 
 - [overview.md](./overview.md) — one-page product overview
 - [system-context/](../system-context/README.md) — C4 L1 actors and external systems
-- [repo-governance/vision/baseerah.md](../../../../repo-governance/vision/baseerah.md) — why
+- [repo-governance/vision/beaver-nest.md](../../../../repo-governance/vision/beaver-nest.md) — why
   Baseerah exists
