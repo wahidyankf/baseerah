@@ -1,5 +1,5 @@
 {
-  "name": "baseerah-be-e2e",
+  "name": "beaver-nest-be-e2e",
   "private": true,
   "scripts": {
     "test": "playwright test",

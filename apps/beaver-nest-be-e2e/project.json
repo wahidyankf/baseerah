@@ -1,28 +1,28 @@
 {
-  "name": "baseerah-be-e2e",
+  "name": "beaver-nest-be-e2e",
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "projectType": "application",
-  "sourceRoot": "apps/baseerah-be-e2e/steps",
+  "sourceRoot": "apps/beaver-nest-be-e2e/steps",
   "targets": {
     "install": {
       "executor": "nx:run-commands",
       "options": {
         "command": "npm install",
-        "cwd": "apps/baseerah-be-e2e"
+        "cwd": "apps/beaver-nest-be-e2e"
       }
     },
     "lint": {
       "executor": "nx:run-commands",
       "options": {
         "command": "npx oxlint@latest .",
-        "cwd": "apps/baseerah-be-e2e"
+        "cwd": "apps/beaver-nest-be-e2e"
       }
     },
     "typecheck": {
       "executor": "nx:run-commands",
       "options": {
         "command": "npx bddgen && npx tsc --noEmit",
-        "cwd": "apps/baseerah-be-e2e"
+        "cwd": "apps/beaver-nest-be-e2e"
       },
       "inputs": ["default", "{workspaceRoot}/specs/apps/beaver-nest/behavior/beaver-nest-be/gherkin/**/*.feature"]
     },
@@ -45,11 +45,11 @@
       "cache": true,
       "options": {
         "commands": [
-          "npx nx run baseerah-be-e2e:typecheck",
-          "npx nx run baseerah-be-e2e:lint",
-          "npx nx run baseerah-be-e2e:test:unit",
-          "npx nx run baseerah-be-e2e:test:coverage",
-          "npx nx run baseerah-be-e2e:test:specs"
+          "npx nx run beaver-nest-be-e2e:typecheck",
+          "npx nx run beaver-nest-be-e2e:lint",
+          "npx nx run beaver-nest-be-e2e:test:unit",
+          "npx nx run beaver-nest-be-e2e:test:coverage",
+          "npx nx run beaver-nest-be-e2e:test:specs"
         ],
         "parallel": false
       },
@@ -65,20 +65,20 @@
       "executor": "nx:run-commands",
       "options": {
         "command": "npx bddgen && npx playwright test --ui",
-        "cwd": "apps/baseerah-be-e2e"
+        "cwd": "apps/beaver-nest-be-e2e"
       }
     },
     "test:e2e:report": {
       "executor": "nx:run-commands",
       "options": {
         "command": "npx playwright show-report",
-        "cwd": "apps/baseerah-be-e2e"
+        "cwd": "apps/beaver-nest-be-e2e"
       }
     },
     "specs:behavior:coverage": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- specs behavior-coverage validate --shared-steps specs/apps/beaver-nest/behavior/beaver-nest-be/gherkin apps/baseerah-be-e2e"
+        "command": "cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- specs behavior-coverage validate --shared-steps specs/apps/beaver-nest/behavior/beaver-nest-be/gherkin apps/beaver-nest-be-e2e"
       },
       "cache": true,
       "inputs": [
@@ -89,8 +89,8 @@
     "specs:e2e:coverage": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "npx bddgen && cargo run --release --quiet --manifest-path ../../apps/rhino-cli/Cargo.toml -- specs e2e-coverage validate --project baseerah-be-e2e --features \"../../specs/apps/beaver-nest/behavior/beaver-nest-be/gherkin/**/*.feature\" --features-gen .features-gen --baseline e2e-coverage-baseline.json",
-        "cwd": "apps/baseerah-be-e2e"
+        "command": "npx bddgen && cargo run --release --quiet --manifest-path ../../apps/rhino-cli/Cargo.toml -- specs e2e-coverage validate --project beaver-nest-be-e2e --features \"../../specs/apps/beaver-nest/behavior/beaver-nest-be/gherkin/**/*.feature\" --features-gen .features-gen --baseline e2e-coverage-baseline.json",
+        "cwd": "apps/beaver-nest-be-e2e"
       },
       "cache": true,
       "inputs": [
@@ -134,9 +134,9 @@
       "executor": "nx:run-commands",
       "options": {
         "commands": [
-          "npx nx run baseerah-be-e2e:specs:structure-validation",
-          "npx nx run baseerah-be-e2e:specs:behavior:coverage",
-          "npx nx run baseerah-be-e2e:specs:e2e:coverage"
+          "npx nx run beaver-nest-be-e2e:specs:structure-validation",
+          "npx nx run beaver-nest-be-e2e:specs:behavior:coverage",
+          "npx nx run beaver-nest-be-e2e:specs:e2e:coverage"
         ],
         "parallel": false
       },
@@ -147,6 +147,6 @@
   "namedInputs": {
     "specs": ["{workspaceRoot}/specs/apps/beaver-nest/behavior/beaver-nest-be/gherkin/**/*.feature"]
   },
-  "tags": ["type:e2e", "platform:playwright", "lang:ts", "domain:baseerah"],
+  "tags": ["type:e2e", "platform:playwright", "lang:ts", "domain:beaver-nest"],
   "implicitDependencies": ["beaver-nest-be"]
 }
