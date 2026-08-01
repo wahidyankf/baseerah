@@ -928,13 +928,14 @@ run beaver-nest-be:test:unit` — acceptance: exits 0, all prior `BaseerahBe` te
 
 ## Phase 10: `beaver-nest-fe` (Next.js) and Brand-Chip Removal
 
-- [ ] [AI] Rename the app directory: `git mv apps/baseerah-fe apps/beaver-nest-fe` — acceptance:
+- [x] [AI] Rename the app directory: `git mv apps/baseerah-fe apps/beaver-nest-fe` — acceptance:
       `test -d apps/beaver-nest-fe` succeeds. **Also**: Phase 5 deliberately left
       `repo-config.yml`'s `env-contract.surfaces[].root: apps/baseerah-fe` and
       `env-injection.apps[].app: baseerah-fe` / `keys-from: apps/baseerah-fe/.env.example`
       unrenamed (see [learnings.md](./learnings.md)) — flip both to their `beaver-nest-fe` forms in
-      this same phase.
-- [ ] [AI] Apply `<CANONICAL-SED>` to every file under `apps/beaver-nest-fe/`, then per Decision 12
+      this same phase. **Done 2026-08-01**: dir moved, both repo-config.yml fields flipped, `env
+validate` clean.
+- [x] [AI] Apply `<CANONICAL-SED>` to every file under `apps/beaver-nest-fe/`, then per Decision 12
       revert the three GitHub-URL citations the sed pass just mangled (Phase 17 flips them for real
       once the GitHub rename has actually happened): `perl -pi -e
 's/github\.com\/wahidyankf\/beaver-nest/github.com\/wahidyankf\/baseerah/g'
@@ -943,8 +944,10 @@ apps/beaver-nest-fe/src/app/page.test.tsx` — acceptance: `git grep -lic baseer
 apps/beaver-nest-fe/` returns only these three files after the remaining steps in this phase
       also complete, and `grep -c "wahidyankf/baseerah" apps/beaver-nest-fe/Dockerfile
 apps/beaver-nest-fe/src/components/AppShell.tsx apps/beaver-nest-fe/src/app/page.test.tsx`
-      returns `1` for each of the three.
-- [ ] [AI] Confirm the brand copy is already fully converted (no hand-edit needed here — the prior
+      returns `1` for each of the three. **Done 2026-08-01**: confirmed exactly the 3 files, count 1
+      each; also forward-fixed the Nx-graph-break in `apps/baseerah-fe-e2e/project.json`'s
+      `implicitDependencies` (`"baseerah-fe"` → `"beaver-nest-fe"`, same class of bug as Phase 6/8).
+- [x] [AI] Confirm the brand copy is already fully converted (no hand-edit needed here — the prior
       `<CANONICAL-SED>` step already rewrote every "Baseerah" occurrence under
       `apps/beaver-nest-fe/`, including the brand-name heading and footer in
       `apps/beaver-nest-fe/src/components/AppFrame.tsx` (`<AppHeader title="BeaverNest" />` and
@@ -954,8 +957,8 @@ apps/beaver-nest-fe/src/components/AppShell.tsx apps/beaver-nest-fe/src/app/page
       brand-chip element a few lines below the description, which still contains
       `wawasan`/`بصيرة`, is untouched by `<CANONICAL-SED>` (it is not a "Baseerah" occurrence) and is
       deleted by the next GREEN step — acceptance: `grep -c "BeaverNest is a personal operating
-layer" apps/beaver-nest-fe/src/components/AppShell.tsx` returns `1`.
-- [ ] [AI] Hand-edit `apps/beaver-nest-fe/src/app/layout.tsx`'s `metadata.description` field: the
+layer" apps/beaver-nest-fe/src/components/AppShell.tsx` returns `1`. **Done 2026-08-01**: confirmed.
+- [x] [AI] Hand-edit `apps/beaver-nest-fe/src/app/layout.tsx`'s `metadata.description` field: the
       prior `<CANONICAL-SED>` step already renamed `"Baseerah — insight, wawasan"` to
       `"BeaverNest — insight, wawasan"` (it does contain the literal "Baseerah" token, so the sed
       pass touches it), but leaves the "insight, wawasan" etymology gloss in place in this
@@ -963,8 +966,9 @@ layer" apps/beaver-nest-fe/src/components/AppShell.tsx` returns `1`.
       no etymology reference (e.g. `"BeaverNest — a personal operating layer"`), per Decision 9
       (`[Repo-grounded]`: this is the one place the etymology gloss survives in rendered/served
       output outside the deleted brand chip, and no other step in this plan touches it) —
-      acceptance: `grep -c "wawasan" apps/beaver-nest-fe/src/app/layout.tsx` returns `0`.
-- [ ] [AI] GREEN (second half of the cycle whose RED landed in Phase 6; REFACTOR continues below and
+      acceptance: `grep -c "wawasan" apps/beaver-nest-fe/src/app/layout.tsx` returns `0`. **Done
+      2026-08-01**: reworded to `"BeaverNest — a personal operating layer"`.
+- [x] [AI] GREEN (second half of the cycle whose RED landed in Phase 6; REFACTOR continues below and
       in Phase 11): delete the multilingual brand-chip JSX block from
       `apps/beaver-nest-fe/src/components/AppShell.tsx` (the `title="insight (English) · wawasan
 (Indonesian) · بصيرة (Arabic)"` element and its containing wrapper), together with its
@@ -975,7 +979,7 @@ layer" apps/beaver-nest-fe/src/components/AppShell.tsx` returns `1`.
       scenario Phase 6's RED step embedded) — acceptance:`grep -c 'title="insight'
       apps/beaver-nest-fe/src/components/AppShell.tsx`returns`0`and`grep -c "DWT-004"
       apps/beaver-nest-fe/src/components/AppShell.tsx`returns`0`.
-- [ ] [AI] GREEN: author the bound scenario into the feature file, so the AC4 binding is a scenario
+- [x] [AI] GREEN: author the bound scenario into the feature file, so the AC4 binding is a scenario
       `rhino-cli` actually validates, not one merely implied by the old scenario's absence. Add the
       following scenario to
       `specs/apps/beaver-nest/behavior/beaver-nest-fe/gherkin/hello/landing-page.feature`, at the
@@ -991,9 +995,11 @@ layer" apps/beaver-nest-fe/src/components/AppShell.tsx` returns `1`.
       ```
 
       Acceptance: the scenario text above appears verbatim in the feature file (spot-check with a
-      manual read or `grep -A4 "no longer renders a brand-chip"` against the file path above).
+      manual read or `grep -A4 "no longer renders a brand-chip"` against the file path above). **Done
+      2026-08-01**: this scenario was already authored during Phase 6's RED step (confirmed verbatim
+      match) — no re-add needed here, just verification.
 
-- [ ] [AI] GREEN: add the corresponding **no-op** step-definition entries to
+- [x] [AI] GREEN: add the corresponding **no-op** step-definition entries to
       `apps/beaver-nest-fe/src/test/landing.steps.ts`, matching this file's own established
       convention (a literal-text registry whose `Given`/`When`/`Then`/`And` calls are
       locally-shadowed no-op functions — per the file's own header comment, "The real assertions
@@ -1013,8 +1019,11 @@ beaver-nest-fe:specs:behavior:coverage` reports zero step gaps for the new scena
       `apps/rhino-cli/src/commands/specs_coverage.rs`'s `orphan_step_impls` check) for the
       still-present, not-yet-deleted `they read or hover the "بصيرة" and "wawasan" terms` step — this
       orphan is expected here and is resolved by the REFACTOR step immediately below, which deletes
-      that step definition and makes the command exit 0.
-- [ ] [AI] REFACTOR: edit `apps/beaver-nest-fe/src/app/page.test.tsx`: delete the chip-specific
+      that step definition and makes the command exit 0. **Done 2026-08-01**: 0 step gaps for the 4
+      new steps confirmed; actual orphan count was 3 (all 3 old step-defs), not the plan's estimated
+      1 — consistent with Phase 6's learnings.md finding that literal-text matching orphans every
+      step, not just one.
+- [x] [AI] REFACTOR: edit `apps/beaver-nest-fe/src/app/page.test.tsx`: delete the chip-specific
       assertions (the `screen.getByText("بصيرة")` lines and the `toHaveAttribute("title", ...)`
       assertion, in both the accessibility test and the "tells a first-time visitor" test), keeping
       the heading/greeting/description assertions (updated to "BeaverNest" by the sed pass); then, in
@@ -1029,8 +1038,9 @@ beaver-nest-fe:specs:behavior:coverage` reports zero step gaps for the new scena
       acceptance: `npx nx run beaver-nest-fe:test:unit` exits 0, `grep -c
 "queryByTitle(/insight/i)).not.toBeInTheDocument" apps/beaver-nest-fe/src/app/page.test.tsx`
       returns `1`, and `grep -c "glosses the multilingual chip"
-apps/beaver-nest-fe/src/app/page.test.tsx` returns `0`.
-- [ ] [AI] REFACTOR: edit `apps/beaver-nest-fe/src/test/landing.steps.ts`: delete all three
+apps/beaver-nest-fe/src/app/page.test.tsx` returns `0`. **Done 2026-08-01**: `test:unit` 7/7 pass,
+      both acceptance greps confirmed.
+- [x] [AI] REFACTOR: edit `apps/beaver-nest-fe/src/test/landing.steps.ts`: delete all three
       now-orphaned step definitions belonging to the scenario Phase 6 deleted —
       `Given("a first-time visitor viewing the homepage brand chip", ...)`,
       `When('they read or hover the "بصيرة" and "wawasan" terms', ...)`, and
@@ -1038,40 +1048,47 @@ apps/beaver-nest-fe/src/app/page.test.tsx` returns `0`.
       three, not just the `When` line — orphan detection is per-step-text, so leaving the
       `Given`/`Then` lines would still fail) — acceptance: `npx nx run
 beaver-nest-fe:specs:behavior:coverage` exits 0 (this resolves Phase 6's deliberate RED for the
-      FE project; Phase 11 resolves the same RED for the FE-E2E project).
-- [ ] [AI] Run `npx nx run beaver-nest-fe:codegen` then `npx nx run beaver-nest-fe:test:unit` —
-      acceptance: both exit 0.
+      FE project; Phase 11 resolves the same RED for the FE-E2E project). **Done 2026-08-01**:
+      `specs:behavior:coverage` exits 0 (1 spec, 6 scenarios, 20 steps, all covered).
+- [x] [AI] Run `npx nx run beaver-nest-fe:codegen` then `npx nx run beaver-nest-fe:test:unit` —
+      acceptance: both exit 0. **Done 2026-08-01**: both exit 0, 7/7 tests pass.
 
 ### Local Quality Gates (Before Push)
 
-- [ ] Run `npx nx affected -t typecheck lint test:quick specs:behavior:coverage` — fix ALL failures.
+- [x] Run `npx nx affected -t typecheck lint test:quick specs:behavior:coverage` — fix ALL failures.
+      **Done 2026-08-01**: `beaver-nest-fe` fully green. Only remaining affected-RED: `baseerah-fe-e2e`
+      (Phase 11 territory).
 
 ### Specs & Gherkin Delivery
 
-- [ ] [AI] Confirm `specs/apps/beaver-nest/behavior/beaver-nest-fe/gherkin/hello/landing-page.feature`
+- [x] [AI] Confirm `specs/apps/beaver-nest/behavior/beaver-nest-fe/gherkin/hello/landing-page.feature`
       (edited in Phase 6, scenario authored above) has no remaining reference to the deleted "brand
       chip is understandable" scenario, contains the new "no longer renders a brand-chip etymology
       gloss" scenario, and its other four preexisting scenarios read "BeaverNest" — acceptance:
       `grep -c "Scenario:" specs/apps/beaver-nest/behavior/beaver-nest-fe/gherkin/hello/landing-page.feature`
       returns `5` and `grep -c "BeaverNest" specs/apps/beaver-nest/behavior/beaver-nest-fe/gherkin/hello/landing-page.feature`
-      returns at least `4`.
+      returns at least `4`. **Done 2026-08-01**: both confirmed (5 scenarios, 5 "BeaverNest" hits).
 
 ### Commit Guidelines
 
-- [ ] [AI] Commit: `chore(rebrand): rename baseerah-fe to beaver-nest-fe, remove brand-chip feature`
+- [x] [AI] Commit: `chore(rebrand): rename baseerah-fe to beaver-nest-fe, remove brand-chip feature`
 
 ### Post-Push CI Verification
 
-- [ ] [AI] Commit and push to origin main; monitor CI; fix and re-push on any failure.
+- [ ] [AI] Commit and push to origin main; monitor CI; fix and re-push on any failure. **Deferred
+      2026-08-01 (plan amendment, user-directed)**: per the Phase 6 push-collapse decision (see
+      [learnings.md](./learnings.md)), stays local; push happens once for the whole Phase 6-11
+      stretch (task #360).
 
 ### Phase 10 Gate
 
-- [ ] [AI] `git grep -lic baseerah apps/beaver-nest-fe/` returns exactly the three Decision-12
+- [x] [AI] `git grep -lic baseerah apps/beaver-nest-fe/` returns exactly the three Decision-12
       GitHub-URL files (`Dockerfile`, `src/components/AppShell.tsx`, `src/app/page.test.tsx`) and no
-      others.
-- [ ] [AI] `npx nx run beaver-nest-fe:test:quick` exits 0.
-- [ ] [AI] `grep -c "wawasan" apps/beaver-nest-fe/src/app/layout.tsx` returns `0`.
-- [ ] [AI] `grep -c "DWT-004" apps/beaver-nest-fe/src/components/AppShell.tsx` returns `0`.
+      others. **Done 2026-08-01**.
+- [x] [AI] `npx nx run beaver-nest-fe:test:quick` exits 0. **Done 2026-08-01**.
+- [x] [AI] `grep -c "wawasan" apps/beaver-nest-fe/src/app/layout.tsx` returns `0`. **Done 2026-08-01**.
+- [x] [AI] `grep -c "DWT-004" apps/beaver-nest-fe/src/components/AppShell.tsx` returns `0`. **Done
+      2026-08-01**.
 
 > **Pause Safety**: `beaver-nest-fe` is fully renamed, the brand-chip feature is removed end to end
 > (component, unit test, Gherkin scenario, one step definition), and the FE `specs:behavior:coverage` RED
@@ -1420,20 +1437,20 @@ definition` → `...beaver-nest-default.json...`) — leaving either one unrenam
       pointer and the agent definition" (`specs/apps/rhino/behavior/rhino-cli/gherkin/harness/agents-bindings.feature:10-15`),
       with only its step text changing.
 
-                                                                                                                  ```gherkin
-                                                                                                                  Scenario: rhino-cli's Amazon Q binding constant points at the renamed file
-                                                                                                                    Given apps/rhino-cli's AMAZONQ_AGENT_DEFINITION constant after the rhino-cli rename phase
-                                                                                                                    When nx run rhino-cli:test:integration runs
-                                                                                                                    Then the test asserting the constant's path value passes against ".amazonq/cli-agents/beaver-nest-default.json"
-                                                                                                                    And the generated file's "name" field reads "beaver-nest-default"
-                                                                                                                  ```
+                                                                                                                                      ```gherkin
+                                                                                                                                      Scenario: rhino-cli's Amazon Q binding constant points at the renamed file
+                                                                                                                                        Given apps/rhino-cli's AMAZONQ_AGENT_DEFINITION constant after the rhino-cli rename phase
+                                                                                                                                        When nx run rhino-cli:test:integration runs
+                                                                                                                                        Then the test asserting the constant's path value passes against ".amazonq/cli-agents/beaver-nest-default.json"
+                                                                                                                                        And the generated file's "name" field reads "beaver-nest-default"
+                                                                                                                                      ```
 
-                                                                                                                  Acceptance: run `npx nx run rhino-cli:test:integration` (or the project's equivalent test
-                                                                                                                  target covering `tests/agents.rs`) and confirm the suite runs without a step-binding-mismatch
-                                                                                                                  error (the renamed macro literal and the renamed Gherkin step text resolve to each other) but
-                                                                                                                  the "Emitting writes the rules pointer and the agent definition" scenario's assertions fail
-                                                                                                                  against the still-unrenamed source constant in `bindings.rs` (a deliberate, expected RED
-                                                                                                                  state).
+                                                                                                                                      Acceptance: run `npx nx run rhino-cli:test:integration` (or the project's equivalent test
+                                                                                                                                      target covering `tests/agents.rs`) and confirm the suite runs without a step-binding-mismatch
+                                                                                                                                      error (the renamed macro literal and the renamed Gherkin step text resolve to each other) but
+                                                                                                                                      the "Emitting writes the rules pointer and the agent definition" scenario's assertions fail
+                                                                                                                                      against the still-unrenamed source constant in `bindings.rs` (a deliberate, expected RED
+                                                                                                                                      state).
 
 - [ ] [AI] GREEN: edit `apps/rhino-cli/src/application/agents/bindings.rs` — rename the
       `AMAZONQ_AGENT_DEFINITION` constant's value to `".amazonq/cli-agents/beaver-nest-default.json"`
