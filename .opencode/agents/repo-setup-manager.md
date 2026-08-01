@@ -137,3 +137,4 @@ See [Vercel MCP Capability Convention](../../repo-governance/development/infra/v
 - [Plan Execution Workflow](../../repo-governance/workflows/plan/plan-execution.md) — Phase 0 is
   the first phase of every plan
 - [plan-maker Agent](./plan-maker.md) — delivery template includes Phase 0
+- [File-Touch Discipline](../../repo-governance/development/practice/file-touch-discipline.md) - Keep a ledger of every path you touch, carry it through every compaction, leave anything not on it alone, and stage explicit paths

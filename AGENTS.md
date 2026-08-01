@@ -282,6 +282,17 @@ min; stale 30 min triggers `TaskStop` and relaunch.
 **Same-machine assumption**: other agents/engineers/processes run concurrently on the same shared
 disk, git object store, worktrees, and CI runners, so every orchestration and git action must be
 concurrency-safe.
+**File-touch ledger**: these repos are edited constantly by agents and humans — in worktrees, on
+branches, and on local `main` — so keep a deliberate, append-only record of every file you touch,
+**reproduce it in full through every compaction, summary, and handoff**, and reconcile it against
+`git status` before staging. `git status` is the union of everyone's work, never a report of yours.
+Anything not on your ledger is another actor's in-flight work: leave it untouched, and without a
+ledger assume **nothing** is yours.
+**Harness mirrors are generated, not hand-written**: `.claude/` is the only hand-authored surface;
+`.opencode/`, `.cursor/`, and `.amazonq/` are emitted by `rhino-cli harness bindings generate`
+(`npm run generate:bindings`, also run and auto-staged by pre-commit). Those mirrors are files you
+touched — they go on your ledger and into the **same commit** as their source, never a follow-up
+sync commit. Verify with `npm run validate:sync`; never hand-edit a mirror.
 **DAG-first**: every task list/delivery checklist declares a dependency DAG (`blocks`/`blockedBy`);
 independent nodes fan out up to N, dependent nodes serialize, cleanup is the terminal node.
 **Background-slot preference**: fill background slots up to N, keeping the main thread the vacant
@@ -292,6 +303,7 @@ maintain a live task list, marking in-progress/completed and adding discovered t
 [Subagent Orchestration Convention](./repo-governance/development/agents/subagent-orchestration.md),
 [Parallel-by-Default Practice](./repo-governance/development/practice/parallel-by-default.md),
 [Task List Discipline](./repo-governance/development/practice/task-list-discipline.md),
+[File-Touch Discipline](./repo-governance/development/practice/file-touch-discipline.md),
 [No Destructive Git Operations](./repo-governance/development/workflow/no-destructive-git-operations.md),
 [Worktree and Artifact Cleanup](./repo-governance/development/workflow/worktree-and-artifact-cleanup.md)
 
@@ -311,45 +323,31 @@ maintain a live task list, marking in-progress/completed and adding discovered t
 
 ## AI Agents
 
-**Content Creation**: docs-{maker,tutorial-maker}, readme-maker, specs-maker, swe-ui-maker
+The **[agent catalog](./.claude/agents/README.md) is authoritative** — every agent is listed there by
+role. Do not maintain a second roster here. Names follow `<domain>-<role>`:
 
-**Validation**: docs-{checker,tutorial-checker,link-checker},
-readme-checker, specs-checker, swe-{code,ui}-checker, ci-checker, web-researcher,
-repo-{rules,workflow,harness-compatibility}-checker
-
-**Fixing**: docs-{fixer,tutorial-fixer,file-manager}, readme-fixer,
-specs-fixer, swe-ui-fixer, ci-fixer, repo-{rules,workflow,harness-compatibility}-fixer,
-pr-review-fixer
-
-**PR Review Cycle**: fan-out (pr-review-{architecture,logic,governance,security,integrity,performance,docs,instruction}-maker)
-to pr-review-synthesis-maker (coordinator) to pr-review-fixer — GitHub-Reviews-API-driven review cycle
-for `*-to-pr` Delivery Mode plans (see [Delivery Mode](./repo-governance/conventions/structure/plans.md#delivery-mode),
-[PR Review Quality Gate workflow](./repo-governance/workflows/pr/pr-review-quality-gate.md), and
-[PR Reviewer-Discipline Convention](./repo-governance/development/quality/pr-review-disciplines.md)).
-
-**Testing**: web-{exploratory,usability,design}-tester (live-site triad: spec-aware / spec-blind /
-design-aware); api-exploratory-tester (live REST/GraphQL, HTTP/curl-driven). All non-destructive; output
-modes: `plan` (default), `delivery` (rule-15 retest), `local-temp`.
-
-**Planning**: plan-{maker,checker,execution-checker,fixer}, repo-setup-manager. plan-maker grills user
-before/after with multiple-choice options per
-[Grilling-With-Options Convention](./repo-governance/development/workflow/grilling-with-options.md);
-Phase 0 first, `[AI]`/`[HUMAN]` tags, gated phases. See
-[plan-execution workflow](./repo-governance/workflows/plan/plan-execution.md) and
-[plan-planning workflow](./repo-governance/workflows/plan/plan-planning.md).
-
-**Development**: swe-{golang,typescript,e2e,csharp,fsharp,rust}-dev
-
-**Operations**: `apps-beaver-nest-fe-{content-maker,content-checker,content-fixer,deployer}`,
-`apps-beaver-nest-be-deployer` — the deployer agents document their intended workflow honestly: no
-production/staging deploy target is provisioned yet (see each agent's own file for specifics)
-
-**Content**: pdf-to-md-{maker,checker,fixer}
-
-**Meta**: agent-maker, repo-{rules,workflow}-maker
-
-**Maker-Checker-Fixer Pattern**: Three-stage workflow with criticality levels (CRITICAL/HIGH/MEDIUM/LOW),
-confidence assessment (HIGH/MEDIUM/FALSE_POSITIVE).
+- **maker / checker / fixer** — the three-stage pattern (criticality CRITICAL/HIGH/MEDIUM/LOW;
+  confidence HIGH/MEDIUM/FALSE_POSITIVE), spanning docs, readme, specs, ci, `swe-{code,ui}`,
+  `repo-{rules,workflow,harness-compatibility}`, and pdf-to-md.
+- **`swe-*-dev`** — language implementers. **Meta** — agent-maker, repo-{rules,workflow}-maker.
+  **Research** — web-researcher.
+- **Operations** — `apps-beaver-nest-fe-{content-maker,content-checker,content-fixer,deployer}` and
+  `apps-beaver-nest-be-deployer`. The deployer agents document their intended workflow honestly: no
+  production or staging deploy target is provisioned yet (see each agent's own file).
+- **Planning** — `plan-{maker,checker,execution-checker,fixer}`, repo-setup-manager. plan-maker
+  grills the user before/after with multiple-choice options per the
+  [Grilling-With-Options Convention](./repo-governance/development/workflow/grilling-with-options.md);
+  Phase 0 first, `[AI]`/`[HUMAN]` tags, gated phases. See the
+  [plan-execution](./repo-governance/workflows/plan/plan-execution.md) and
+  [plan-planning](./repo-governance/workflows/plan/plan-planning.md) workflows.
+- **PR Review Cycle** — eight discipline `pr-review-*-maker` specialists fan out to
+  `pr-review-synthesis-maker` (coordinator) to `pr-review-fixer`, for `*-to-pr` Delivery Mode plans.
+  See [Delivery Mode](./repo-governance/conventions/structure/plans.md#delivery-mode),
+  [PR Review Quality Gate](./repo-governance/workflows/pr/pr-review-quality-gate.md),
+  [PR Reviewer-Discipline Convention](./repo-governance/development/quality/pr-review-disciplines.md).
+- **Testing** — `web-{exploratory,usability,design}-tester` (spec-aware / spec-blind / design-aware)
+  and api-exploratory-tester. All non-destructive; output modes `plan` (default), `delivery`
+  (rule-15 retest), `local-temp`.
 
 **Web Research Default**: `web-researcher` is the default primitive for public-web information gathering.
 See [Web Research Delegation Convention](./repo-governance/conventions/writing/web-research-delegation.md).
@@ -420,20 +418,15 @@ details.
 
 ## Related Repositories
 
-This repo (`beaver-nest`) is one of **four sibling repositories** in the Open Sharia Enterprise (OSE)
-family, which cross-reference each other directly — no parent container repo exists. `beaver-nest` is
-a full member of the family and stands **outside** the three-repo OSE parity loop below: it
-scaffolded from that ecosystem but does not participate in cross-repo parity syncs. **"All of the OSE
-repos" means exactly these four** — `beaver-nest` is always included, parity loop notwithstanding.
-
-- [`ose-public`](https://github.com/wahidyankf/ose-public) — upstream source of truth for
-  scaffolding. MIT licensed.
-- [`ose-primer`](https://github.com/wahidyankf/ose-primer) — downstream public template (scaffolding
-  layer: governance, AI agents, skills, conventions, CI harness, polyglot demo apps). MIT licensed.
-- [`ose-private`](https://github.com/wahidyankf/ose-private) — private infrastructure repo (GitHub Actions
-  runner stack, `coralpolyp` app). Proprietary; not publicly accessible.
-- [`beaver-nest`](https://github.com/wahidyankf/beaver-nest) — this repo; BeaverNest, a personal
-  operating layer built as a product within the OSE ecosystem. MIT licensed.
+Four sibling repos cross-referencing each other directly — no parent container repo. **"All of the
+OSE repos" means exactly these four**; `beaver-nest` is always included, despite standing **outside**
+the three-repo parity loop below:
+[`ose-public`](https://github.com/wahidyankf/ose-public) (MIT — upstream source of truth for
+scaffolding), [`ose-primer`](https://github.com/wahidyankf/ose-primer) (MIT — downstream public
+template: governance, agents, skills, conventions, CI harness, polyglot demo apps),
+[`ose-private`](https://github.com/wahidyankf/ose-private) (proprietary — GitHub Actions runner
+stack, `coralpolyp`; not public), and this repo (MIT — a personal operating layer built as a product
+within the OSE ecosystem).
 
 Content parity between `ose-public` and `ose-primer` maintained via
 [plan-multi-repo-parity-planning](./repo-governance/workflows/plan/plan-multi-repo-parity-planning.md)
@@ -491,18 +484,18 @@ heading until the next same-level heading or end of file.
 
 Concrete tool integrations live **outside** `repo-governance/` in platform-binding directories:
 
-- **Claude Code** → `.claude/`, with `CLAUDE.md` as the Claude-Code-discoverable shim importing this file
-- **OpenCode** → `.opencode/agents/` (auto-synced from `.claude/`); reads this file (`AGENTS.md`)
-  natively; reads agent skill files at `.claude/skills/<name>/SKILL.md` natively
-- **OpenAI Codex CLI** → reads `AGENTS.md` natively (`.codex/config.toml` present)
-- **GitHub Copilot, Cursor, Windsurf, Junie, Antigravity CLI, Pi** → read `AGENTS.md` natively (Tier-1); Cursor also emits `.cursor/agents/`; no other per-tool file (no-shadowing)
-- **Amazon Q Developer** (sunsetting — IDE plugins EOS 2027-04-30; succeeded by **Kiro CLI**, which
-  reads `AGENTS.md` natively) → does not read `AGENTS.md` natively; receives a generated bridge under
-  `.amazonq/` (`rules/00-agents-md.md` + a default agent config), emitted by `rhino-cli agents emit-bindings`
-- **Aider** → reads `CONVENTIONS.md` natively per Aider's own docs
-  (<https://aider.chat/docs/usage/conventions.html>); the agents.md standard site lists Aider as a
-  supported tool but Aider's own documentation does not document AGENTS.md specifically
-- **Future**: `CONVENTIONS.md` (Aider)
+Tier-1 harnesses — OpenAI Codex CLI, GitHub Copilot, Cursor, Windsurf, Junie, Antigravity CLI, Pi,
+and Kiro CLI — read `AGENTS.md` natively and get **no** per-tool instruction file (no-shadowing).
+The exceptions:
+
+- **Claude Code** → `.claude/`, with `CLAUDE.md` as the discoverable shim importing this file
+- **OpenCode** → `.opencode/agents/`; reads `AGENTS.md` and `.claude/skills/<name>/SKILL.md` natively
+- **Cursor** → additionally emits `.cursor/agents/`
+- **Amazon Q Developer** (sunsetting — IDE plugins EOS 2027-04-30, succeeded by Kiro CLI) → does not
+  read `AGENTS.md`; gets a generated `.amazonq/` bridge (`rules/00-agents-md.md` + agent config)
+- **Aider** → reads `CONVENTIONS.md` per [its own docs](https://aider.chat/docs/usage/conventions.html)
+
+Every generated directory above is emitted by `rhino-cli harness bindings generate` — never hand-edited.
 
 See [docs/reference/platform-bindings.md](./docs/reference/platform-bindings.md) for the full catalog
 of binding directories, root instruction files, and mechanical translation artifacts. The two-tier
