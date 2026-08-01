@@ -32,7 +32,7 @@ but they all share the same Nx build system and git hooks.
 
 - **Minimal** — Node.js + Docker + jq. Covers git hooks, TypeScript projects, and
   basic E2E tests.
-- **Full** — All tools checked by doctor. Required for the planned `baseerah-be` F# backend
+- **Full** — All tools checked by doctor. Required for the planned `beaver-nest-be` F# backend
   (not yet scaffolded) and Rust CLI tools (`rhino-cli`).
 - **Automated** — Run `npm run doctor -- --fix` to auto-install missing tools. Use
   `npm run doctor -- --fix --dry-run` to preview what would be installed.
@@ -244,7 +244,7 @@ This also warms the Nx cache, making subsequent pushes fast.
 
 ### Test integration tests
 
-No app in this repo currently has a `test:integration` target (the planned `baseerah-be` F#
+No app in this repo currently has a `test:integration` target (the planned `beaver-nest-be` F#
 backend, once scaffolded, will use Docker + PostgreSQL and expose one). Until then, verify Docker
 and database tooling directly:
 
@@ -253,7 +253,7 @@ docker compose version
 docker info
 ```
 
-Once `baseerah-be` exists, run `nx run baseerah-be:test:integration` to confirm the full
+Once `beaver-nest-be` exists, run `nx run beaver-nest-be:test:integration` to confirm the full
 Docker + PostgreSQL integration path works.
 
 ## Troubleshooting
@@ -328,13 +328,13 @@ npx playwright install-deps
 
 All version requirements are auto-detected by `npm run doctor` from these config files:
 
-| Tool       | Version Source                                                                      |
-| ---------- | ----------------------------------------------------------------------------------- |
-| Node.js    | `package.json` → `volta.node`                                                       |
-| npm        | `package.json` → `volta.npm`                                                        |
-| Rust       | `apps/rhino-cli/rust-toolchain.toml` → `channel`                                    |
-| .NET       | `apps/baseerah-be/global.json` → `sdk` (planned — `baseerah-be` not yet scaffolded) |
-| Docker, jq | Any (no pinned version)                                                             |
+| Tool       | Version Source                                                                            |
+| ---------- | ----------------------------------------------------------------------------------------- |
+| Node.js    | `package.json` → `volta.node`                                                             |
+| npm        | `package.json` → `volta.npm`                                                              |
+| Rust       | `apps/rhino-cli/rust-toolchain.toml` → `channel`                                          |
+| .NET       | `apps/beaver-nest-be/global.json` → `sdk` (planned — `beaver-nest-be` not yet scaffolded) |
+| Docker, jq | Any (no pinned version)                                                                   |
 
 Never hardcode version numbers in scripts — always read from these source-of-truth files.
 

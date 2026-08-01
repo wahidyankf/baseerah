@@ -11,11 +11,11 @@ created: 2025-11-29
 
 # Components & Code Architecture
 
-C4 Level 3 component diagrams and Level 4 code architecture for the Baseerah platform.
+C4 Level 3 component diagrams and Level 4 code architecture for the BeaverNest platform.
 
-> **2026 Baseerah repo reset**: the `ose-www`, `ayokoding-cli`, and `ayokoding-www` components
+> **2026 BeaverNest repo reset**: the `ose-www`, `ayokoding-cli`, and `ayokoding-www` components
 > previously documented here were deleted along with their apps. `rhino-cli` is the sole
-> surviving app; `baseerah-fe` and `baseerah-be` are planned but not yet scaffolded, so no
+> surviving app; `beaver-nest-fe` and `beaver-nest-be` are planned but not yet scaffolded, so no
 > component diagram exists for them yet. See [applications.md](./applications.md).
 
 ## C4 Level 3: Component Diagrams
@@ -58,5 +58,5 @@ graph TB
 ## C4 Level 4: Code Architecture
 
 Shows implementation details for critical components. No Level 4 breakdown is documented yet
-beyond the `rhino-cli` Level 3 diagram above; this section will gain entries for `baseerah-fe`
-and `baseerah-be` once those apps are scaffolded.
+beyond the `rhino-cli` Level 3 diagram above; this section will gain entries for `beaver-nest-fe`
+and `beaver-nest-be` once those apps are scaffolded.

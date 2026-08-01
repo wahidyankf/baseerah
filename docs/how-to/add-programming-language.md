@@ -1,6 +1,6 @@
 ---
 title: "How to Add a Programming Language"
-description: "Historical record of the ayokoding-www content-authoring workflow. ayokoding-www no longer lives in this repo (see Baseerah repo-reset); not currently actionable here."
+description: "Historical record of the ayokoding-www content-authoring workflow. ayokoding-www no longer lives in this repo (see BeaverNest repo-reset); not currently actionable here."
 category: how-to
 tags:
   - programming-languages
@@ -14,7 +14,7 @@ created: 2025-12-18
 # How to Add a Programming Language
 
 > **Historical note**: `ayokoding-www` — the app this guide targets — was removed from this
-> repository in the Baseerah repo-reset (this repo no longer serves AyoKoding's educational
+> repository in the BeaverNest repo-reset (this repo no longer serves AyoKoding's educational
 > content; see [tech-docs Decision 12](../../plans/done/2026-07-31__baseerah-repo-reset/tech-docs.md)).
 > None of the steps below are actionable here — the `ayokoding-web-*` agents they reference no
 > longer exist in `.claude/agents/`, and `apps/ayokoding-www/` no longer exists in this repo. The

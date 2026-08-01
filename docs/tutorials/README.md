@@ -13,7 +13,7 @@ created: 2025-11-22
 
 **All tutorial content was migrated to the AyoKoding website on December 8, 2025.**
 
-> **Update**: `ayokoding-www` itself was later removed from this repository in the Baseerah
+> **Update**: `ayokoding-www` itself was later removed from this repository in the BeaverNest
 > repo-reset — this repo no longer serves AyoKoding's educational content. The paths below
 > reflect where the content lived at migration time; they no longer resolve in this repo. The
 > content and the live site continue to exist in the sibling `ose-public` repository.

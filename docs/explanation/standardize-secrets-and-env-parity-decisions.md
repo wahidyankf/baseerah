@@ -124,7 +124,7 @@ framework-reserved name the Next.js dev server reads natively. In F# backends (`
 `ose-be`), the port var takes the full prefix (`ORGANICLEVER_BE_PORT`, `OSE_BE_PORT`). (All apps
 named here were later removed in the `baseerah-repo-reset`; the underlying rule — framework-reserved
 names stay unprefixed, app-owned backend vars take the full prefix — still applies to the planned
-`baseerah-fe`/`baseerah-be` apps.)
+`beaver-nest-fe`/`beaver-nest-be` apps.)
 
 **Why**: This asymmetry follows from who owns the binding. The Next.js dev server reads `PORT` from
 the platform (PaaS or OS) with no indirection through app code — renaming it to `OSE_WWW_PORT` would

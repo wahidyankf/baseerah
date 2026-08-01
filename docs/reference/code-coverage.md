@@ -40,14 +40,14 @@ behind (tech-docs Decision 11 of the `baseerah-repo-reset` plan): new projects u
 matching the `nx-targets.md` governance rule, rather than reproducing the old F# backends' 95% or
 the old web apps' 70–88%.
 
-| Project        | Status                      | Tool                           | Format        | Threshold                                                                                            |
-| -------------- | --------------------------- | ------------------------------ | ------------- | ---------------------------------------------------------------------------------------------------- |
-| `rhino-cli`    | Current                     | `cargo llvm-cov`               | LCOV          | 90% line                                                                                             |
-| `rust-commons` | Current                     | `cargo llvm-cov`               | LCOV          | 90% line                                                                                             |
-| `web-ui`       | Current                     | Vitest + `@vitest/coverage-v8` | LCOV          | 70% line (preexisting; not retroactively raised)                                                     |
-| `web-ui-token` | Current                     | N/A                            | N/A           | N/A — deliberately omitted; the single vitest-cucumber scenario already covers this token-export lib |
-| `baseerah-be`  | Planned, not yet scaffolded | NUnit/xUnit + Coverlet         | Cobertura XML | 90% line (new project — Decision 11)                                                                 |
-| `baseerah-fe`  | Planned, not yet scaffolded | Vitest + `@vitest/coverage-v8` | LCOV          | 90% line (new project — Decision 11)                                                                 |
+| Project          | Status                      | Tool                           | Format        | Threshold                                                                                            |
+| ---------------- | --------------------------- | ------------------------------ | ------------- | ---------------------------------------------------------------------------------------------------- |
+| `rhino-cli`      | Current                     | `cargo llvm-cov`               | LCOV          | 90% line                                                                                             |
+| `rust-commons`   | Current                     | `cargo llvm-cov`               | LCOV          | 90% line                                                                                             |
+| `web-ui`         | Current                     | Vitest + `@vitest/coverage-v8` | LCOV          | 70% line (preexisting; not retroactively raised)                                                     |
+| `web-ui-token`   | Current                     | N/A                            | N/A           | N/A — deliberately omitted; the single vitest-cucumber scenario already covers this token-export lib |
+| `beaver-nest-be` | Planned, not yet scaffolded | NUnit/xUnit + Coverlet         | Cobertura XML | 90% line (new project — Decision 11)                                                                 |
+| `beaver-nest-fe` | Planned, not yet scaffolded | Vitest + `@vitest/coverage-v8` | LCOV          | 90% line (new project — Decision 11)                                                                 |
 
 ### Enforcement commands by tool
 
@@ -55,10 +55,10 @@ the old web apps' 70–88%.
 # Rust (rhino-cli, rust-commons)
 cargo llvm-cov --lib --fail-under-lines 90
 
-# TypeScript (web-ui: 70%; baseerah-fe once scaffolded: 90%)
+# TypeScript (web-ui: 70%; beaver-nest-fe once scaffolded: 90%)
 npx vitest run --coverage --coverage.thresholds.lines=<threshold>
 
-# F# (baseerah-be once scaffolded)
+# F# (beaver-nest-be once scaffolded)
 dotnet test --collect:"XPlat Code Coverage" \
   /p:Threshold=90 /p:ThresholdType=line /p:ThresholdStat=Total
 ```

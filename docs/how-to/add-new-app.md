@@ -287,7 +287,7 @@ TypeScript path mappings are configured in `tsconfig.base.json`.
 
 ### Additional Checklist for Apps with OpenAPI Contracts
 
-Apps that use a shared OpenAPI contract (e.g., the planned `baseerah-be`/`baseerah-fe` full-stack
+Apps that use a shared OpenAPI contract (e.g., the planned `beaver-nest-be`/`beaver-nest-fe` full-stack
 pair) must satisfy these additional requirements:
 
 **Mandatory Nx targets** (all 7 required):

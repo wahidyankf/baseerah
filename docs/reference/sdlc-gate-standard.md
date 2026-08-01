@@ -288,9 +288,9 @@ for the full synthesis approach and acceptance criteria.
 
 The following variations are not flagged as drift:
 
-- **App set and per-app deploy CRONs** — `ose-public` (mid-rename to Baseerah) currently ships only
+- **App set and per-app deploy CRONs** — `ose-public` (mid-rename to BeaverNest) currently ships only
   `rhino-cli` (a CLI, no deploy CRON) after the `baseerah-repo-reset` removed its prior content/web
-  apps; `baseerah-fe` and `baseerah-be` are planned apps (not yet scaffolded) that will pick up their
+  apps; `beaver-nest-fe` and `beaver-nest-be` are planned apps (not yet scaffolded) that will pick up their
   own deploy CRON workflows once built. `ose-primer` ships polyglot demo backends/frontends;
   `ose-private` ships `coralpolyp`. Each repo keeps only the deploy CRON workflows for apps it actually
   ships. `ose-primer`'s `test-and-deploy-*-development.yml`

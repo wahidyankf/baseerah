@@ -86,7 +86,7 @@ its instruction surface is generated mechanically by `rhino-cli agents emit-bind
 
 - **`.amazonq/rules/00-agents-md.md`** — a pointer file (not a copy) directing Amazon Q to read and
   follow `AGENTS.md` at the repository root.
-- **`.amazonq/cli-agents/baseerah-default.json`** — a minimal Amazon Q agent definition whose `resources`
+- **`.amazonq/cli-agents/beaver-nest-default.json`** — a minimal Amazon Q agent definition whose `resources`
   load `file://AGENTS.md` and `file://.amazonq/rules/**/*.md`.
 
 These files are deterministic and idempotent — never hand-edit them. The companion guard

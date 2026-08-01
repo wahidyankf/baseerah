@@ -34,7 +34,7 @@ The ecosystem consists of three independent sibling repositories. No parent coor
 
 `ose-primer` is **downstream**: it receives scaffolding updates, but its product layer (anything a consumer builds on top) is never pulled back into `ose-public`. Generic improvements that consumers contribute to `ose-primer` (for example, new governance patterns, Skill definitions, or demo-app implementations) can flow back to `ose-public` when adopted.
 
-Both directions — propagation (upstream → downstream) and adoption (downstream → upstream) — are maintained **manually**, typically driven by the [plan-multi-repo-parity-planning](../../repo-governance/workflows/plan/plan-multi-repo-parity-planning.md) and [plan-multi-repo-parity-planning-and-execution](../../repo-governance/workflows/plan/plan-multi-repo-parity-planning-and-execution.md) planning workflows, which survey both repos, record per-gap decisions, and author aligned plans. Paths that are product-specific (for example, the planned `apps/baseerah-fe/` and `apps/baseerah-be/`, once scaffolded) are never propagated in either direction.
+Both directions — propagation (upstream → downstream) and adoption (downstream → upstream) — are maintained **manually**, typically driven by the [plan-multi-repo-parity-planning](../../repo-governance/workflows/plan/plan-multi-repo-parity-planning.md) and [plan-multi-repo-parity-planning-and-execution](../../repo-governance/workflows/plan/plan-multi-repo-parity-planning-and-execution.md) planning workflows, which survey both repos, record per-gap decisions, and author aligned plans. Paths that are product-specific (for example, the planned `apps/beaver-nest-fe/` and `apps/beaver-nest-be/`, once scaffolded) are never propagated in either direction.
 
 ### Licensing
 

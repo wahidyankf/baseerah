@@ -262,7 +262,7 @@ Per-project:
 
 ### Complete Example (Next.js App)
 
-Illustrative — no Next.js app is scaffolded yet; shape matches the planned `baseerah-fe`
+Illustrative — no Next.js app is scaffolded yet; shape matches the planned `beaver-nest-fe`
 (see [monorepo-structure.md](./monorepo-structure.md)):
 
 ```json
@@ -294,7 +294,7 @@ Illustrative — no Next.js app is scaffolded yet; shape matches the planned `ba
       }
     }
   },
-  "tags": ["type:app", "platform:nextjs", "lang:ts", "domain:baseerah"]
+  "tags": ["type:app", "platform:nextjs", "lang:ts", "domain:beaver-nest"]
 }
 ```
 
@@ -357,7 +357,7 @@ All projects use a standard four-dimension tag scheme:
 | `type:`     | `app`, `lib`, `e2e`                                     | Yes                      | Project kind            |
 | `platform:` | `cli`, `nextjs`, `flutter`, `spring-boot`, `playwright` | For apps/e2e             | Framework/runtime       |
 | `lang:`     | `rust`, `ts`, `dotnet`                                  | Where source code exists | Primary language        |
-| `domain:`   | `baseerah`, `tooling`, `ui`                             | Yes                      | Business/product domain |
+| `domain:`   | `beaver-nest`, `tooling`, `ui`                          | Yes                      | Business/product domain |
 
 **Notes**:
 

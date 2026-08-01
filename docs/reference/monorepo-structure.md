@@ -36,7 +36,7 @@ open-sharia-enterprise/
 │   └── k8s/                  # Kubernetes deployments
 ├── specs/                     # Gherkin acceptance specs, C4 diagrams, and OpenAPI contracts
 │   ├── apps/                  # Per-app specs (C4-aware five-folder layout)
-│   │   └── [domain]/         # e.g. rhino/, baseerah/ (planned)
+│   │   └── [domain]/         # e.g. rhino/, beaver-nest/ (planned)
 │   │       ├── product/      # PM-first content (overview, roadmap)
 │   │       ├── system-context/ # C4 L1 — system boundary diagram
 │   │       ├── containers/   # C4 L2 — runtime containers + OpenAPI contracts
@@ -78,18 +78,18 @@ Flat structure - all apps at the same level, no subdirectories.
 
 `[domain]-[type]`
 
-**Current Apps** (as of the 2026 Baseerah repo reset, see
+**Current Apps** (as of the 2026 BeaverNest repo reset, see
 [baseerah-repo-reset plan](../../plans/done/2026-07-31__baseerah-repo-reset/README.md)):
 
 - `rhino-cli` - Repository management CLI (Rust application). Ported from Go 2026-05-23 (predecessor Go source recoverable from git history).
-- `baseerah-fe` - Baseerah frontend (Next.js 16 App Router, port 19310)
-- `baseerah-fe-e2e` - Playwright FE E2E tests for baseerah-fe
-- `baseerah-be` - Baseerah backend (F#/Giraffe/ASP.NET REST API, port 19320)
-- `baseerah-be-e2e` - E2E tests for baseerah-be
+- `beaver-nest-fe` - BeaverNest frontend (Next.js 16 App Router, port 19310)
+- `beaver-nest-fe-e2e` - Playwright FE E2E tests for beaver-nest-fe
+- `beaver-nest-be` - BeaverNest backend (F#/Giraffe/ASP.NET REST API, port 19320)
+- `beaver-nest-be-e2e` - E2E tests for beaver-nest-be
 
-Every other app previously listed here (`ose-www`, `ose-be`, `ayokoding-www`, `ayokoding-cli`, `ose-cli`, `crane-cli`, `organiclever-www`, `organiclever-app-web`, `organiclever-be`, `wahidyankf-www`, and their `-e2e` counterparts) was deleted by the Baseerah repo reset. The structural examples below use generic `apps/<app-name>/` placeholders except where `rhino-cli` illustrates a real, currently-scaffolded app.
+Every other app previously listed here (`ose-www`, `ose-be`, `ayokoding-www`, `ayokoding-cli`, `ose-cli`, `crane-cli`, `organiclever-www`, `organiclever-app-web`, `organiclever-be`, `wahidyankf-www`, and their `-e2e` counterparts) was deleted by the BeaverNest repo reset. The structural examples below use generic `apps/<app-name>/` placeholders except where `rhino-cli` illustrates a real, currently-scaffolded app.
 
-### App Structure (Next.js Application — planned, e.g. `baseerah-fe`)
+### App Structure (Next.js Application — planned, e.g. `beaver-nest-fe`)
 
 ```
 apps/<app-name>/
@@ -123,7 +123,7 @@ apps/rhino-cli/
 └── README.md                  # App documentation
 ```
 
-### App Structure (F#/Giraffe Application — planned, e.g. `baseerah-be`)
+### App Structure (F#/Giraffe Application — planned, e.g. `beaver-nest-be`)
 
 ```
 apps/<app-name>/
@@ -166,7 +166,7 @@ Contains reusable library packages.
 
 - `ts-` - TypeScript (e.g., `web-ui`, `web-ui-token`)
 - `rust-` - Rust (e.g., `rust-commons`)
-- `fsharp-` - F# (future; `fsharp-crane-core` was deleted 2026 alongside `crane-cli`, its sole consumer, by the Baseerah repo reset)
+- `fsharp-` - F# (future; `fsharp-crane-core` was deleted 2026 alongside `crane-cli`, its sole consumer, by the BeaverNest repo reset)
 - `java-` - Java (future)
 - `kt-` - Kotlin (future)
 - `py-` - Python (future)
@@ -217,7 +217,7 @@ libs/ts-utils/
 ### Current Scope
 
 Rust (`rust-commons`) and TypeScript (`web-ui`, `web-ui-token`) libraries. No F# library currently exists;
-`fsharp-crane-core` was deleted by the Baseerah repo reset (it was `crane-cli`-specific, not generic).
+`fsharp-crane-core` was deleted by the BeaverNest repo reset (it was `crane-cli`-specific, not generic).
 
 ## Nx Monorepo Projects (`apps/` and `libs/`)
 
@@ -254,7 +254,7 @@ Rust (`rust-commons`) and TypeScript (`web-ui`, `web-ui-token`) libraries. No F#
 
 Location: `apps/[app-name]/project.json` or `libs/[lib-name]/project.json`
 
-**Next.js App Example** (illustrative — no Next.js app is scaffolded yet; shape matches the planned `baseerah-fe`):
+**Next.js App Example** (illustrative — no Next.js app is scaffolded yet; shape matches the planned `beaver-nest-fe`):
 
 ```json
 {
@@ -278,7 +278,7 @@ Location: `apps/[app-name]/project.json` or `libs/[lib-name]/project.json`
       "outputs": ["{projectRoot}/.next"]
     }
   },
-  "tags": ["type:app", "platform:nextjs", "lang:ts", "domain:baseerah"]
+  "tags": ["type:app", "platform:nextjs", "lang:ts", "domain:beaver-nest"]
 }
 ```
 
@@ -354,7 +354,7 @@ All projects use a standard four-dimension tag scheme:
 | `type:`     | `app`, `lib`, `e2e`                          | Yes                      | Project kind            |
 | `platform:` | `cli`, `nextjs`, `spring-boot`, `playwright` | For apps/e2e             | Framework/runtime       |
 | `lang:`     | `rust`, `ts`, `dotnet`                       | Where source code exists | Primary language        |
-| `domain:`   | `baseerah`, `tooling`, `ui`                  | Yes                      | Business/product domain |
+| `domain:`   | `beaver-nest`, `tooling`, `ui`               | Yes                      | Business/product domain |
 
 **Notes**:
 
@@ -528,12 +528,12 @@ Configured in `tsconfig.base.json`:
 
 ## Port Allocation
 
-| App                                 | Port    | Status  |
-| ----------------------------------- | ------- | ------- |
-| `baseerah-fe` (Next.js 16 frontend) | `19310` | Current |
-| `baseerah-be` (F#/Giraffe backend)  | `19320` | Current |
+| App                                    | Port    | Status  |
+| -------------------------------------- | ------- | ------- |
+| `beaver-nest-fe` (Next.js 16 frontend) | `19310` | Current |
+| `beaver-nest-be` (F#/Giraffe backend)  | `19320` | Current |
 
-**Rule**: Baseerah deliberately allocates outside every port band the sibling repos occupy, since all
+**Rule**: BeaverNest deliberately allocates outside every port band the sibling repos occupy, since all
 four repos (`ose-public`, `ose-primer`, `ose-private`, and this repo) can run concurrently on one
 development machine:
 

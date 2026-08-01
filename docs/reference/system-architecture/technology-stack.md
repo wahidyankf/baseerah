@@ -11,16 +11,16 @@ created: 2025-11-29
 
 # Technology Stack
 
-Technology stack summary, quality tools, and future architecture considerations for the Baseerah platform.
+Technology stack summary, quality tools, and future architecture considerations for the BeaverNest platform.
 
-> **2026 Baseerah repo reset**: every prior application except `rhino-cli` was deleted. The
-> Frontend and Backend sections below describe the **planned** `baseerah-fe`/`baseerah-be` stack
+> **2026 BeaverNest repo reset**: every prior application except `rhino-cli` was deleted. The
+> Frontend and Backend sections below describe the **planned** `beaver-nest-fe`/`beaver-nest-be` stack
 > (not yet scaffolded); the CLI Tools section describes the **current** state. See
 > [applications.md](./applications.md).
 
 ## Technology Stack Summary
 
-### Frontend (planned — `baseerah-fe` not yet scaffolded)
+### Frontend (planned — `beaver-nest-fe` not yet scaffolded)
 
 **Web Application** (Next.js):
 
@@ -28,16 +28,16 @@ Technology stack summary, quality tools, and future architecture considerations 
 - **React**: 19
 - **Styling**: TailwindCSS + Radix UI / shadcn-ui
 - **Deployment**: Vercel (planned)
-- **Applications**: `baseerah-fe` (planned, port 19310)
+- **Applications**: `beaver-nest-fe` (planned, port 19310)
 
-### Backend (planned — `baseerah-be` not yet scaffolded)
+### Backend (planned — `beaver-nest-be` not yet scaffolded)
 
 **REST API**:
 
 - **Framework**: Likely Giraffe (ASP.NET Core) — framework TBD pending backend tech-stack decision
 - **Language**: Likely F# (.NET 10)
 - **Build**: dotnet via Nx (if F#)
-- **Applications**: `baseerah-be` (planned, port 19320)
+- **Applications**: `beaver-nest-be` (planned, port 19320)
 
 ### CLI Tools (current)
 
@@ -47,7 +47,7 @@ Technology stack summary, quality tools, and future architecture considerations 
 - **Build**: Cargo via Nx
 - **Distribution**: Local binaries
 - **Applications**: `rhino-cli` (Repository Hygiene & INtegration Orchestrator) — the sole
-  surviving app after the 2026 Baseerah repo reset
+  surviving app after the 2026 BeaverNest repo reset
 
 ### Infrastructure
 
@@ -56,7 +56,7 @@ Technology stack summary, quality tools, and future architecture considerations 
 - **Package Manager**: npm 11.10.1
 - **Git Workflow**: Trunk-Based Development
 - **CI**: GitHub Actions
-- **CD**: Vercel (planned, for `baseerah-fe` once scaffolded — no app is deployed today)
+- **CD**: Vercel (planned, for `beaver-nest-fe` once scaffolded — no app is deployed today)
 
 ### Quality Tools
 
@@ -83,7 +83,7 @@ Technology stack summary, quality tools, and future architecture considerations 
 ### Scalability Considerations
 
 - **Nx Cloud**: Distributed task execution and caching
-- **CDN**: Static asset delivery optimization (Vercel, once `baseerah-fe` is deployed)
+- **CDN**: Static asset delivery optimization (Vercel, once `beaver-nest-fe` is deployed)
 - **Additional Next.js Sites**: More specialized content platforms
 - **CLI Tool Suite Expansion**: More specialized automation tools
 - **Shared Rust Crates**: Common functionality across Rust CLI tools

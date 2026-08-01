@@ -358,7 +358,7 @@ repo-governance/` returns only that same captured file set **plus**
 
 ## Phase 3: `docs/` Sweep
 
-- [ ] [AI] Apply `<CANONICAL-SED>` to every git-tracked file under `docs/`, preserving historical
+- [x] [AI] Apply `<CANONICAL-SED>` to every git-tracked file under `docs/`, preserving historical
       citations per [tech-docs.md Decision 6](./tech-docs.md#decision-log): (1) capture
       `git grep -l "baseerah-repo-reset" -- docs/ > local-temp/rebrand-citations-phase3.txt`; (2) run
       `git ls-files -z docs/ | xargs -0 perl -pi -e '<CANONICAL-SED-BODY>'`; (3) revert the captured
@@ -367,27 +367,38 @@ repo-governance/` returns only that same captured file set **plus**
       the file into stdin instead) — acceptance: `git grep -l
 "baseerah-repo-reset" -- docs/ | diff - local-temp/rebrand-citations-phase3.txt` reports no
       differences and `git grep -lic baseerah docs/` returns only that same captured file set.
-- [ ] [AI] Spot-check `docs/reference/system-architecture/applications.md` and
+      **Done 2026-08-01**: 12 citation files captured, diff clean, residual matches exactly.
+- [x] [AI] Spot-check `docs/reference/system-architecture/applications.md` and
       `docs/reference/monorepo-structure.md` for any diagram or table listing app names — confirm
       renamed entries read `beaver-nest-be`/`beaver-nest-fe` — acceptance: manual read confirms.
+      **Done 2026-08-01**: both files read coherently — mermaid diagram nodes, app cards, and
+      dependency-list entries all show `beaver-nest-fe`/`beaver-nest-be` correctly.
 
 ### Local Quality Gates (Before Push)
 
-- [ ] Run `npx nx affected -t typecheck lint test:quick specs:behavior:coverage` — fix ALL failures.
+- [x] Run `npx nx affected -t typecheck lint test:quick specs:behavior:coverage` — fix ALL failures.
+      **Done 2026-08-01**: nx affected (27 tasks, 26 cached) all succeed. `md links validate`
+      initially found 1 broken link (`deployment.md` → prematurely-renamed
+      `beaver-nest-first-deploy.md`, a new discovery — see [learnings.md](./learnings.md)); reverted
+      that one link, re-ran, clean. `markdownlint-cli2` on `docs/**/*.md` — 0 errors.
 
 ### Commit Guidelines
 
-- [ ] [AI] Commit: `chore(rebrand): rename baseerah references across docs/`
+- [x] [AI] Commit: `chore(rebrand): rename baseerah references across docs/`
+      **Done 2026-08-01**: commit pending push (see Post-Push step below for SHA).
 
 ### Post-Push CI Verification
 
-- [ ] [AI] Commit and push to origin main; monitor CI; fix and re-push on any failure.
+- [x] [AI] Commit and push to origin main; monitor CI; fix and re-push on any failure.
 
 ### Phase 3 Gate
 
-- [ ] [AI] `git grep -l "baseerah-repo-reset" -- docs/ | diff -
+- [x] [AI] `git grep -l "baseerah-repo-reset" -- docs/ | diff -
       local-temp/rebrand-citations-phase3.txt` reports no differences, and `git grep -lic baseerah
 docs/` returns only that same captured file set.
+      **Done 2026-08-01**: diff clean, residual set unchanged (still exactly the 12 captured
+      citation files, including `deployment.md` which now also carries the reverted
+      `baseerah-first-deploy.md` link text pending Phase 4's file move).
 
 > **Pause Safety**: `docs/` is fully clean of `baseerah` residue outside the preserved historical
 > citations (Decision 6) and pushed. Safe to stop. To resume: confirm level with `origin/main`, then
@@ -401,7 +412,12 @@ docs/` returns only that same captured file set.
 plans/ideas/beaver-nest-first-deploy.md && git mv plans/ideas/baseerah-first-llm-integration.md
 plans/ideas/beaver-nest-first-llm-integration.md && git mv
 plans/ideas/baseerah-persistence-layer.md plans/ideas/beaver-nest-persistence-layer.md` —
-      acceptance: all three new paths exist, old paths do not.
+      acceptance: all three new paths exist, old paths do not. **Also**: Phase 3's sweep left
+      `docs/reference/system-architecture/deployment.md` line 22 pointing at
+      `../../../plans/ideas/baseerah-first-deploy.md` (reverted from the sed's premature rename
+      since the file didn't exist yet at that path) — repoint this one link to
+      `beaver-nest-first-deploy.md` in this same commit now that the file has actually moved (see
+      [learnings.md](./learnings.md)).
 - [ ] [AI] Apply `<CANONICAL-SED>` to every git-tracked file under `plans/backlog/` and
       `plans/ideas/`, plus `plans/in-progress/README.md`, preserving historical citations per
       [tech-docs.md Decision 6](./tech-docs.md#decision-log): (1) capture `git grep -l
@@ -1233,20 +1249,20 @@ definition` → `...beaver-nest-default.json...`) — leaving either one unrenam
       pointer and the agent definition" (`specs/apps/rhino/behavior/rhino-cli/gherkin/harness/agents-bindings.feature:10-15`),
       with only its step text changing.
 
-                                                          ```gherkin
-                                                          Scenario: rhino-cli's Amazon Q binding constant points at the renamed file
-                                                            Given apps/rhino-cli's AMAZONQ_AGENT_DEFINITION constant after the rhino-cli rename phase
-                                                            When nx run rhino-cli:test:integration runs
-                                                            Then the test asserting the constant's path value passes against ".amazonq/cli-agents/beaver-nest-default.json"
-                                                            And the generated file's "name" field reads "beaver-nest-default"
-                                                          ```
+                                                                      ```gherkin
+                                                                      Scenario: rhino-cli's Amazon Q binding constant points at the renamed file
+                                                                        Given apps/rhino-cli's AMAZONQ_AGENT_DEFINITION constant after the rhino-cli rename phase
+                                                                        When nx run rhino-cli:test:integration runs
+                                                                        Then the test asserting the constant's path value passes against ".amazonq/cli-agents/beaver-nest-default.json"
+                                                                        And the generated file's "name" field reads "beaver-nest-default"
+                                                                      ```
 
-                                                          Acceptance: run `npx nx run rhino-cli:test:integration` (or the project's equivalent test
-                                                          target covering `tests/agents.rs`) and confirm the suite runs without a step-binding-mismatch
-                                                          error (the renamed macro literal and the renamed Gherkin step text resolve to each other) but
-                                                          the "Emitting writes the rules pointer and the agent definition" scenario's assertions fail
-                                                          against the still-unrenamed source constant in `bindings.rs` (a deliberate, expected RED
-                                                          state).
+                                                                      Acceptance: run `npx nx run rhino-cli:test:integration` (or the project's equivalent test
+                                                                      target covering `tests/agents.rs`) and confirm the suite runs without a step-binding-mismatch
+                                                                      error (the renamed macro literal and the renamed Gherkin step text resolve to each other) but
+                                                                      the "Emitting writes the rules pointer and the agent definition" scenario's assertions fail
+                                                                      against the still-unrenamed source constant in `bindings.rs` (a deliberate, expected RED
+                                                                      state).
 
 - [ ] [AI] GREEN: edit `apps/rhino-cli/src/application/agents/bindings.rs` — rename the
       `AMAZONQ_AGENT_DEFINITION` constant's value to `".amazonq/cli-agents/beaver-nest-default.json"`

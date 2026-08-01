@@ -11,14 +11,14 @@ created: 2025-11-29
 
 # Deployment Architecture
 
-Deployment architecture, environment branches, and Vercel configuration for the Baseerah platform.
+Deployment architecture, environment branches, and Vercel configuration for the BeaverNest platform.
 
-> **2026 Baseerah repo reset**: every deployed web app and its environment branches/workflows
+> **2026 BeaverNest repo reset**: every deployed web app and its environment branches/workflows
 > (`ose-www`, `ayokoding-www`, `organiclever-www`, `organiclever-app-web`, `organiclever-be`,
 > `wahidyankf-www`, `ose-be`) were deleted. `rhino-cli` is a CLI tool distributed as a local binary,
-> not deployed via Vercel. `baseerah-fe` and `baseerah-be` are now scaffolded, and their deployer
-> agents and CI caller workflows exist, but no deploy target is provisioned yet (no `prod-baseerah-fe`
-> Vercel project, no `stag-baseerah-be` consumer) — see
+> not deployed via Vercel. `beaver-nest-fe` and `beaver-nest-be` are now scaffolded, and their deployer
+> agents and CI caller workflows exist, but no deploy target is provisioned yet (no `prod-beaver-nest-fe`
+> Vercel project, no `stag-beaver-nest-be` consumer) — see
 > [baseerah-first-deploy](../../../plans/ideas/baseerah-first-deploy.md). See
 > [applications.md](./applications.md) and the
 > [baseerah-repo-reset plan](../../../plans/done/2026-07-31__baseerah-repo-reset/README.md).
@@ -52,14 +52,14 @@ graph LR
     style LOCAL fill:#6a4c93,stroke:#22223b,color:#ffffff
 ```
 
-**Planned Baseerah deployment** (once `baseerah-fe`/`baseerah-be` are scaffolded — not yet real):
+**Planned BeaverNest deployment** (once `beaver-nest-fe`/`beaver-nest-be` are scaffolded — not yet real):
 
 ```mermaid
 graph LR
     subgraph "Source Control (planned)"
         MAIN2[main branch]
-        STAG_FE[stag-baseerah-fe]
-        STAG_BE[stag-baseerah-be]
+        STAG_FE[stag-beaver-nest-fe]
+        STAG_BE[stag-beaver-nest-be]
     end
 
     subgraph "Build System"
@@ -68,7 +68,7 @@ graph LR
     end
 
     subgraph "Deployment Targets"
-        VERCEL_FE[Vercel<br/>baseerah-fe]
+        VERCEL_FE[Vercel<br/>beaver-nest-fe]
         BE_TARGET[Backend Host<br/>TBD]
     end
 
@@ -92,7 +92,7 @@ graph LR
 
 ### Vercel Deployment
 
-No Vercel-deployed site currently exists. Once scaffolded, `baseerah-fe` (Next.js 16, planned
+No Vercel-deployed site currently exists. Once scaffolded, `beaver-nest-fe` (Next.js 16, planned
 port 19310) is expected to deploy via Vercel with the same conventions as the platform's prior
 Next.js sites:
 
@@ -121,9 +121,9 @@ Next.js sites:
   `stag-organiclever-app-web`, `stag-organiclever-be`, and their deploy workflows
   (`ayokoding-www-test-local-deploy-prod.yml`, `ose-www-test-local-deploy-prod.yml`,
   `wahidyankf-www-test-local-deploy-prod.yml`, `organiclever-app-test-local-deploy-stag.yml`,
-  `organiclever-app-test-stag.yml`) were removed by the 2026 Baseerah repo reset. See
+  `organiclever-app-test-stag.yml`) were removed by the 2026 BeaverNest repo reset. See
   [ci-cd.md § App Deploy Workflows](./ci-cd.md#app-deploy-workflows--deleted-reusable-templates-remain)
   for the generic reusable templates that survived and remain available for future reuse.
-- **Planned**: `stag-baseerah-fe`, `stag-baseerah-be` (and corresponding `prod-*` branches once
+- **Planned**: `stag-beaver-nest-fe`, `stag-beaver-nest-be` (and corresponding `prod-*` branches once
   production CD is designed), following the same **NEVER commit directly outside CI automation**
   policy as every prior environment branch.

@@ -12,14 +12,14 @@ created: 2025-11-29
 
 # CI/CD Pipeline
 
-Git hooks, GitHub Actions workflows, Nx build system, and development workflow for the Baseerah platform.
+Git hooks, GitHub Actions workflows, Nx build system, and development workflow for the BeaverNest platform.
 
-> **2026 Baseerah repo reset**: the app-specific scheduled deploy workflows described in earlier
+> **2026 BeaverNest repo reset**: the app-specific scheduled deploy workflows described in earlier
 > revisions of this document (`ayokoding-www-test-local-deploy-prod.yml`,
 > `ose-www-test-local-deploy-prod.yml`, `wahidyankf-www-test-local-deploy-prod.yml`,
 > `organiclever-app-test-local-deploy-stag.yml`, `organiclever-app-test-stag.yml`,
-> `web-ui-build-deploy-prod.yml`) were deleted along with their apps, then `baseerah-fe` and
-> `baseerah-be` were scaffolded along with CI callers that are wired but dormant (no `prod-*`/
+> `web-ui-build-deploy-prod.yml`) were deleted along with their apps, then `beaver-nest-fe` and
+> `beaver-nest-be` were scaffolded along with CI callers that are wired but dormant (no `prod-*`/
 > `stag-*` branch exists yet to trigger them). See [applications.md](./applications.md) and the
 > [baseerah-repo-reset plan](../../../plans/done/2026-07-31__baseerah-repo-reset/README.md).
 
@@ -175,11 +175,11 @@ against the entire monorepo on a fixed cadence independent of any single PR
 Every app-specific scheduled deploy workflow (`ayokoding-www-test-local-deploy-prod.yml`,
 `ose-www-test-local-deploy-prod.yml`, `wahidyankf-www-test-local-deploy-prod.yml`,
 `organiclever-app-test-local-deploy-stag.yml`, `organiclever-app-test-stag.yml`,
-`web-ui-build-deploy-prod.yml`) was deleted along with its app by the 2026 Baseerah repo reset.
+`web-ui-build-deploy-prod.yml`) was deleted along with its app by the 2026 BeaverNest repo reset.
 `rhino-cli` (a CLI tool, not a deployed web app) has no deploy workflow of its own.
 
 Three **generic, parameterized reusable workflows** survived the reset and remain wired for future
-use once `baseerah-fe`/`baseerah-be` are scaffolded:
+use once `beaver-nest-fe`/`beaver-nest-be` are scaffolded:
 
 - **`.github/workflows/_reusable-app-test-local-deploy-stag.yml`** — reusable heavy-test pipeline
   for a web + backend + E2E app group; runs the full stack locally via docker-compose, then on
@@ -193,7 +193,7 @@ use once `baseerah-fe`/`baseerah-be` are scaffolded:
 
 No caller workflow currently invokes these templates (no app group exists yet to invoke them
 with); a future phase of the `baseerah-repo-reset` plan is expected to add
-`baseerah-app-test-local-deploy-stag.yml` (or similar) once `baseerah-fe` and `baseerah-be` exist.
+`beaver-nest-app-test-local-deploy-stag.yml` (or similar) once `beaver-nest-fe` and `beaver-nest-be` exist.
 
 ### PR Quality Gate Workflow (duplicate entry)
 
@@ -284,7 +284,7 @@ with); a future phase of the `baseerah-repo-reset` plan is expected to add
    - Merge once the five hardened merge preconditions hold — `[AI]` by default
 
 6. **Deploy** (once a deployable app exists): no app-specific deploy workflow exists today
-   (see the App Deploy Workflows section above). Once `baseerah-fe`/`baseerah-be` are scaffolded
+   (see the App Deploy Workflows section above). Once `beaver-nest-fe`/`beaver-nest-be` are scaffolded
    and wired to the reusable templates, deployment follows the env-branch pattern:
 
    ```bash

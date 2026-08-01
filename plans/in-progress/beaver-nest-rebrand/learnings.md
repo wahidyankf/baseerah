@@ -19,6 +19,20 @@ string, leaving the referencing file's own full `baseerah`→`beaver-nest` prose
 designated phase. Verify with `git grep -l "<old-path>"` before push to catch every reference, and
 re-run `md links validate` before every push, not just at the phase whose own gate mentions it.
 
+## Phase 3: content sed can rename an outbound link's target path before the target file itself moves
+
+`docs/reference/system-architecture/deployment.md` linked to
+`../../../plans/ideas/baseerah-first-deploy.md`. Phase 3's blind `<CANONICAL-SED>` pass rewrote the
+link text to `beaver-nest-first-deploy.md`, but that file isn't `git mv`'d until Phase 4 — so the
+link broke immediately, failing `md links validate` before Phase 3 could even push. Reverted the one
+link back to `baseerah-first-deploy.md` (mirroring the Decision-12 GitHub-URL pattern: keep the old
+path text until the real move happens), and added a step to Phase 4's idea-brief-rename item to
+repoint this same link once the file actually moves — the mirror-image of the Phase 1 rule (that
+rule was about inbound links breaking when a path moves; this is an outbound link's target text being
+renamed before the path moves). **Generalizable rule**: whenever a phase's content sweep touches a
+markdown link whose _target_ is renamed by a _later_ phase, revert that one link's text in the
+current phase and add an explicit repoint step to the later phase's `git mv` item.
+
 ## Phase 2: BSD `xargs` on macOS has no `-a` flag
 
 The plan's own reference commands use `xargs -a <file> -I{} ...` to feed a captured citation-file

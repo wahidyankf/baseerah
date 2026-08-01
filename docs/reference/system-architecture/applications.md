@@ -11,12 +11,12 @@ created: 2025-11-29
 
 # Applications & Containers
 
-Application inventory and C4 Level 2 container diagram for the Baseerah platform.
+Application inventory and C4 Level 2 container diagram for the BeaverNest platform.
 
-> **2026 Baseerah repo reset**: every prior app (`ose-www`, `ose-be`, `ayokoding-www`,
+> **2026 BeaverNest repo reset**: every prior app (`ose-www`, `ose-be`, `ayokoding-www`,
 > `ayokoding-cli`, `ose-cli`, `crane-cli`, `organiclever-www`, `organiclever-app-web`,
-> `organiclever-be`, `wahidyankf-www`, and their `-e2e` counterparts) was deleted, then `baseerah-fe`
-> and `baseerah-be` were scaffolded as the Baseerah product's hello-world skeleton. See
+> `organiclever-be`, `wahidyankf-www`, and their `-e2e` counterparts) was deleted, then `beaver-nest-fe`
+> and `beaver-nest-be` were scaffolded as the BeaverNest product's hello-world skeleton. See
 > [monorepo-structure.md](../monorepo-structure.md) and the
 > [baseerah-repo-reset plan](../../../plans/done/2026-07-31__baseerah-repo-reset/README.md).
 
@@ -32,29 +32,29 @@ Application inventory and C4 Level 2 container diagram for the Baseerah platform
 - **Location**: `apps/rhino-cli/`
 - **Status**: Active development
 
-### Baseerah Product Apps
+### BeaverNest Product Apps
 
-#### baseerah-fe
+#### beaver-nest-fe
 
-- **Purpose**: Baseerah frontend
+- **Purpose**: BeaverNest frontend
 - **Technology**: Next.js 16 (App Router) + TypeScript
 - **Dev Port**: 19310
-- **Location**: `apps/baseerah-fe/`
-- **Dependencies**: `web-ui`, `web-ui-token`, `baseerah-contracts`
+- **Location**: `apps/beaver-nest-fe/`
+- **Dependencies**: `web-ui`, `web-ui-token`, `beaver-nest-contracts`
 
-#### baseerah-be
+#### beaver-nest-be
 
-- **Purpose**: Baseerah backend REST API
+- **Purpose**: BeaverNest backend REST API
 - **Technology**: F# + Giraffe + ASP.NET
 - **Port**: 19320
-- **Location**: `apps/baseerah-be/`
-- **Dependencies**: `baseerah-contracts`, `rhino-cli`
+- **Location**: `apps/beaver-nest-be/`
+- **Dependencies**: `beaver-nest-contracts`, `rhino-cli`
 
-#### baseerah-fe-e2e / baseerah-be-e2e
+#### beaver-nest-fe-e2e / beaver-nest-be-e2e
 
-- **Purpose**: Playwright FE E2E and HTTP-driven BE E2E suites for `baseerah-fe` and
-  `baseerah-be` respectively
-- **Location**: `apps/baseerah-fe-e2e/`, `apps/baseerah-be-e2e/`
+- **Purpose**: Playwright FE E2E and HTTP-driven BE E2E suites for `beaver-nest-fe` and
+  `beaver-nest-be` respectively
+- **Location**: `apps/beaver-nest-fe-e2e/`, `apps/beaver-nest-be-e2e/`
 
 ## C4 Level 2: Container Diagram
 
@@ -68,14 +68,14 @@ graph LR
         RHINO[rhino-cli<br/>Rust CLI]
     end
 
-    subgraph "Baseerah Product"
-        FE[baseerah-fe<br/>Next.js App]
-        BE[baseerah-be<br/>Backend API]
+    subgraph "BeaverNest Product"
+        FE[beaver-nest-fe<br/>Next.js App]
+        BE[beaver-nest-be<br/>Backend API]
     end
 
     subgraph "E2E Test Suites"
-        FE_E2E[baseerah-fe-e2e<br/>Playwright FE E2E]
-        BE_E2E[baseerah-be-e2e<br/>BE E2E]
+        FE_E2E[beaver-nest-fe-e2e<br/>Playwright FE E2E]
+        BE_E2E[beaver-nest-be-e2e<br/>BE E2E]
     end
 
     subgraph "Shared Infrastructure"
@@ -103,8 +103,8 @@ graph LR
 ## Application Interactions
 
 - `rhino-cli`: Repository management automation, managed by the Nx workspace
-- `baseerah-fe` calls `baseerah-be` over HTTP per the `baseerah-contracts` OpenAPI spec
-- `baseerah-fe` imports `web-ui` and `web-ui-token` for UI components and design tokens
-- `baseerah-be` declares `rhino-cli` as an `implicitDependency` for spec validation;
-  `baseerah-fe` invokes `rhino-cli` via a raw `cargo run` command in its `specs:*` targets instead
+- `beaver-nest-fe` calls `beaver-nest-be` over HTTP per the `beaver-nest-contracts` OpenAPI spec
+- `beaver-nest-fe` imports `web-ui` and `web-ui-token` for UI components and design tokens
+- `beaver-nest-be` declares `rhino-cli` as an `implicitDependency` for spec validation;
+  `beaver-nest-fe` invokes `rhino-cli` via a raw `cargo run` command in its `specs:*` targets instead
 - All applications are managed by the Nx workspace
