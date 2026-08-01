@@ -3,6 +3,28 @@
 
 # Learnings: beaver-nest-rebrand
 
+## Phase 11: a literal `/` in Gherkin step text is a Cucumber Expression alternation delimiter, not a literal slash
+
+The new scenario's step text (authored in Phase 10, per the plan's own literal wording) reads
+`Then no بصيرة/wawasan-style etymology chip is present`. Registering this verbatim as a
+`createBdd()` `Then("no بصيرة/wawasan-style etymology chip is present", ...)` step in
+`apps/beaver-nest-fe-e2e/steps/landing.steps.ts` compiled fine but `bddgen` reported it as a
+**missing** step definition — Cucumber Expressions treat an unescaped `/` between two words as an
+**alternative-text delimiter** (`cat/dog` matches "cat" or "dog"), so `بصيرة/wawasan-style` compiled
+to an alternation regex with no literal slash in it at all, which never matches the literal Gherkin
+line (which does contain the slash character). Fix: escape the slash in the step-definition string —
+`Then("no بصيرة\\/wawasan-style etymology chip is present", ...)` — which restores literal-slash
+matching; `bddgen` and `specs:e2e:coverage` both pass clean afterward. Ruled out a stale
+`.features-gen/` cache as the cause first (deleted it, reran with `--skip-nx-cache`, same failure) —
+this is a genuine Cucumber Expression syntax gotcha, not a caching artifact.
+
+**Generalizable rule**: any Gherkin step text containing a literal `/` between two words must escape
+it (`\/`) in the corresponding `createBdd()` step-definition string, or the step will silently fail
+to bind despite looking identical to the eye. The plain-string no-op step-def files (e.g. the FE
+unit-test side's `landing.steps.ts`, which only registers dummy `Given`/`When`/`Then` functions with
+no real Cucumber Expression parsing) don't hit this — only real `playwright-bdd` `createBdd()` step
+registries do, so check e2e step files specifically whenever a Gherkin line contains a bare `/`.
+
 ## Phase 8: `git add` on an invalid multi-pathspec call can stage some paths with STALE content, silently
 
 While staging Phase 8, an initial `git add -A <path1> <path2> ... <badpath> ...` call errored on a

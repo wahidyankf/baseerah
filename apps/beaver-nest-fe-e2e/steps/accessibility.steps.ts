@@ -1,7 +1,7 @@
 /**
- * Step definitions for the baseerah-fe landing-page feature's accessibility scenario.
+ * Step definitions for the beaver-nest-fe landing-page feature's accessibility scenario.
  *
- * Covers: specs/apps/baseerah/behavior/baseerah-fe/gherkin/hello/landing-page.feature
+ * Covers: specs/apps/beaver-nest/behavior/beaver-nest-fe/gherkin/hello/landing-page.feature
  */
 import AxeBuilder from "@axe-core/playwright";
 import { createBdd } from "playwright-bdd";
@@ -16,7 +16,7 @@ function violationsOfImpact(results: AxeResults, impact: string): AxeResults["vi
   return results.violations.filter((violation) => violation.impact === impact);
 }
 
-// @covers specs/apps/baseerah/behavior/baseerah-fe/gherkin/hello/landing-page.feature:The landing page meets the baseline accessibility bar
+// @covers specs/apps/beaver-nest/behavior/beaver-nest-fe/gherkin/hello/landing-page.feature:The landing page meets the baseline accessibility bar
 When("an automated accessibility scan runs against the rendered page", async ({ page }) => {
   lastScan = await new AxeBuilder({ page }).analyze();
 });

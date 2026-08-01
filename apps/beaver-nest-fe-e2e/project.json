@@ -1,7 +1,7 @@
 {
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
-  "name": "baseerah-fe-e2e",
-  "sourceRoot": "apps/baseerah-fe-e2e/steps",
+  "name": "beaver-nest-fe-e2e",
+  "sourceRoot": "apps/beaver-nest-fe-e2e/steps",
   "projectType": "application",
   "targets": {
     "install": {
@@ -59,11 +59,11 @@
       "cache": true,
       "options": {
         "commands": [
-          "npx nx run baseerah-fe-e2e:typecheck",
-          "npx nx run baseerah-fe-e2e:lint",
-          "npx nx run baseerah-fe-e2e:test:unit",
-          "npx nx run baseerah-fe-e2e:test:coverage",
-          "npx nx run baseerah-fe-e2e:test:specs"
+          "npx nx run beaver-nest-fe-e2e:typecheck",
+          "npx nx run beaver-nest-fe-e2e:lint",
+          "npx nx run beaver-nest-fe-e2e:test:unit",
+          "npx nx run beaver-nest-fe-e2e:test:coverage",
+          "npx nx run beaver-nest-fe-e2e:test:specs"
         ],
         "parallel": false
       },
@@ -93,8 +93,8 @@
     "specs:e2e:coverage": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "npx bddgen && cargo run --release --quiet --manifest-path ../../apps/rhino-cli/Cargo.toml -- specs e2e-coverage validate --project baseerah-fe-e2e --features \"../../specs/apps/beaver-nest/behavior/beaver-nest-fe/gherkin/**/*.feature\" --features-gen .features-gen --baseline e2e-coverage-baseline.json",
-        "cwd": "apps/baseerah-fe-e2e"
+        "command": "npx bddgen && cargo run --release --quiet --manifest-path ../../apps/rhino-cli/Cargo.toml -- specs e2e-coverage validate --project beaver-nest-fe-e2e --features \"../../specs/apps/beaver-nest/behavior/beaver-nest-fe/gherkin/**/*.feature\" --features-gen .features-gen --baseline e2e-coverage-baseline.json",
+        "cwd": "apps/beaver-nest-fe-e2e"
       },
       "cache": true,
       "inputs": [
@@ -117,9 +117,9 @@
       "executor": "nx:run-commands",
       "options": {
         "commands": [
-          "npx nx run baseerah-fe-e2e:specs:structure-validation",
-          "npx nx run baseerah-fe-e2e:specs:behavior:coverage",
-          "npx nx run baseerah-fe-e2e:specs:e2e:coverage"
+          "npx nx run beaver-nest-fe-e2e:specs:structure-validation",
+          "npx nx run beaver-nest-fe-e2e:specs:behavior:coverage",
+          "npx nx run beaver-nest-fe-e2e:specs:e2e:coverage"
         ],
         "parallel": false
       },
@@ -140,7 +140,7 @@
       "cache": true
     }
   },
-  "tags": ["type:e2e", "platform:playwright", "lang:ts", "domain:baseerah"],
+  "tags": ["type:e2e", "platform:playwright", "lang:ts", "domain:beaver-nest"],
   "implicitDependencies": ["beaver-nest-fe", "beaver-nest-be"],
   "namedInputs": {
     "specs": ["{workspaceRoot}/specs/apps/beaver-nest/behavior/beaver-nest-fe/gherkin/**/*.feature"]

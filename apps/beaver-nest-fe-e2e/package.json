@@ -1,6 +1,6 @@
 {
   "$schema": "https://json.schemastore.org/package.json",
-  "name": "baseerah-fe-e2e",
+  "name": "beaver-nest-fe-e2e",
   "version": "0.1.0",
   "private": true,
   "type": "module",
