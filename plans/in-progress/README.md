@@ -4,8 +4,7 @@ Active project plans currently being worked on.
 
 ## Active Plans
 
-- [beaver-nest-rebrand](./beaver-nest-rebrand/README.md) — renames the repository's product
-  identity to BeaverNest (formerly Baseerah) across every git-tracked surface.
+No active plans currently.
 
 Ready-to-execute plans wait in [`../backlog/`](../backlog/README.md); promote one here when
 work begins.
