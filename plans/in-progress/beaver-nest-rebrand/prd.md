@@ -47,7 +47,7 @@ Scenario: A repo-wide case-insensitive search finds no unexpected "baseerah" res
   Given the Repo-Wide Residual Sweep phase has completed all prior content phases
   When a case-insensitive search runs for "baseerah" across all git-tracked files
   Then the only matches are inside plans/done/2026-07-31__baseerah-repo-reset/
-  And any match outside that folder is limited to the enumerated historical-citation allowlist
+  And any match outside that folder is a file the historical-citation preservation rule recognizes as legitimately citing baseerah-repo-reset
 ```
 
 ### AC2 — Landing page shows the new brand name
@@ -76,7 +76,7 @@ Scenario: The homepage tells a first-time visitor what BeaverNest is, with no in
 Scenario: The homepage no longer renders a brand-chip etymology gloss
   Given a first-time visitor viewing the rendered homepage
   When they inspect the page for a hoverable multilingual term chip
-  Then no برصيرة/wawasan-style etymology chip is present
+  Then no بصيرة/wawasan-style etymology chip is present
   And no automated test or Gherkin scenario asserts one exists
 ```
 
@@ -105,7 +105,7 @@ Scenario: The renamed agent fleet is internally consistent
 ```gherkin
 Scenario: rhino-cli's Amazon Q binding constant points at the renamed file
   Given apps/rhino-cli's AMAZONQ_AGENT_DEFINITION constant after the rhino-cli rename phase
-  When nx run rhino-cli:test:unit runs
+  When nx run rhino-cli:test:integration runs
   Then the test asserting the constant's path value passes against ".amazonq/cli-agents/beaver-nest-default.json"
   And the generated file's "name" field reads "beaver-nest-default"
 ```

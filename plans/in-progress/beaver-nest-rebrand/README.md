@@ -43,6 +43,9 @@ observable behavior changes beyond the brand name and copy text a visitor reads.
 - `apps/rhino-cli` source and tests where they hardcode repo-identity strings (the
   `.amazonq/cli-agents/baseerah-default.json` path constant and its embedded template, plus
   self-contained test fixtures using `baseerah`/`baseerah-be` as example data)
+- `specs/apps/rhino/behavior/rhino-cli/gherkin/harness/agents-bindings.feature` — its step text is
+  matched verbatim by a `cucumber` step-binding literal in `apps/rhino-cli/tests/agents.rs` and must
+  rename in lockstep with it
 
 **Out of scope**:
 
