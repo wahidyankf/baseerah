@@ -280,10 +280,11 @@ inside the app, and must preserve all existing consumers.
   Source: [PatternFly status and severity](https://www.patternfly.org/patterns/status-and-severity/),
   accessed 2026-08-02.
 - [Web-cited] Primer's banner guidance favors one concise status region near relevant content, and
-  Primer Blankslate explains why content is absent. These patterns support one readiness region plus
-  a neutral workspace empty state. Sources:
-  [Primer Banner guidelines](https://primer.style/product/components/banner/guidelines/) and
-  [Primer Blankslate](https://primer.style/product/components/blankslate/), accessed 2026-08-02.
+  Primer Blankslate explains why content is absent. Exact excerpts: [Primer Banner guidelines](https://primer.style/product/components/banner/guidelines/)
+  say “Do not display more than one banner” and “Place Banners near the relevant section”; [Primer
+  Blankslate](https://primer.style/product/components/blankslate/) says it is “used as placeholder
+  to tell users why content is missing.” These patterns support one readiness region plus a neutral
+  workspace empty state. Accessed 2026-08-02.
 
 ### Diverge — Alternative A: Focused Readiness Card
 

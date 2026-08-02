@@ -40,6 +40,28 @@ Every row under `### Files Changed` names one path, action (`created`, `modified
 ledger against `rtk git status --short` before every commit; stage only ledgered paths. The final
 archival step moves this file with the plan; it is not a second source of product requirements.
 
+## PR-Review Workflow Invocation Record
+
+The repository's agent/workflow interface is the invocation mechanism for the mandatory review
+cycles; it has no shell-equivalent command. For **each** cycle, the orchestrator sends this exact
+request to the repository workflow runner, substituting only the values in angle brackets:
+
+```text
+Run workflow `pr-review-quality-gate` with:
+  pr: <the sole URL in local-temp/beaver-nest-app-setup-unit-<N>-pr-url.txt>
+  cycles: 1
+  cycle-label: unit-<N>-cycle-<C>
+  prior-cycle-record: <local-temp/beaver-nest-app-setup-unit-<N>-cycle-<C-1>-review.md, or none for C=1>
+  result-record: local-temp/beaver-nest-app-setup-unit-<N>-cycle-<C>-review.md
+```
+
+The workflow runner writes the returned `final-status`, `cycles-completed`, `unresolved-threads`,
+the pinned PR head SHA, the consolidated-review URL, all fixer commit SHAs, and any escalation to
+the named `result-record`. The orchestrator appends the same path and summary to the phase block of
+`execution-state.md`. A cycle fails if the record is absent, does not say `done`, does not say
+`cycles-completed: 1`, or says a nonzero unresolved-thread count. The following CI-run-ID command
+is run only after that cycle record exists and its fixer push is visible.
+
 ## Parallelization Model
 
 Use the N+1 model with the main orchestrator and at most N=3 background agents. The three
@@ -108,8 +130,14 @@ flowchart LR
       doctor exits 0 without changing git identity.
 - [ ] [AI] Initialize the append-only file-touch ledger in executor task state; acceptance: every
       later touched path is recorded and no repository file is created for the Phase 0 ledger.
+- [ ] [AI] Record the dependency-policy evidence for the immutable, official Docker Hub fixture
+      `docker.io/library/nginx:1.27-alpine@sha256:65645c7bb6a0661892a8b03b89d0743208a18dd2f3f17a54ef4b76fb8e2f2a10`
+      with `docker buildx imagetools inspect docker.io/library/nginx:1.27-alpine@sha256:65645c7bb6a0661892a8b03b89d0743208a18dd2f3f17a54ef4b76fb8e2f2a10 > local-temp/beaver-nest-app-setup-publication-probe-image.txt`;
+      acceptance: the file is non-empty, inspection returns the exact digest, and the executor's
+      dependency-policy ledger records its source, inspection date, advisory checks, and selected
+      policy path before the fixture is run.
 - [ ] [AI] Run a disposable host-address publication capability probe with
-      `beaver_nest_probe=beaver-nest-publication-probe-$$; trap 'docker rm -f "$beaver_nest_probe" >/dev/null 2>&1 || true' EXIT; docker run --detach --name "$beaver_nest_probe" --publish 127.0.0.1:19391:80 nginx:1.27-alpine >/dev/null && curl --fail --silent --show-error http://127.0.0.1:19391/ >/dev/null && docker port "$beaver_nest_probe" 80 | rg '^127\.0\.0\.1:19391$'`;
+      `beaver_nest_probe=beaver-nest-publication-probe-$$; trap 'docker rm -f "$beaver_nest_probe" >/dev/null 2>&1 || true' EXIT; docker run --detach --name "$beaver_nest_probe" --publish 127.0.0.1:19391:80 docker.io/library/nginx:1.27-alpine@sha256:65645c7bb6a0661892a8b03b89d0743208a18dd2f3f17a54ef4b76fb8e2f2a10 >/dev/null && curl --fail --silent --show-error http://127.0.0.1:19391/ >/dev/null && docker port "$beaver_nest_probe" 80 | rg '^127\.0\.0\.1:19391$'`;
       acceptance: the selected Linux Docker Engine or macOS Docker Desktop runtime retains the explicit
       loopback fixture address rather than a wildcard, and records no real VPN address. If it fails,
       stop before Phase 1 and record the unsupported runtime in executor task state; do not relax the
@@ -203,17 +231,25 @@ different working directory.
       `gh pr create --draft --base main --head beaver-nest-app-setup --title "docs(governance): support configured production databases" --body-file local-temp/beaver-nest-app-setup-unit-1-pr.md`;
       acceptance: `gh pr view beaver-nest-app-setup --json baseRefName,headRefName,isDraft` reports
       `main`, `beaver-nest-app-setup`, and `true`.
-- [ ] [AI] Run PR-Review Maker→Fixer cycle 1 from
-      `repo-governance/workflows/pr/pr-review-quality-gate.md`; acceptance: all reported
-      CRITICAL/HIGH/MEDIUM findings are resolved and pushed.
+- [ ] [AI] Record the unit 1 PR URL with
+      `gh pr view beaver-nest-app-setup --json url --jq .url > local-temp/beaver-nest-app-setup-unit-1-pr-url.txt && test -s local-temp/beaver-nest-app-setup-unit-1-pr-url.txt`;
+      acceptance: the file has exactly one HTTPS PR URL.
+- [ ] [AI] Send the exact **PR-Review Workflow Invocation Record** request with `N=1`, `C=1`, and
+      `prior-cycle-record: none`; acceptance:
+      `local-temp/beaver-nest-app-setup-unit-1-cycle-1-review.md` says `final-status: done`,
+      `cycles-completed: 1`, and `unresolved-threads: 0`, and all reported CRITICAL/HIGH/MEDIUM
+      findings are resolved and pushed.
 - [ ] [AI] Resolve the cycle 1 run ID with
       `gh run list --branch beaver-nest-app-setup --event pull_request --limit 1 --json databaseId --jq '.[0].databaseId' > local-temp/beaver-nest-app-setup-unit-1-cycle-1-run-id.txt && test -s local-temp/beaver-nest-app-setup-unit-1-cycle-1-run-id.txt`;
       acceptance: the file contains one numeric run ID for the pushed cycle 1 HEAD.
 - [ ] [AI] Poll unit 1 CI every two minutes with one
       `gh run view "$(tr -d '\n' < local-temp/beaver-nest-app-setup-unit-1-cycle-1-run-id.txt)" --json status,conclusion`
       call per wakeup; acceptance: status is `completed` and conclusion is `success`.
-- [ ] [AI] Run PR-Review Maker→Fixer cycle 2 on the updated unit 1 branch; acceptance: all blocking
-      findings are resolved and pushed.
+- [ ] [AI] Send the exact **PR-Review Workflow Invocation Record** request with `N=1`, `C=2`, and
+      `prior-cycle-record: local-temp/beaver-nest-app-setup-unit-1-cycle-1-review.md`; acceptance:
+      `local-temp/beaver-nest-app-setup-unit-1-cycle-2-review.md` says `final-status: done`,
+      `cycles-completed: 1`, and `unresolved-threads: 0`; all blocking findings are resolved and
+      pushed.
 - [ ] [AI] Resolve the cycle 2 run ID with
       `gh run list --branch beaver-nest-app-setup --event pull_request --limit 1 --json databaseId --jq '.[0].databaseId' > local-temp/beaver-nest-app-setup-unit-1-cycle-2-run-id.txt && test -s local-temp/beaver-nest-app-setup-unit-1-cycle-2-run-id.txt`;
       acceptance: the file contains one numeric run ID for the pushed cycle 2 HEAD and differs from
@@ -221,8 +257,11 @@ different working directory.
 - [ ] [AI] Poll the new unit 1 CI run every two minutes with one
       `gh run view "$(tr -d '\n' < local-temp/beaver-nest-app-setup-unit-1-cycle-2-run-id.txt)" --json status,conclusion`
       call per wakeup; acceptance: status is `completed` and conclusion is `success`.
-- [ ] [AI] Run PR-Review Maker→Fixer cycle 3 on the updated unit 1 branch; acceptance: zero
-      CRITICAL/HIGH/MEDIUM findings remain and the branch is forward-updated to latest `origin/main`.
+- [ ] [AI] Send the exact **PR-Review Workflow Invocation Record** request with `N=1`, `C=3`, and
+      `prior-cycle-record: local-temp/beaver-nest-app-setup-unit-1-cycle-2-review.md`; acceptance:
+      `local-temp/beaver-nest-app-setup-unit-1-cycle-3-review.md` says `final-status: done`,
+      `cycles-completed: 1`, and `unresolved-threads: 0`; zero CRITICAL/HIGH/MEDIUM findings remain
+      and the branch is forward-updated to latest `origin/main`.
 - [ ] [AI] Resolve the cycle 3 run ID with
       `gh run list --branch beaver-nest-app-setup --event pull_request --limit 1 --json databaseId --jq '.[0].databaseId' > local-temp/beaver-nest-app-setup-unit-1-cycle-3-run-id.txt && test -s local-temp/beaver-nest-app-setup-unit-1-cycle-3-run-id.txt`;
       acceptance: the file contains one numeric run ID for the pushed cycle 3 HEAD and differs from
@@ -725,24 +764,36 @@ names a different working directory.
 - [ ] [AI] Open the unit 2 draft PR with
       `gh pr create --draft --base main --head beaver-nest-app-setup-backend --title "feat(beaver-nest-be): add sqlite readiness foundation" --body-file local-temp/beaver-nest-app-setup-unit-2-pr.md`;
       acceptance: the PR targets `main` from only the backend worktree branch.
-- [ ] [AI] Run PR-Review Maker→Fixer cycle 1 for unit 2; acceptance: all
-      CRITICAL/HIGH/MEDIUM findings are resolved and pushed.
+- [ ] [AI] Record the unit 2 PR URL with
+      `gh pr view beaver-nest-app-setup-backend --json url --jq .url > local-temp/beaver-nest-app-setup-unit-2-pr-url.txt && test -s local-temp/beaver-nest-app-setup-unit-2-pr-url.txt`;
+      acceptance: the file has exactly one HTTPS PR URL.
+- [ ] [AI] Send the exact **PR-Review Workflow Invocation Record** request with `N=2`, `C=1`, and
+      `prior-cycle-record: none`; acceptance:
+      `local-temp/beaver-nest-app-setup-unit-2-cycle-1-review.md` says `final-status: done`,
+      `cycles-completed: 1`, and `unresolved-threads: 0`; all CRITICAL/HIGH/MEDIUM findings are
+      resolved and pushed.
 - [ ] [AI] Resolve the unit 2 cycle 1 run ID with
       `gh run list --branch beaver-nest-app-setup-backend --event pull_request --limit 1 --json databaseId --jq '.[0].databaseId' > local-temp/beaver-nest-app-setup-unit-2-cycle-1-run-id.txt && test -s local-temp/beaver-nest-app-setup-unit-2-cycle-1-run-id.txt`;
       acceptance: the file contains one numeric run ID for cycle 1 HEAD.
 - [ ] [AI] Poll unit 2 cycle 1 CI every two minutes with one
       `gh run view "$(tr -d '\n' < local-temp/beaver-nest-app-setup-unit-2-cycle-1-run-id.txt)" --json status,conclusion`
       per wakeup; acceptance: completed/success.
-- [ ] [AI] Run PR-Review Maker→Fixer cycle 2 for unit 2; acceptance: all blocking findings are resolved
-      and pushed.
+- [ ] [AI] Send the exact **PR-Review Workflow Invocation Record** request with `N=2`, `C=2`, and
+      `prior-cycle-record: local-temp/beaver-nest-app-setup-unit-2-cycle-1-review.md`; acceptance:
+      `local-temp/beaver-nest-app-setup-unit-2-cycle-2-review.md` says `final-status: done`,
+      `cycles-completed: 1`, and `unresolved-threads: 0`; all blocking findings are resolved and
+      pushed.
 - [ ] [AI] Resolve the unit 2 cycle 2 run ID with
       `gh run list --branch beaver-nest-app-setup-backend --event pull_request --limit 1 --json databaseId --jq '.[0].databaseId' > local-temp/beaver-nest-app-setup-unit-2-cycle-2-run-id.txt && test -s local-temp/beaver-nest-app-setup-unit-2-cycle-2-run-id.txt`;
       acceptance: the numeric run ID is for cycle 2 HEAD and differs from cycle 1.
 - [ ] [AI] Poll unit 2 cycle 2 CI every two minutes with one
       `gh run view "$(tr -d '\n' < local-temp/beaver-nest-app-setup-unit-2-cycle-2-run-id.txt)" --json status,conclusion`
       per wakeup; acceptance: completed/success.
-- [ ] [AI] Run PR-Review Maker→Fixer cycle 3 for unit 2; acceptance: zero
-      CRITICAL/HIGH/MEDIUM findings remain and the branch is forward-updated to latest `origin/main`.
+- [ ] [AI] Send the exact **PR-Review Workflow Invocation Record** request with `N=2`, `C=3`, and
+      `prior-cycle-record: local-temp/beaver-nest-app-setup-unit-2-cycle-2-review.md`; acceptance:
+      `local-temp/beaver-nest-app-setup-unit-2-cycle-3-review.md` says `final-status: done`,
+      `cycles-completed: 1`, and `unresolved-threads: 0`; zero CRITICAL/HIGH/MEDIUM findings remain
+      and the branch is forward-updated to latest `origin/main`.
 - [ ] [AI] Resolve the unit 2 cycle 3 run ID with
       `gh run list --branch beaver-nest-app-setup-backend --event pull_request --limit 1 --json databaseId --jq '.[0].databaseId' > local-temp/beaver-nest-app-setup-unit-2-cycle-3-run-id.txt && test -s local-temp/beaver-nest-app-setup-unit-2-cycle-3-run-id.txt`;
       acceptance: the numeric run ID is for cycle 3 HEAD and differs from cycles 1 and 2.
@@ -1154,11 +1205,13 @@ checkbox names a different working directory.
     And the returned document is the Vite application shell
   ```
 
-- [ ] [AI] **GREEN** — configure APIs, `/api/{**path}` JSON catch-all, static assets, protected
-      `/assets` 404, and last-priority GET/HEAD SPA fallback in
-      `apps/beaver-nest-be/src/BeaverNestBe/WebApp.fs`; run
+- [ ] [AI] **GREEN** — configure `UseStaticFiles` for the dedicated Vite directory in
+      `apps/beaver-nest-be/src/BeaverNestBe/Program.fs`; then configure known APIs, the
+      `/api/{**path}` JSON catch-all, protected `/assets` 404, and a final Giraffe
+      `spaFallbackHandler` in `apps/beaver-nest-be/src/BeaverNestBe/WebApp.fs`. The fallback permits
+      only GET/HEAD dotless non-API/non-asset paths and returns `index.html`; run
       `npm exec -- nx run beaver-nest-be:test:unit`; acceptance: all three route-boundary scenarios and
-      security headers pass.
+      security headers pass, and source inspection finds no `MapFallbackToFile` call.
 - [ ] [AI] **REFACTOR** — centralize route predicates/cache policies so fingerprinted assets are
       immutable-cacheable while `index.html` is no-cache; run
       `npm exec -- nx run beaver-nest-be:test:quick`; acceptance: no directory browsing or API HTML
@@ -1618,6 +1671,13 @@ checkbox names a different working directory.
 - [ ] [AI] Call `browser_resize(375, 812)`, `browser_resize(768, 1024)`, and
       `browser_resize(1280, 800)` as three separate verification calls; acceptance: mobile, tablet, and
       desktop clip, overlap, and focus checks pass.
+- [ ] [AI] After each resized inspection, call `browser_take_screenshot()` and save the returned
+      Playwright-MCP capture respectively as
+      `plans/in-progress/beaver-nest-app-setup/evidence/ui/en/phase-6-ready-light-375px.png`,
+      `plans/in-progress/beaver-nest-app-setup/evidence/ui/en/phase-6-ready-light-768px.png`, and
+      `plans/in-progress/beaver-nest-app-setup/evidence/ui/en/phase-6-ready-light-1280px.png`;
+      acceptance: each sanitized screenshot visibly shows the selected ready state at its stated
+      viewport, with no local data path, VPN address, or secret rendered or embedded in metadata.
 - [ ] [AI] Run
       `BEAVER_NEST_FE_E2E_EVIDENCE_DIRECTORY=plans/in-progress/beaver-nest-app-setup/evidence/ui/en npm exec -- playwright test --config apps/beaver-nest-fe-e2e/playwright.viewport.config.ts --grep @delivery-evidence`;
       acceptance: Playwright exits 0 and writes exactly `320-ready-light.png`, `375-ready-light.png`,
@@ -1808,15 +1868,24 @@ checkbox names a different working directory.
       `gh pr create --draft --base main --head beaver-nest-app-setup-client-runtime --title "feat(beaver-nest): establish local vpn app" --body-file local-temp/beaver-nest-app-setup-unit-3-pr.md`;
       acceptance: the PR targets latest `main`, links units 1 and 2, and contains no private runtime
       value.
-- [ ] [AI] Run PR-Review Maker→Fixer cycle 1 for unit 3; acceptance: all
-      CRITICAL/HIGH/MEDIUM findings are resolved, affected Rule 15/16 checks rerun, and fixes pushed.
+- [ ] [AI] Record the unit 3 PR URL with
+      `gh pr view beaver-nest-app-setup-client-runtime --json url --jq .url > local-temp/beaver-nest-app-setup-unit-3-pr-url.txt && test -s local-temp/beaver-nest-app-setup-unit-3-pr-url.txt`;
+      acceptance: the file has exactly one HTTPS PR URL.
+- [ ] [AI] Send the exact **PR-Review Workflow Invocation Record** request with `N=3`, `C=1`, and
+      `prior-cycle-record: none`; acceptance:
+      `local-temp/beaver-nest-app-setup-unit-3-cycle-1-review.md` says `final-status: done`,
+      `cycles-completed: 1`, and `unresolved-threads: 0`; all CRITICAL/HIGH/MEDIUM findings are
+      resolved, affected Rule 15/16 checks rerun, and fixes pushed.
 - [ ] [AI] Resolve the unit 3 cycle 1 run ID with
       `gh run list --branch beaver-nest-app-setup-client-runtime --event pull_request --limit 1 --json databaseId --jq '.[0].databaseId' > local-temp/beaver-nest-app-setup-unit-3-cycle-1-run-id.txt && test -s local-temp/beaver-nest-app-setup-unit-3-cycle-1-run-id.txt`;
       acceptance: the file contains one numeric run ID for cycle 1 HEAD.
 - [ ] [AI] Poll unit 3 cycle 1 CI every two minutes with one
       `gh run view "$(tr -d '\n' < local-temp/beaver-nest-app-setup-unit-3-cycle-1-run-id.txt)" --json status,conclusion`
       per wakeup; acceptance: completed/success.
-- [ ] [AI] Run PR-Review Maker→Fixer cycle 2 for unit 3; acceptance: all blocking findings are resolved,
+- [ ] [AI] Send the exact **PR-Review Workflow Invocation Record** request with `N=3`, `C=2`, and
+      `prior-cycle-record: local-temp/beaver-nest-app-setup-unit-3-cycle-1-review.md`; acceptance:
+      `local-temp/beaver-nest-app-setup-unit-3-cycle-2-review.md` says `final-status: done`,
+      `cycles-completed: 1`, and `unresolved-threads: 0`; all blocking findings are resolved,
       affected full-story checks rerun, and fixes pushed.
 - [ ] [AI] Resolve the unit 3 cycle 2 run ID with
       `gh run list --branch beaver-nest-app-setup-client-runtime --event pull_request --limit 1 --json databaseId --jq '.[0].databaseId' > local-temp/beaver-nest-app-setup-unit-3-cycle-2-run-id.txt && test -s local-temp/beaver-nest-app-setup-unit-3-cycle-2-run-id.txt`;
@@ -1824,9 +1893,11 @@ checkbox names a different working directory.
 - [ ] [AI] Poll unit 3 cycle 2 CI every two minutes with one
       `gh run view "$(tr -d '\n' < local-temp/beaver-nest-app-setup-unit-3-cycle-2-run-id.txt)" --json status,conclusion`
       per wakeup; acceptance: completed/success.
-- [ ] [AI] Run PR-Review Maker→Fixer cycle 3 for unit 3; acceptance: zero
-      CRITICAL/HIGH/MEDIUM findings remain, tester gates remain resolved, and the branch is
-      forward-updated to latest `origin/main`.
+- [ ] [AI] Send the exact **PR-Review Workflow Invocation Record** request with `N=3`, `C=3`, and
+      `prior-cycle-record: local-temp/beaver-nest-app-setup-unit-3-cycle-2-review.md`; acceptance:
+      `local-temp/beaver-nest-app-setup-unit-3-cycle-3-review.md` says `final-status: done`,
+      `cycles-completed: 1`, and `unresolved-threads: 0`; zero CRITICAL/HIGH/MEDIUM findings remain,
+      tester gates remain resolved, and the branch is forward-updated to latest `origin/main`.
 - [ ] [AI] Resolve the unit 3 cycle 3 run ID with
       `gh run list --branch beaver-nest-app-setup-client-runtime --event pull_request --limit 1 --json databaseId --jq '.[0].databaseId' > local-temp/beaver-nest-app-setup-unit-3-cycle-3-run-id.txt && test -s local-temp/beaver-nest-app-setup-unit-3-cycle-3-run-id.txt`;
       acceptance: the numeric run ID is for cycle 3 HEAD and differs from cycles 1 and 2.

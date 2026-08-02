@@ -66,10 +66,14 @@ flowchart TB
 5. Return a real 404 for missing `/assets/*` files.
 6. Register `index.html` fallback last for GET/HEAD non-file client routes.
 
-[Web-cited] Microsoft documents `MapFallbackToFile` as a lowest-priority SPA routing convenience.
-Because unmatched API GETs are also non-file paths, the API JSON catch-all must precede fallback.
-Source: [Microsoft `MapFallbackToFile`](https://learn.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.builder.staticfilesendpointroutebuilderextensions.mapfallbacktofile?view=aspnetcore-10.0),
-accessed 2026-08-02.
+[Repo-grounded] Implement this with the existing Giraffe seam, not `MapFallbackToFile` or ASP.NET
+endpoint routing. `Program.fs` configures `UseStaticFiles` for only the Vite static directory before
+calling `UseGiraffe webApp`. `WebApp.fs` retains its existing ordered `choose` handler: known API
+routes, then the `/api/{**path}` JSON error handler, then an `/assets/` missing-file 404 handler,
+then a final `spaFallbackHandler`. That handler accepts only GET/HEAD paths whose final segment has
+no `.` and returns the configured `index.html`; it rejects `/api/` and `/assets/`. The Phase 5
+route-boundary test must assert this `UseStaticFiles` + final Giraffe `spaFallbackHandler` path,
+rather than any `MapFallbackToFile` call.
 
 ## Component Boundaries
 
@@ -119,10 +123,11 @@ flowchart TB
 `beaver-nest-fe`; no `beaver-nest-www` exists because there is no promotional site.
 
 [Web-cited] Vite's production build uses `index.html` as its default entry and emits a bundle suited
-to static hosting. `server.proxy` is a development-server feature, so production requests use a
-relative same-origin `/api` path instead. Sources: [Vite build guide](https://vite.dev/guide/build)
-and [Vite server proxy](https://vite.dev/config/server-options.html#server-proxy), accessed
-2026-08-02.
+to static hosting. Exact excerpts: the [Vite build guide](https://vite.dev/guide/build) says
+“uses `<root>/index.html` as the build entry point” and “produces an application bundle” suitable
+for static hosting; the [Vite proxy reference](https://vite.dev/config/server-options.html#server-proxy)
+says it configures proxy rules “for the dev server.” Production therefore uses a relative
+same-origin `/api` path. Accessed 2026-08-02.
 
 Consequences:
 
@@ -161,11 +166,12 @@ Consequences:
 substitute for PostgreSQL.
 
 [Web-cited] SQLite WAL supports concurrent readers and one writer and expects all database users on
-the same machine. Microsoft recommends a new connection per concurrent operation and finite lock
-timeouts. Sources: [SQLite WAL](https://www.sqlite.org/wal.html),
-[Microsoft SQLite database errors](https://learn.microsoft.com/en-us/dotnet/standard/data/sqlite/database-errors),
-and [Microsoft SQLite connection strings](https://learn.microsoft.com/en-us/dotnet/standard/data/sqlite/connection-strings),
-accessed 2026-08-02.
+the same machine. Exact excerpts: [SQLite WAL](https://www.sqlite.org/wal.html) says “there can
+only be one writer at a time” and “all processes using a database must be on the same host
+computer”; [Microsoft's error guidance](https://learn.microsoft.com/en-us/dotnet/standard/data/sqlite/database-errors)
+says `DefaultTimeout` sets “the default timeout of all commands on this connection”; and the
+[connection-string reference](https://learn.microsoft.com/en-us/dotnet/standard/data/sqlite/connection-strings)
+says `Foreign Keys=True` sends `PRAGMA foreign_keys = 1`. Accessed 2026-08-02.
 
 Required settings:
 
@@ -189,9 +195,10 @@ journal. Create no domain table. DbUp runs before the web host accepts requests 
 on failure.
 
 [Web-cited] DbUp officially provides SQLite support through `dbup-sqlite`; its umbrella `dbup`
-package is legacy and is not selected. Sources: [DbUp SQLite repository](https://github.com/DbUp/dbup-sqlite),
-[DbUp supported databases](https://dbup.readthedocs.io/en/latest/supported-databases/), and
-[NuGet `dbup-sqlite`](https://www.nuget.org/packages/dbup-sqlite/), accessed 2026-08-02.
+package is legacy and is not selected. Exact excerpts: the [provider repository](https://github.com/DbUp/dbup-sqlite)
+describes itself as “SQLite provider for DbUp”; the [supported-databases page](https://dbup.readthedocs.io/en/latest/supported-databases/)
+lists “SQLite”; and [NuGet](https://www.nuget.org/packages/dbup-sqlite/) says “This package adds
+SQLite support.” Accessed 2026-08-02.
 
 The migration file follows the repository's timestamp naming convention under
 `apps/beaver-nest-be/src/BeaverNestBe/Migrations/` and is embedded/copied deterministically into
@@ -216,9 +223,9 @@ to `/var/lib/beaver-nest`, with `bind.create_host_path: false`. The mount includ
 `-wal`, and `-shm` files.
 
 [Web-cited] Docker documents that short bind syntax can create a missing host directory and that
-long syntax can disable that behavior. Source:
-[Docker Compose services/bind mounts](https://docs.docker.com/reference/compose-file/services/),
-accessed 2026-08-02.
+long syntax can disable that behavior. Exact excerpt: the [Compose services reference](https://docs.docker.com/reference/compose-file/services/)
+says short syntax “creates a directory at the source path” and that long syntax with
+`create_host_path` set to `false` prevents it. Accessed 2026-08-02.
 
 The production image creates a stable unprivileged account with UID/GID `10001`, assigns only its
 static and application files to that account, sets `USER 10001:10001`, and starts with `umask 0077`.
@@ -257,9 +264,10 @@ one-shot services additionally receive a distinct operator-owned backup bind at
 
 [Web-cited] Microsoft supports online backup with `SqliteConnection.BackupDatabase`; it briefly
 blocks writers. SQLite warns that copying only the main database while WAL is active can omit
-committed transactions. Sources:
-[Microsoft SQLite backup](https://learn.microsoft.com/en-us/dotnet/standard/data/sqlite/backup) and
-[SQLite WAL](https://www.sqlite.org/wal.html), accessed 2026-08-02.
+committed transactions. Exact excerpts: [Microsoft's backup guidance](https://learn.microsoft.com/en-us/dotnet/standard/data/sqlite/backup)
+says `BackupDatabase` “blocks other connections from writing to the database”; [SQLite WAL](https://www.sqlite.org/wal.html)
+says the WAL “is part of the persistent state” and must be kept with the database during a copy or
+move. Accessed 2026-08-02.
 
 No automatic scheduler or retention policy is included. A second directory on the same disk does
 not protect against host/disk loss. The operator procedure therefore requires copying or directly
@@ -273,17 +281,15 @@ application port only on `${BEAVER_NEST_BE_VPN_HOST_IP}`. The operator must supp
 that exists on an already configured encrypted VPN interface.
 
 [Web-cited] Compose binds all host interfaces when `host_ip` is omitted; Kestrel `0.0.0.0` means all
-container IPv4 interfaces. Sources: [Docker Compose ports](https://docs.docker.com/reference/compose-file/services/#ports)
-and [Kestrel endpoints](https://learn.microsoft.com/en-us/aspnet/core/fundamentals/servers/kestrel?view=aspnetcore-10.0),
-accessed 2026-08-02.
+container IPv4 interfaces. Exact excerpts: the [Compose ports reference](https://docs.docker.com/reference/compose-file/services/#ports)
+says an unset `host_ip` “binds to all network interfaces (`0.0.0.0`)”; the [Kestrel endpoints
+reference](https://learn.microsoft.com/en-us/aspnet/core/fundamentals/servers/kestrel?view=aspnetcore-10.0)
+says `0.0.0.0` “binds to all IPv4 addresses.” Accessed 2026-08-02.
 
-[Web-cited] Docker Desktop routes published ports through its host backend on macOS, while native
-Docker Engine uses the host networking stack. The plan supports both Linux and macOS Docker only
-when a disposable Phase 0 publication probe proves that the exact supplied address (not a wildcard)
-is retained by that runtime. Docker host networking is not used to achieve this. Sources:
-[Docker Desktop networking](https://docs.docker.com/desktop/features/networking/) and
-[Docker port publishing](https://docs.docker.com/engine/network/port-publishing/), accessed
-2026-08-02.
+[Judgment call] Support Linux Docker Engine and macOS Docker Desktop only when the disposable Phase
+0 publication probe proves the exact supplied address (not a wildcard) is retained by the selected
+runtime. Docker host networking is not used to achieve this. This conditional behavior is an
+implementation acceptance rule, not a claim about either runtime's undocumented forwarding path.
 
 Required controls:
 
@@ -513,8 +519,9 @@ Paths marked **New file/pattern** are creation targets; deletions are explicit.
 
 [Web-cited] Registry snapshots observed on 2026-08-02 include `dbup-sqlite` `6.0.4` and
 `Microsoft.Data.Sqlite` `10.0.10`. These are evidence of package availability, not automatic
-recommendations. Sources: [NuGet `dbup-sqlite`](https://www.nuget.org/packages/dbup-sqlite/) and
-[NuGet `Microsoft.Data.Sqlite`](https://www.nuget.org/packages/Microsoft.Data.Sqlite/10.0.10).
+recommendations. Exact excerpts: [NuGet `dbup-sqlite`](https://www.nuget.org/packages/dbup-sqlite/)
+shows “dbup-sqlite 6.0.4,” and [NuGet `Microsoft.Data.Sqlite`](https://www.nuget.org/packages/Microsoft.Data.Sqlite/10.0.10)
+shows “Microsoft.Data.Sqlite 10.0.10.” Accessed 2026-08-02.
 
 Before manifest edits, execution applies the repository dependency-bump stability/safety policy,
 checks exact compatible versions across required advisory sources, records the selected path and
