@@ -4,10 +4,10 @@ Active project plans currently being worked on.
 
 ## Active Plans
 
-No active plans currently.
+- [BeaverNest App Setup](./beaver-nest-app-setup/README.md) — replace the hello-world quad with a
+  VPN-hosted, client-rendered, SQLite-backed local application foundation.
 
-Ready-to-execute plans wait in [`../backlog/`](../backlog/README.md); promote one here when
-work begins.
+Ready-to-execute plans wait in [`../backlog/`](../backlog/README.md).
 
 ## Instructions
 

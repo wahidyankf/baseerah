@@ -1,56 +1,61 @@
-# BeaverNest persistence layer
+# BeaverNest product persistence slice
 
-One-line summary: give `beaver-nest-be` a real data store — currently every route is stateless and the
-greeting is a hardcoded constant.
+One-line summary: introduce the first concrete BeaverNest feature that durably stores and retrieves
+product data on the explicit SQLite foundation planned in
+[`beaver-nest-app-setup`](../in-progress/beaver-nest-app-setup/README.md).
 
-> Idea, added 2026-07-31, filed from `baseerah-repo-reset`'s Product Scope § Out of scope.
+> Idea, added 2026-07-31 from `baseerah-repo-reset`; narrowed 2026-08-02 when the infrastructure-only
+> SQLite foundation became its own active plan.
 
 ## Problem / context
 
-`baseerah-repo-reset` deliberately built `beaver-nest-be`/`beaver-nest-fe` as a stateless hello-world
-skeleton: "No persistence. No database, no in-memory store, no state of any kind. The greeting is a
-constant." That was the right scope for a walking skeleton, but it means BeaverNest has zero
-capability to remember anything — no notes, no captures, no user data — which is the entire point
-of the product per [BeaverNest Vision](../../repo-governance/vision/beaver-nest.md).
+The app-setup plan deliberately creates SQLite configuration, migrations, readiness, durability,
+and recovery without a domain table. That avoids inventing a generic note, capture, or settings
+model before a product behavior needs one, but it also means BeaverNest still cannot remember real
+product data after the foundation lands.
 
 ## Why now
 
-Not yet — this is a placeholder for the first plan that needs real product state. Building
-persistence before a concrete feature needs it would be speculative infrastructure.
+Not yet. Promote this brief together with the first assistant/content capability whose value depends
+on durable state. The feature must drive aggregate shape, queries, audit actor, retention, and
+soft-delete behavior.
 
 ## Prior art / precedents
 
-- Sibling repo backends (`ose-app`, `organiclever-be` before their removal/migration) used
-  PostgreSQL via `docker-compose.integration.yml` + `db/migrations/` — the established pattern this
-  repo already has tooling conventions for, per
-  [monorepo-structure](../../docs/reference/monorepo-structure.md).
-- `repo-governance/development/pattern/functional-programming.md` — functional core/imperative
-  shell shapes how a persistence boundary should be designed (pure domain logic, impure I/O at the
-  edge).
+- [`beaver-nest-app-setup`](../in-progress/beaver-nest-app-setup/README.md) — fixes SQLite, DbUp,
+  single-host, no-ORM, backup, and real-database test boundaries.
+- [BeaverNest Vision](../../repo-governance/vision/beaver-nest.md) — names assistant, content,
+  posting, and workflow capabilities that may supply the first stateful slice.
+- [Functional Programming](../../repo-governance/development/pattern/functional-programming.md) —
+  requires pure domain logic and an explicit imperative persistence edge.
+- [Database Audit Trail](../../repo-governance/development/pattern/database-audit-trail.md) — applies
+  to every future domain table.
 
 ## Proposed direction (sketch)
 
-- A database service (likely PostgreSQL, matching the sibling-repo pattern) wired via
-  `docker-compose.integration.yml`, with `db/migrations/` and a test-reset hook for E2E isolation.
-- Introduced alongside the first real feature that needs state, not ahead of it.
+Choose one minimal stateful behavior, design its table and repository port with the behavior, use
+explicit parameterized SQL, and add a query builder only if measured query composition makes direct
+SQL materially worse. Apply a forward-only DbUp migration and test against real disposable SQLite
+files at integration/E2E levels.
 
 ## Rough scope & non-goals
 
-In scope: eventually, a persistence boundary for whatever the first stateful feature turns out to
-be.
+In scope: one concrete product aggregate with durable create/read behavior, audit fields, migration,
+repository boundary, and restart/backup coverage.
 
-Out of scope (for now): choosing a schema, an ORM, or even confirming PostgreSQL — none of that can
-be decided without a concrete feature driving the requirements.
+Out of scope: generic persistence abstractions, an ORM, selecting a query builder without need,
+multi-tenant ownership, PostgreSQL, or a catch-all key/value table.
 
 ## Risks & open questions
 
-- Which feature drives the first real persistence requirement? (open — determines the whole shape)
-- PostgreSQL (matching siblings) vs. something lighter for a still-small product? (open)
-- Does E2E isolation need a test-reset hook from day one, or can it be added when the first
-  stateful E2E scenario is written? (open)
+- Which real capability supplies the first aggregate?
+- What actor value is honest while the app has one VPN-trusted shared workspace and no identities?
+- Does the behavior require update/soft-delete now, or only create/read?
+- Are direct parameterized queries sufficient, or does concrete dynamic composition justify a query
+  builder?
 
 ## What success looks like + promotion signal
 
-Success: `beaver-nest-be` can durably store and retrieve real product data. Ready to promote only when
-a concrete feature (capture, notes, or similar) needs state to design against — until then it
-correctly stays an under-specified idea.
+Success means BeaverNest durably stores and retrieves real product data through one useful user
+behavior, not merely a migration journal or diagnostic setting. Promote only when that behavior has
+been selected and its lifecycle can be specified in Gherkin.
