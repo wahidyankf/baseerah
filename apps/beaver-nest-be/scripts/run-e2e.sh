@@ -57,5 +57,10 @@ done
 
 # Run the Playwright e2e suite
 cd "${ROOT}/apps/beaver-nest-be-e2e"
-API_BASE_URL="${API_BASE_URL}" npx bddgen
-API_BASE_URL="${API_BASE_URL}" npx playwright test
+if [[ "${USES_EXISTING_SERVICE}" == false ]]; then
+	BEAVER_NEST_BE_E2E_COMPOSE_PROJECT="${PROJECT_NAME}" API_BASE_URL="${API_BASE_URL}" npx bddgen
+	BEAVER_NEST_BE_E2E_COMPOSE_PROJECT="${PROJECT_NAME}" API_BASE_URL="${API_BASE_URL}" npx playwright test
+else
+	API_BASE_URL="${API_BASE_URL}" npx bddgen
+	API_BASE_URL="${API_BASE_URL}" npx playwright test
+fi

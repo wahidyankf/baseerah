@@ -3,8 +3,9 @@
  * fault injection remains in the F# integration suite; this BDD surface
  * verifies the externally observable contract of the disposable runtime.
  */
-import { expect, test } from "@playwright/test";
+import { expect } from "@playwright/test";
 import { createBdd } from "playwright-bdd";
+import { backendShell, requireComposeRuntime, resetBackendData } from "../utils/compose-runtime";
 import { getResponse } from "../utils/response-store";
 import { expectNoStorageDiagnostics, expectReadinessResponse } from "../utils/readiness";
 
@@ -19,12 +20,11 @@ Given("startup migrations completed and SQLite accepts queries", async () => {
 });
 
 Given("SQLite cannot complete the readiness query", async () => {
-  // The container runtime has no external fault-injection endpoint. The F# HTTP/
-  // SQLite integration suite owns that setup; retain this as a conditional,
-  // explicit guard rather than an unconditional test skip.
-  test.skip(
-    process.env.BEAVER_NEST_BE_E2E_UNREADY !== "true",
-    "requires an explicitly provisioned unready database runtime",
+  requireComposeRuntime();
+  // Replacing only the disposable named-volume database forces the next
+  // read-only readiness probe to fail, without adding a production test seam.
+  await backendShell(
+    "printf '%s' 'invalid sqlite fixture' > /var/lib/beaver-nest/beaver-nest.sqlite3.next && mv /var/lib/beaver-nest/beaver-nest.sqlite3.next /var/lib/beaver-nest/beaver-nest.sqlite3 && rm -f /var/lib/beaver-nest/beaver-nest.sqlite3-wal /var/lib/beaver-nest/beaver-nest.sqlite3-shm",
   );
 });
 
@@ -55,6 +55,10 @@ Then("the response sends {string} without a cache validator", async ({}, cacheCo
   expect(response.headers()[headerName.toLowerCase()]).toBe(expectedValue);
   expect(response.headers().etag).toBeUndefined();
   expect(response.headers()["last-modified"]).toBeUndefined();
+
+  if (response.status() === 503) {
+    await resetBackendData();
+  }
 });
 
 Then("the response reveals no database path or migration detail", async () => {

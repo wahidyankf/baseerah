@@ -45,6 +45,18 @@ let ``database configuration refuses an explicit symbolic-link component`` () =
         Directory.Delete(root, true)
 
 [<Fact>]
+let ``database configuration rejects an existing file passed as its data directory`` () =
+    let filePath =
+        Path.Combine(Path.GetTempPath(), "beaver-nest-data-file-" + Guid.NewGuid().ToString("N"))
+
+    File.WriteAllText(filePath, "not a directory")
+
+    try
+        Assert.Equal(Error "database data directory must be a directory", create filePath 100)
+    finally
+        File.Delete(filePath)
+
+[<Fact>]
 let ``database environment uses safe defaults and parses only positive timeouts`` () =
     let from entries =
         fromEnvironment (fun key -> entries |> Map.tryFind key |> Option.toObj)

@@ -11,39 +11,57 @@ type DatabaseConfiguration =
 
 let databaseFileName = "beaver-nest.sqlite3"
 
+let private normalizeDirectoryPath (path: string) =
+    Path.GetFullPath(path) |> Path.TrimEndingDirectorySeparator
+
 let private isDisallowedDirectory (path: string) =
-    let normalized = Path.GetFullPath path
+    let normalized = normalizeDirectoryPath path
     let root = Path.GetPathRoot normalized
-    let home = Environment.GetFolderPath Environment.SpecialFolder.UserProfile
-    let repository = Path.GetFullPath(Directory.GetCurrentDirectory())
+
+    let home =
+        Environment.GetFolderPath Environment.SpecialFolder.UserProfile
+        |> normalizeDirectoryPath
+
+    let repository = Directory.GetCurrentDirectory() |> normalizeDirectoryPath
     normalized = root || normalized = home || normalized = repository
 
-let private hasSymlinkComponent (path: string) =
+let private isSymbolicLink (path: string) =
+    try
+        (File.GetAttributes(path) &&& FileAttributes.ReparsePoint) <> enum 0
+    with
+    | :? FileNotFoundException
+    | :? DirectoryNotFoundException -> false
+    | :? UnauthorizedAccessException
+    | :? IOException -> true
+
+/// Checks every existing component without resolving it. `/var` and `/tmp` are
+/// platform-owned aliases on macOS, whereas all operator-controlled components
+/// must be direct directories rather than symbolic links.
+let hasSymbolicLinkComponent (path: string) =
     let rec inspect current =
         let parent = Directory.GetParent(current)
         let isSystemTemporaryAlias = current = "/var" || current = "/tmp"
 
-        let isLink =
-            not isSystemTemporaryAlias
-            && Directory.Exists current
-            && (DirectoryInfo(current).Attributes &&& FileAttributes.ReparsePoint) <> enum 0
+        let isLink = not isSystemTemporaryAlias && isSymbolicLink current
 
         if isLink then true
         elif isNull parent then false
         else inspect parent.FullName
 
-    inspect path
+    inspect (normalizeDirectoryPath path)
 
 let create (dataDirectory: string) (busyTimeoutMilliseconds: int) : Result<DatabaseConfiguration, string> =
     if String.IsNullOrWhiteSpace dataDirectory then
         Error "database data directory is not permitted"
     else
-        let directory = Path.GetFullPath dataDirectory
+        let directory = normalizeDirectoryPath dataDirectory
 
         if isDisallowedDirectory directory then
             Error "database data directory is not permitted"
-        elif hasSymlinkComponent directory then
+        elif hasSymbolicLinkComponent directory then
             Error "database data directory may not contain a symbolic link"
+        elif File.Exists directory then
+            Error "database data directory must be a directory"
         elif busyTimeoutMilliseconds <= 0 then
             Error "SQLite busy timeout must be finite and positive"
         else

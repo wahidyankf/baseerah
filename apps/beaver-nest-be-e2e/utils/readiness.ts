@@ -2,10 +2,12 @@ import { expect, type APIRequestContext, type APIResponse } from "@playwright/te
 
 export const readinessPath = "/api/v1/readiness";
 
-type ReadyPayload = {
+type ReadinessPayload = {
   status: string;
-  database: string;
-  schema: string;
+  components: {
+    database: string;
+    schema: string;
+  };
 };
 
 export async function expectCurrentReadiness(request: APIRequestContext): Promise<void> {
@@ -24,13 +26,16 @@ export async function expectReadinessResponse(
   expect(response.headers().etag).toBeUndefined();
   expect(response.headers()["last-modified"]).toBeUndefined();
 
-  const body = (await response.json()) as ReadyPayload;
-  expect(body.status).toBe(status);
-
-  if (database !== undefined && schema !== undefined) {
-    expect(body.database).toBe(database);
-    expect(body.schema).toBe(schema);
-  }
+  const expectedDatabase = database ?? (status === "ready" ? "ready" : "unavailable");
+  const expectedSchema = schema ?? (status === "ready" ? "current" : "unknown");
+  const body = (await response.json()) as ReadinessPayload;
+  expect(body).toEqual({
+    status,
+    components: {
+      database: expectedDatabase,
+      schema: expectedSchema,
+    },
+  });
 }
 
 export async function expectNoStorageDiagnostics(response: APIResponse): Promise<void> {

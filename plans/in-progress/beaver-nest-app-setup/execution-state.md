@@ -158,3 +158,31 @@
 ### Evidence
 
 - `plans/in-progress/beaver-nest-app-setup/evidence/phase-2-dependency-adoption.md` — retained as the dependency-policy clearance and waiver record for the combined delivery unit.
+
+### Cycle 1 Follow-Up
+
+- `apps/beaver-nest-be/src/BeaverNestBe/Domain/Readiness.fs` — modified — align the exact runtime
+  response bodies with the OpenAPI nested `components` schemas for both ready and unavailable states.
+- `apps/beaver-nest-be/tests/unit/Steps/ReadinessSteps.fs` — modified — assert the exact nested ready
+  and unavailable JSON contracts.
+- `apps/beaver-nest-be/tests/unit/Tests/ReadinessHandlerTests.fs` — modified — regress the complete
+  200 and 503 payload bodies, including unavailable component states.
+- `apps/beaver-nest-be-e2e/utils/readiness.ts` — modified — require the exact nested, no-extra-fields
+  readiness body in aggregate browser assertions.
+- `apps/beaver-nest-be-e2e/utils/compose-runtime.ts` — created — constrain aggregate Docker/CLI probes
+  to the disposable Compose runtime without a production test route or host database access.
+- `apps/beaver-nest-be-e2e/steps/{readiness,persistence,recovery}.steps.ts` — modified — replace
+  readiness-only false positives with disposable database inspections, an invalid-migration boot,
+  configured connection checks, bounded contention, and real backup/restore CLI observations.
+- `apps/beaver-nest-be/scripts/run-e2e.sh` — modified — pass the disposable Compose-project capability
+  only to locally started E2E runs; externally supplied services do not gain Docker control.
+- `infra/dev/beaver-nest-app/docker-compose.ci.yml` — modified — provide the disposable shared backup
+  volume required by the stopped-service restore observation.
+- Cycle 1 contract follow-up: backend unit tests (52 passed), backend lint, E2E typecheck, E2E lint,
+  Compose rendering, existing-service wrapper regression, and `git diff --check` — passed.
+- Local direct Kestrel verification remains bounded but unavailable: the targeted
+  `ReadinessHttpTests` run reached xUnit test start and produced no result before an explicit 90-second
+  alarm stopped it (exit 142). Those tests construct `webAppWith` directly and do not enter `Program`
+  or acquire a database/service lock, so this is not evidence of double lock acquisition. The direct
+  Docker E2E invocation likewise produced no output before it was stopped; neither local run is
+  claimed as passed. Post-push CI must verify the changed Docker flow.

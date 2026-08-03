@@ -9,21 +9,25 @@ type ReadinessResult =
     | Ready
     | Unavailable
 
-type ReadyResponse =
-    { Status: string
-      Database: string
-      Schema: string }
+type ReadinessComponents = { Database: string; Schema: string }
 
-type UnreadyResponse = { Status: string }
+type ReadinessResponse =
+    { Status: string
+      Components: ReadinessComponents }
 
 let ok: Liveness = { Status = "ok" }
 
-let readyResponse: ReadyResponse =
+let readyResponse: ReadinessResponse =
     { Status = "ready"
-      Database = "ready"
-      Schema = "current" }
+      Components =
+        { Database = "ready"
+          Schema = "current" } }
 
-let unavailableResponse: UnreadyResponse = { Status = "not-ready" }
+let unavailableResponse: ReadinessResponse =
+    { Status = "not-ready"
+      Components =
+        { Database = "unavailable"
+          Schema = "unknown" } }
 
 /// Keeps migration comparison independent of HTTP and database providers.
 let schemaState expectedScripts recordedScripts =

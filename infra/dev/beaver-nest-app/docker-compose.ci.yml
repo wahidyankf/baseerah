@@ -10,6 +10,7 @@ services:
       BEAVER_NEST_BE_SQLITE_BUSY_TIMEOUT_MILLISECONDS: "1000"
     volumes:
       - beaver-nest-be-e2e-data:/var/lib/beaver-nest
+      - beaver-nest-be-e2e-backups:/var/backups/beaver-nest
 
   beaver-nest-fe:
     build:
@@ -22,3 +23,4 @@ services:
 
 volumes:
   beaver-nest-be-e2e-data:
+  beaver-nest-be-e2e-backups:

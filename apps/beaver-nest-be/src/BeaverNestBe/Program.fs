@@ -10,7 +10,6 @@ open BeaverNestBe.Domain.HttpConfiguration
 open BeaverNestBe.Domain.DatabaseConfiguration
 open BeaverNestBe.Infrastructure.Migrations
 open BeaverNestBe.Infrastructure.Sqlite.Errors
-open BeaverNestBe.Infrastructure.Sqlite.Connection
 open BeaverNestBe.Operations.Database
 open BeaverNestBe.Application.ReadinessPort
 
@@ -26,15 +25,7 @@ let private configuration () =
     fromEnvironment System.Environment.GetEnvironmentVariable
 
 let private databaseReadiness databaseConfiguration =
-    fromProbe (fun () ->
-        try
-            use connection = openConfigured databaseConfiguration
-            use command = connection.CreateCommand()
-            command.CommandText <- "SELECT 1;"
-            command.ExecuteScalar() |> ignore
-            true
-        with _ ->
-            false)
+    fromProbe (fun () -> isReady databaseConfiguration)
 
 /// Application composition seam: durable migration completes before the caller
 /// can construct Kestrel or publish an HTTP listener.
@@ -71,17 +62,22 @@ let main args =
             match prepareApplication System.Environment.GetEnvironmentVariable with
             | Error error -> fail error
             | Ok listener ->
-                Host
-                    .CreateDefaultBuilder(args)
-                    .ConfigureWebHostDefaults(fun webHostBuilder ->
-                        webHostBuilder
-                            .UseUrls(url listener)
-                            // Suppresses the "Server: Kestrel" response header — Rule-16 finding AET-001.
-                            .ConfigureKestrel(fun opts -> opts.AddServerHeader <- false)
-                            .Configure(configureApp (databaseReadiness databaseConfiguration))
-                            .ConfigureServices(configureServices)
-                        |> ignore)
-                    .Build()
-                    .Run()
+                match acquireDataDirectoryServiceLock databaseConfiguration with
+                | Error error -> fail error
+                | Ok serviceLock ->
+                    use _serviceLock = serviceLock
 
-                0
+                    Host
+                        .CreateDefaultBuilder(args)
+                        .ConfigureWebHostDefaults(fun webHostBuilder ->
+                            webHostBuilder
+                                .UseUrls(url listener)
+                                // Suppresses the "Server: Kestrel" response header — Rule-16 finding AET-001.
+                                .ConfigureKestrel(fun opts -> opts.AddServerHeader <- false)
+                                .Configure(configureApp (databaseReadiness databaseConfiguration))
+                                .ConfigureServices(configureServices)
+                            |> ignore)
+                        .Build()
+                        .Run()
+
+                    0

@@ -35,6 +35,32 @@ let ``restarting does not duplicate the migration journal`` () =
     Assert.Equal("current", journalState [ initializationScriptName ] [ initializationScriptName ])
 
 [<Fact>]
+let ``migration SQL is loaded deterministically from the embedded migration resource`` () =
+    let scripts = embeddedScripts ()
+
+    Assert.Equal<string>([ initializationScriptName ], scripts |> List.map fst)
+    Assert.Contains("migration journal", scripts |> List.head |> snd)
+
+[<Fact>]
+let ``readiness requires an unchanged migration journal without creating database state`` () =
+    let directory =
+        Path.Combine(Path.GetTempPath(), "beaver-nest-readiness-" + Guid.NewGuid().ToString("N"))
+
+    let configuration = create directory 1000 |> Result.defaultWith failwith
+    Assert.False(isReady configuration)
+    Assert.False(Directory.Exists directory)
+
+    Assert.Equal(Ok(), initialize configuration)
+    Assert.True(isReady configuration)
+
+    use connection = new SqliteConnection($"Data Source={databasePath configuration}")
+    connection.Open()
+    use command = connection.CreateCommand()
+    command.CommandText <- "DELETE FROM SchemaVersions;"
+    command.ExecuteNonQuery() |> ignore
+    Assert.False(isReady configuration)
+
+[<Fact>]
 let ``invalid SQL fails before a service can listen`` () =
     let directory = temporaryDirectory ()
     let configuration = create directory 1000 |> Result.defaultWith failwith

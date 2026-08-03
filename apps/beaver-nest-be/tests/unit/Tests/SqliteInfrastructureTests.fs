@@ -61,3 +61,14 @@ let ``SQLite connection string uses the validated fixed database path and write-
 
     Assert.Equal(databasePath configuration, builder.DataSource)
     Assert.Equal(SqliteOpenMode.ReadWriteCreate, builder.Mode)
+
+[<Fact>]
+let ``readiness connections require an existing database and never create one`` () =
+    let directory =
+        Path.Combine(Path.GetTempPath(), "beaver-nest-readonly-" + Guid.NewGuid().ToString("N"))
+
+    let configuration = create directory 1000 |> Result.defaultWith failwith
+    let builder = SqliteConnectionStringBuilder(readOnlyConnectionString configuration)
+
+    Assert.Equal(databasePath configuration, builder.DataSource)
+    Assert.Equal(SqliteOpenMode.ReadOnly, builder.Mode)

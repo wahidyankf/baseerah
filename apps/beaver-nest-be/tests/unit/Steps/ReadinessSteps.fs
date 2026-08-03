@@ -44,13 +44,14 @@ let ``the response status is 503`` () = Assert.Equal(503, lastStatus)
 
 [<Then>]
 let ``the JSON response reports status "ready", database "ready" and schema "current"`` () =
-    Assert.Contains("\"status\":\"ready\"", lastBody)
-    Assert.Contains("\"database\":\"ready\"", lastBody)
-    Assert.Contains("\"schema\":\"current\"", lastBody)
+    Assert.Equal("{\"status\":\"ready\",\"components\":{\"database\":\"ready\",\"schema\":\"current\"}}", lastBody)
 
 [<Then>]
 let ``the JSON response reports status "not-ready"`` () =
-    Assert.Contains("\"status\":\"not-ready\"", lastBody)
+    Assert.Equal(
+        "{\"status\":\"not-ready\",\"components\":{\"database\":\"unavailable\",\"schema\":\"unknown\"}}",
+        lastBody
+    )
 
 [<Then>]
 let ``the response reveals no database path, SQL text or exception detail`` () =

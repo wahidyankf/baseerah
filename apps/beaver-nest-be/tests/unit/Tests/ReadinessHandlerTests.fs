@@ -24,9 +24,7 @@ let ``ready port produces a safe current readiness response`` () =
     Assert.Equal(HttpStatusCode.OK, response.StatusCode)
     assertNoStoreWithoutValidator response
     let body = response.Content.ReadAsStringAsync().Result
-    Assert.Contains("\"status\":\"ready\"", body)
-    Assert.Contains("\"database\":\"ready\"", body)
-    Assert.Contains("\"schema\":\"current\"", body)
+    Assert.Equal("{\"status\":\"ready\",\"components\":{\"database\":\"ready\",\"schema\":\"current\"}}", body)
 
 // @covers specs/apps/beaver-nest/behavior/beaver-nest-be/gherkin/health/readiness-unready.feature:Unready workspace returns a safe response
 [<Fact>]
@@ -35,7 +33,11 @@ let ``unavailable port maps every failure to a safe 503 response`` () =
     Assert.Equal(HttpStatusCode.ServiceUnavailable, response.StatusCode)
     assertNoStoreWithoutValidator response
     let body = response.Content.ReadAsStringAsync().Result
-    Assert.Equal("{\"status\":\"not-ready\"}", body)
+
+    Assert.Equal(
+        "{\"status\":\"not-ready\",\"components\":{\"database\":\"unavailable\",\"schema\":\"unknown\"}}",
+        body
+    )
 
 [<Fact>]
 let ``schema state is current only when expected and recorded migrations match`` () =
