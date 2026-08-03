@@ -130,14 +130,16 @@ flowchart LR
       doctor exits 0 without changing git identity.
 - [ ] [AI] Initialize the append-only file-touch ledger in executor task state; acceptance: every
       later touched path is recorded and no repository file is created for the Phase 0 ledger.
-- [ ] [AI] Record the dependency-policy evidence for the immutable, official Docker Hub fixture
-      `docker.io/library/nginx:1.27-alpine@sha256:65645c7bb6a0661892a8b03b89d0743208a18dd2f3f17a54ef4b76fb8e2f2a10`
-      with `docker buildx imagetools inspect docker.io/library/nginx:1.27-alpine@sha256:65645c7bb6a0661892a8b03b89d0743208a18dd2f3f17a54ef4b76fb8e2f2a10 > local-temp/beaver-nest-app-setup-publication-probe-image.txt`;
-      acceptance: the file is non-empty, inspection returns the exact digest, and the executor's
-      dependency-policy ledger records its source, inspection date, advisory checks, and selected
-      policy path before the fixture is run.
+- [ ] [AI] Create only local temporary scratch-probe inputs
+      `local-temp/beaver-nest-publication-probe/{main.rs,Dockerfile}`: `main.rs` uses only Rust `std` to
+      listen on `0.0.0.0:80` and return a bounded `200` response; `Dockerfile` uses only `FROM scratch`,
+      copies the compiled binary, and declares port `80`. Record their hashes, the installed
+      `aarch64-unknown-linux-musl` target, `rust-lld` linker, and `docker build --pull=false` result in
+      `local-temp/beaver-nest-publication-probe/executor-state.md`; acceptance: the executor-state record
+      proves no registry package, remote image, or manifest change is introduced, so the dependency
+      policy's external-package clearance path is not applicable.
 - [ ] [AI] Run a disposable host-address publication capability probe with
-      `beaver_nest_probe=beaver-nest-publication-probe-$$; trap 'docker rm -f "$beaver_nest_probe" >/dev/null 2>&1 || true' EXIT; docker run --detach --name "$beaver_nest_probe" --publish 127.0.0.1:19391:80 docker.io/library/nginx:1.27-alpine@sha256:65645c7bb6a0661892a8b03b89d0743208a18dd2f3f17a54ef4b76fb8e2f2a10 >/dev/null && curl --fail --silent --show-error http://127.0.0.1:19391/ >/dev/null && docker port "$beaver_nest_probe" 80 | rg '^127\.0\.0\.1:19391$'`;
+      `rustc --edition=2024 --target aarch64-unknown-linux-musl -C linker=rust-lld -C target-feature=+crt-static -O local-temp/beaver-nest-publication-probe/main.rs -o local-temp/beaver-nest-publication-probe/publication-probe-server && docker build --pull=false --tag beaver-nest-publication-probe:local -f local-temp/beaver-nest-publication-probe/Dockerfile local-temp/beaver-nest-publication-probe && beaver_nest_probe=beaver-nest-publication-probe-$$; trap 'docker stop "$beaver_nest_probe" >/dev/null 2>&1 || true; docker rm "$beaver_nest_probe" >/dev/null 2>&1 || true' EXIT; docker run --detach --name "$beaver_nest_probe" --publish 127.0.0.1:19391:80 beaver-nest-publication-probe:local >/dev/null && curl --fail --silent --show-error http://127.0.0.1:19391/ >/dev/null && docker port "$beaver_nest_probe" 80 | rg '^127\.0\.0\.1:19391$'`;
       acceptance: the selected Linux Docker Engine or macOS Docker Desktop runtime retains the explicit
       loopback fixture address rather than a wildcard, and records no real VPN address. If it fails,
       stop before Phase 1 and record the unsupported runtime in executor task state; do not relax the
@@ -176,6 +178,16 @@ different working directory.
       empty `### Task Status`, `### Files Changed`, `### Commands and Results`, and `### Evidence`
       sections, and its first `Files Changed` row records the file itself as created for durable
       execution-state tracking.
+- [ ] [AI] If Phase 0's local scratch publication probe succeeded and its executor-state record can be
+      safely retained without host-specific data, create the committed sanitized evidence record
+      `plans/in-progress/beaver-nest-app-setup/evidence/phase-0-dependency-adoption.md` before editing
+      governance content. Transcribe only the source and Dockerfile hashes, Rust target, `rust-lld` link,
+      and `docker build --pull=false` result from
+      `local-temp/beaver-nest-publication-probe/executor-state.md`; acceptance: the retained record proves
+      no registry package, remote image, or manifest change was introduced, retains no private host value,
+      and preserves the local artifact's **N/A** external-package-clearance status. If retention is not
+      safe or appropriate, record that decision in the Phase 1 execution-state ledger and do not create
+      the evidence file.
 
 - [ ] [AI] Edit `repo-governance/development/quality/three-level-testing-standard.md` so universal
       integration gates require each app's real configured production database rather than PostgreSQL;
@@ -312,11 +324,19 @@ names a different working directory.
       `repo-governance/development/workflow/dependency-bump-policy.md` to exact versions of
       `dbup-sqlite` and `Microsoft.Data.Sqlite`, recording sanitized Path A/B/C evidence in
       `plans/in-progress/beaver-nest-app-setup/evidence/phase-2-dependency-adoption.md`; acceptance: the
-      evidence covers NVD, GitHub Advisories, Snyk, vendor pages, CISA KEV, and EPSS without secrets.
+      evidence records the selection date, 60-day cutoff when applicable, release date, Rule 5a and Rule
+      5b results, NVD, GitHub Advisories, Snyk, vendor pages, CISA KEV, and EPSS without secrets; copy
+      each final clearance status and exact version into the `tech-docs.md` Security Clearance Status
+      table before editing the project file.
 - [ ] [AI] Edit `apps/beaver-nest-be/src/BeaverNestBe/BeaverNestBe.fsproj` to exact-pin only the
       approved DbUp SQLite and Microsoft SQLite packages; acceptance:
       `dotnet list apps/beaver-nest-be/src/BeaverNestBe/BeaverNestBe.fsproj package | rg -i 'EntityFramework|Dapper|ORM'`
       exits 1 with no matches.
+- [ ] [AI] Verify the Phase 2 dependency edit with
+      `rg -n 'Version="[^"]*(\^|~|\*|latest)' apps/beaver-nest-be/src/BeaverNestBe/BeaverNestBe.fsproj`
+      and `npm exec -- nx run beaver-nest-be:deps:audit`; acceptance: the exact-pin scan exits 1 with
+      no match, the dependency audit exits 0, and their sanitized results are added to the Phase 2
+      evidence file and `tech-docs.md` clearance table before continuing.
 - [ ] [AI] **RED** — add listener-configuration tests to
       `apps/beaver-nest-be/tests/unit/Tests/HttpConfigurationTests.fs` and register the test-only file in
       `apps/beaver-nest-be/tests/unit/BeaverNestBe.UnitTests.fsproj`; run
@@ -880,10 +900,16 @@ checkbox names a different working directory.
       the phase begins with no claimed files or results, every subsequent Phase 4 path is appended when
       touched, and the execution-state record inherited from merged unit 2 remains committed history
       rather than an uncommitted cross-worktree ledger.
-- [ ] [AI] Apply the dependency-adoption policy to exact Vite, official React-plugin, and MSW versions,
-      recording sanitized evidence in
+- [ ] [AI] Apply `repo-governance/development/workflow/dependency-bump-policy.md` to exact Vite, official
+      React-plugin, and MSW versions, plus the exact tag and immutable digest for every
+      `docker.io/library/node` `FROM` reference retained or introduced in
+      `apps/beaver-nest-fe/Dockerfile`, recording sanitized evidence in
       `plans/in-progress/beaver-nest-app-setup/evidence/phase-4-dependency-adoption.md`; acceptance: the
-      record covers required vulnerability sources and contains no secret/private host value.
+      record contains the selection date, 60-day cutoff when applicable, release date, Rule 5a and Rule
+      5b results, NVD, GitHub Advisories, Snyk, vendor pages, CISA KEV, and required EPSS results without
+      secret/private host values; copy each final clearance status, exact package version, and Node
+      tag/digest plus its `FROM` occurrence into the `tech-docs.md` Security Clearance Status table before
+      the manifest or Dockerfile edit.
 - [ ] [AI] Inventory the existing FE migration surface with
       `rg --files apps/beaver-nest-fe | sort`; acceptance: the executor records the exact root files,
       `src/app/{page,layout,error,not-found,icon,globals}` files/tests, `AppFrame`, `AppShell`, greeting
@@ -898,6 +924,11 @@ checkbox names a different working directory.
       exact-pin approved Vite, React-plugin, and MSW dependencies; run `npm install`; acceptance: only
       `apps/beaver-nest-fe/package.json` and root `package-lock.json` change for this action, and the
       lockfile records the approved exact versions.
+- [ ] [AI] Verify the Phase 4 dependency edit with
+      `grep -E '"\^|"~' apps/beaver-nest-fe/package.json && { echo 'FAIL: caret/tilde found'; exit 1; } || echo 'OK: all exact'`
+      followed by `npm audit --audit-level=moderate`; acceptance: the exact-pin command reports `OK: all
+exact`, the audit exits 0, and their sanitized results are added to the Phase 4 evidence file and
+      `tech-docs.md` clearance table before continuing.
 - [ ] [AI] **GREEN** — add `apps/beaver-nest-fe/{index.html,vite.config.ts}` and
       `apps/beaver-nest-fe/src/{main,App}.tsx`; run `npm exec -- nx run beaver-nest-fe:test:unit`;
       acceptance: the Vite entry contract passes and `index.html` contains no inline theme script or
@@ -1143,6 +1174,21 @@ checkbox names a different working directory.
       `plans/in-progress/beaver-nest-app-setup/execution-state.md`; acceptance: the phase begins with
       no claimed files or results, and every subsequent Phase 5 path is appended when touched.
 
+- [ ] [AI] Apply `repo-governance/development/workflow/dependency-bump-policy.md` before rewriting any
+      Phase 5 Dockerfile: `docker.io/library/node` for the
+      `apps/beaver-nest-be/Dockerfile` build stage and
+      `infra/dev/beaver-nest-app/Dockerfile.fe.dev`; `mcr.microsoft.com/dotnet/sdk` for the
+      `apps/beaver-nest-be/Dockerfile` build stage, `apps/beaver-nest-be/Dockerfile.integration`, and
+      `infra/dev/beaver-nest-app/Dockerfile.be.dev`; and `mcr.microsoft.com/dotnet/aspnet` for the
+      `apps/beaver-nest-be/Dockerfile` runtime stage. Record the selected exact tag and immutable digest,
+      clearance, and each consuming `FROM` occurrence in
+      `plans/in-progress/beaver-nest-app-setup/evidence/phase-5-container-base-images.md`; acceptance:
+      the evidence records the selection date, current LTS confirmation or Path B/C cutoff, release date,
+      Rule 5a/5b result, NVD, GitHub Advisories, Snyk, vendor, CISA KEV, and required EPSS results without
+      secrets, and updates every corresponding `tech-docs.md` Security Clearance Status row before any
+      Dockerfile edit. A Path C result also creates the required waiver in both `tech-docs.md` and
+      `docs/reference/security-waivers.md` before merge.
+
 - [ ] [AI] **RED** — add `infra/dev/beaver-nest-app/tests/clean-image-build.sh`, which rsyncs the
       current unit-3 source into a task-specific `mktemp` tree while excluding `.git`, `node_modules`,
       `dist`, and generated-contract trees, then runs the root-context image build; run
@@ -1156,6 +1202,17 @@ checkbox names a different working directory.
       `UID:GID 10001:10001`, and exposes only production container port `19300`; run
       `bash infra/dev/beaver-nest-app/tests/clean-image-build.sh`; acceptance: a source-only image builds
       with no reliance on host-generated/untracked clients or frontend output.
+- [ ] [AI] Verify every rewritten `FROM` reference in
+      `apps/beaver-nest-fe/Dockerfile`, `apps/beaver-nest-be/Dockerfile`,
+      `apps/beaver-nest-be/Dockerfile.integration`, `infra/dev/beaver-nest-app/Dockerfile.be.dev`, and
+      `infra/dev/beaver-nest-app/Dockerfile.fe.dev` with
+      `awk '$1 == "FROM" { beaver_nest_image = $2; if (beaver_nest_image ~ /^--/) beaver_nest_image = $3; if (beaver_nest_image !~ /:[^@]+@sha256:[0-9a-f]{64}$/) { print FILENAME ": FAIL: non-exact or non-digest FROM reference: " $0; invalid = 1 } } END { exit invalid }' apps/beaver-nest-fe/Dockerfile apps/beaver-nest-be/Dockerfile apps/beaver-nest-be/Dockerfile.integration infra/dev/beaver-nest-app/Dockerfile.be.dev infra/dev/beaver-nest-app/Dockerfile.fe.dev`
+      followed by
+      `awk '$1 == "FROM" { beaver_nest_image = $2; if (beaver_nest_image ~ /^--/) beaver_nest_image = $3; print beaver_nest_image }' apps/beaver-nest-fe/Dockerfile apps/beaver-nest-be/Dockerfile apps/beaver-nest-be/Dockerfile.integration infra/dev/beaver-nest-app/Dockerfile.be.dev infra/dev/beaver-nest-app/Dockerfile.fe.dev | sort -u | while IFS= read -r beaver_nest_from_image; do beaver_nest_inspection=$(docker buildx imagetools inspect "$beaver_nest_from_image") || exit 1; printf '\nPost-rewrite inspection: %s\n%s\n' "$beaver_nest_from_image" "$beaver_nest_inspection" >> plans/in-progress/beaver-nest-app-setup/evidence/phase-5-container-base-images.md; done`;
+      acceptance: both commands exit 0; every `FROM` in all five rewritten Dockerfiles has an exact
+      version tag plus immutable digest; each unique digest is inspectable; no floating image reference
+      remains; and the sanitized per-occurrence inspection output is recorded in the Phase 4/5 evidence
+      files and clearance table.
 - [ ] [AI] **REFACTOR** — minimize copied build inputs/layers in root `.dockerignore` and
       `apps/beaver-nest-be/Dockerfile`; run
       `docker build -f apps/beaver-nest-be/Dockerfile -t beaver-nest-app:local .` followed by
@@ -1502,7 +1559,7 @@ checkbox names a different working directory.
       acceptance: an absent/unsafe development directory fails before either dev server starts, the
       backend receives only the canonical development directory, Compose never references
       `BEAVER_NEST_BE_DEVELOPMENT_DATA_DIRECTORY`, and the bound `Development uses a separate SQLite
-    directory` scenario passes.
+directory` scenario passes.
 - [ ] [AI] **REFACTOR** — keep the development wrapper's environment handoff explicit and limited to
       its development directory, loopback ports, and `nx run-many` invocation; rerun
       `npm exec -- nx run beaver-nest-be:test:specs && bash infra/dev/beaver-nest-app/tests/development-data-isolation.sh && bash infra/dev/beaver-nest-app/tests/development-ports.sh`;
