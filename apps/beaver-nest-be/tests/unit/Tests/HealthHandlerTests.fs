@@ -5,7 +5,7 @@ open Xunit
 open BeaverNestBe.WebApp
 open BeaverNestBe.Tests.Unit.Steps.BddState
 
-// @covers specs/apps/beaver-nest/behavior/beaver-nest-be/gherkin/health/service-health.feature:The service reports liveness
+// @covers specs/apps/beaver-nest/behavior/beaver-nest-be/gherkin/health/liveness.feature:Live process reports liveness without database details
 [<Fact>]
 let ``health route returns 200 with status ok`` () =
     let client = buildClient webApp

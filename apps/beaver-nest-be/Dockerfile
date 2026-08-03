@@ -22,8 +22,10 @@ WORKDIR /app
 
 COPY --from=build /app/publish .
 
-# Default port — override at runtime via BEAVER_NEST_BE_PORT.
-ENV BEAVER_NEST_BE_PORT=19320
-EXPOSE 19320
+# Container listener defaults. Host binding is explicit because containers do not
+# expose the loopback interface to their published port.
+ENV BEAVER_NEST_BE_HTTP_LISTEN_ADDRESS=0.0.0.0
+ENV BEAVER_NEST_BE_HTTP_LISTEN_PORT=19300
+EXPOSE 19300
 
 ENTRYPOINT ["dotnet", "BeaverNestBe.dll"]

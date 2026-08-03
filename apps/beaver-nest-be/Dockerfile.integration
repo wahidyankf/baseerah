@@ -4,6 +4,14 @@ FROM mcr.microsoft.com/dotnet/sdk:10.0
 
 WORKDIR /build
 
+# Docker Compose supplies the same explicit, sanitized values and mounts this
+# directory as tmpfs. Keeping defaults here makes direct image execution use a
+# disposable database and loopback-only listener as well.
+ENV BEAVER_NEST_BE_DATA_DIRECTORY=/tmp/beaver-nest-integration \
+    BEAVER_NEST_BE_HTTP_LISTEN_ADDRESS=127.0.0.1 \
+    BEAVER_NEST_BE_HTTP_LISTEN_PORT=19320 \
+    BEAVER_NEST_BE_SQLITE_BUSY_TIMEOUT_MILLISECONDS=1000
+
 # Copy solution-level files first for dependency caching.
 COPY apps/beaver-nest-be/global.json .
 COPY apps/beaver-nest-be/dotnet-tools.json .

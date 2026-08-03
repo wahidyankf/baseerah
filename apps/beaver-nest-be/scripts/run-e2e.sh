@@ -18,6 +18,7 @@ fi
 COMPOSE_FILES=(-f "${ROOT}/infra/dev/beaver-nest-app/docker-compose.yml" -f "${ROOT}/infra/dev/beaver-nest-app/docker-compose.ci.yml")
 PROJECT_NAME="beaver-nest-be-e2e"
 PORT=19320
+API_BASE_URL="http://127.0.0.1:${PORT}"
 
 cleanup() {
 	docker compose -p "${PROJECT_NAME}" "${COMPOSE_FILES[@]}" down -v >/dev/null 2>&1 || true
@@ -44,4 +45,5 @@ done
 
 # Run the Playwright e2e suite
 cd "${ROOT}/apps/beaver-nest-be-e2e"
-npx bddgen && npx playwright test
+API_BASE_URL="${API_BASE_URL}" npx bddgen
+API_BASE_URL="${API_BASE_URL}" npx playwright test

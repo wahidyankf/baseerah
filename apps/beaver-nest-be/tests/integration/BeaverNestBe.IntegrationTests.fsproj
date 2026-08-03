@@ -10,6 +10,9 @@
 
   <ItemGroup>
     <Compile Include="HostBootTests.fs" />
+    <Compile Include="ReadinessHttpTests.fs" />
+    <Compile Include="SqliteMigrationTests.fs" />
+    <Compile Include="SqliteSettingsTests.fs" />
   </ItemGroup>
 
   <ItemGroup>

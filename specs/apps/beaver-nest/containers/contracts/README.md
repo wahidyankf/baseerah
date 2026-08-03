@@ -1,6 +1,6 @@
 # BeaverNest API Contract
 
-OpenAPI 3.1 specification for the BeaverNest hello-world quad's REST API.
+OpenAPI 3.1 specification for the BeaverNest REST API.
 
 ## Purpose
 
@@ -22,15 +22,20 @@ nx run beaver-nest-contracts:bundle
 ```
 contracts/
 ├── README.md
-├── openapi.yaml     # Full spec: health, hello, and the shared Error schema
+├── openapi.yaml     # Full spec: health, readiness, hello, and the shared Error schema
 ├── project.json     # Nx project targets
+├── tests/
+│   └── readiness-contract.sh # Assertion-only readiness contract guard
 └── generated/        # Output (gitignored)
     └── openapi-bundled.yaml
 ```
 
 ## Rules
 
-- Exactly two `GET` routes (`/api/v1/health`, `/api/v1/hello`) — no write operations this phase
+- Exactly three `GET` routes (`/api/v1/health`, `/api/v1/readiness`, `/api/v1/hello`) — no write
+  operations this phase
+- Readiness exposes only the documented `200` ready and `503` not-ready bodies; both responses
+  require `Cache-Control: no-store` and declare no response validator headers
 - Every schema has a `description`
 - Changes to this contract should stay in lockstep with the Gherkin scenarios in
   [../../behavior/beaver-nest-be/gherkin/](../../behavior/beaver-nest-be/gherkin/README.md)

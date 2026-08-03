@@ -29,9 +29,10 @@
     "test:unit": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "echo 'no-op: target not applicable for this project (OpenAPI contract spec only)'"
+        "command": "bash specs/apps/beaver-nest/containers/contracts/tests/readiness-contract.sh"
       },
-      "cache": true
+      "cache": true,
+      "inputs": ["{projectRoot}/openapi.yaml", "{projectRoot}/tests/readiness-contract.sh"]
     },
     "test:coverage": {
       "executor": "nx:run-commands",

@@ -20,6 +20,9 @@ let ``the beaver-nest-be service is running on port 19320`` () = client <- Some(
 [<Given>]
 let ``the service has finished starting`` () = client <- Some(buildClient webApp)
 
+[<Given>]
+let ``the BeaverNest process is accepting HTTP requests`` () = client <- Some(buildClient webApp)
+
 [<When>]
 let ``I send a GET request to "/api/v1/health"`` () =
     let resp = client.Value.GetAsync("/api/v1/health").Result
@@ -30,5 +33,10 @@ let ``I send a GET request to "/api/v1/health"`` () =
 let ``the response status is 200`` () = Assert.Equal(200, lastStatus)
 
 [<Then>]
-let ``the response body field "status" equals "ok"`` () =
+let ``the JSON response reports status "ok"`` () =
     Assert.Contains("\"status\":\"ok\"", lastBody.Replace(" ", ""))
+
+[<Then>]
+let ``the response reveals no database path or migration detail`` () =
+    Assert.DoesNotContain("sqlite", lastBody, System.StringComparison.OrdinalIgnoreCase)
+    Assert.DoesNotContain("migration", lastBody, System.StringComparison.OrdinalIgnoreCase)

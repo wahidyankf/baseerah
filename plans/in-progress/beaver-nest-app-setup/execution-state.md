@@ -32,3 +32,114 @@
 ### Evidence
 
 - `plans/in-progress/beaver-nest-app-setup/evidence/phase-0-dependency-adoption.md` — sanitized local scratch-probe evidence; no host-specific value retained.
+
+## Phase 2
+
+### Task Status
+
+- Complete: additive SQLite, migration, recovery, listener, and environment-contract foundation is
+  implemented and verified before readiness delivery.
+
+### Files Changed
+
+- `plans/in-progress/beaver-nest-app-setup/evidence/phase-2-dependency-adoption.md` — created — dependency policy decision record.
+- `plans/in-progress/beaver-nest-app-setup/tech-docs.md` — modified — record Phase 2 package clearances.
+- `docs/reference/security-waivers.md` — modified — retain the required Path C native SQLite override.
+- `apps/beaver-nest-be/.env.example` — modified — declare value-free listener and SQLite contract keys.
+- `apps/beaver-nest-be/Dockerfile` — modified — remove obsolete listener variable and set container-only defaults.
+- `apps/beaver-nest-be/project.json` — modified — add explicit local listener, environment input, SQL cache inputs, and transitive dependency audit.
+- `apps/beaver-nest-be/src/BeaverNestBe/BeaverNestBe.fsproj` — modified — exact-pinned approved persistence dependencies and migration resource registration.
+- `apps/beaver-nest-be/src/BeaverNestBe/Domain/HttpConfiguration.fs` — created — pure listener configuration validation.
+- `apps/beaver-nest-be/src/BeaverNestBe/Domain/DatabaseConfiguration.fs` — created — canonical durable SQLite directory validation.
+- `apps/beaver-nest-be/src/BeaverNestBe/Infrastructure/Migrations.fs` — created — pre-listen DbUp migration orchestration.
+- `apps/beaver-nest-be/src/BeaverNestBe/Infrastructure/Sqlite/Connection.fs` — created — SQLite settings and connection boundary.
+- `apps/beaver-nest-be/src/BeaverNestBe/Infrastructure/Sqlite/Errors.fs` — created — sanitized provider error classification.
+- `apps/beaver-nest-be/src/BeaverNestBe/Migrations/001-initialize.sql` — created — embedded initialization migration.
+- `apps/beaver-nest-be/src/BeaverNestBe/Operations/Database.fs` — created — validated SQLite backup and restore commands.
+- `apps/beaver-nest-be/src/BeaverNestBe/Program.fs` — modified — command dispatch and migration-before-listen composition.
+- `apps/beaver-nest-be/tests/integration/BeaverNestBe.IntegrationTests.fsproj` — modified — register persistence integration tests.
+- `apps/beaver-nest-be/tests/integration/SqliteMigrationTests.fs` — created — real migration/restart/failure coverage.
+- `apps/beaver-nest-be/tests/integration/SqliteSettingsTests.fs` — created — real SQLite pragma and contention coverage.
+- `apps/beaver-nest-be/tests/unit/BeaverNestBe.UnitTests.fsproj` — modified — register additive behavior bindings and tests.
+- `apps/beaver-nest-be/tests/unit/Steps/PersistenceSteps.fs` — created — literal persistence feature bindings.
+- `apps/beaver-nest-be/tests/unit/Steps/RecoverySteps.fs` — created — literal recovery feature bindings.
+- `apps/beaver-nest-be/tests/unit/Tests/DatabaseConfigurationTests.fs` — created — database directory validation coverage.
+- `apps/beaver-nest-be/tests/unit/Tests/DatabaseOperationsTests.fs` — created — backup-name validation coverage.
+- `apps/beaver-nest-be/tests/unit/Tests/HttpConfigurationTests.fs` — created — listener configuration coverage.
+- `apps/beaver-nest-be/README.md` — modified — document additive local database operations.
+- `repo-config.yml` — modified — declare backend environment ownership and injection homes.
+- `infra/dev/beaver-nest-app/docker-compose.ci.yml` — modified — supply only explicit disposable CI database/listener values.
+- `infra/dev/beaver-nest-app/README.md` — modified — document CI environment ownership.
+- `infra/dev/beaver-nest-app/tests/env-contract.sh` — created — assert backend environment contract ownership.
+- `apps/rhino-cli/src/application/env/validate.rs` — modified — recognize literal F# environment wrappers and exempt only the .NET runtime-owned container signal.
+- `apps/rhino-cli/tests/env.rs` — modified — cover wrapper discovery and the narrow runtime-signal exclusion.
+- `specs/apps/rhino/behavior/rhino-cli/gherkin/env/env-validate-app-drift.feature` — modified — bind the scanner behavior.
+- `specs/apps/beaver-nest/behavior/beaver-nest-be/gherkin/README.md` — modified — link additive behavior features.
+- `specs/apps/beaver-nest/behavior/beaver-nest-be/gherkin/persistence/fresh-database.feature` — created — specify pre-listen migration.
+- `specs/apps/beaver-nest/behavior/beaver-nest-be/gherkin/persistence/migration-restart.feature` — created — specify migration idempotence.
+- `specs/apps/beaver-nest/behavior/beaver-nest-be/gherkin/persistence/broken-migration.feature` — created — specify sanitized startup failure.
+- `specs/apps/beaver-nest/behavior/beaver-nest-be/gherkin/persistence/sqlite-settings.feature` — created — specify SQLite safety settings.
+- `specs/apps/beaver-nest/behavior/beaver-nest-be/gherkin/persistence/sqlite-contention.feature` — created — specify bounded busy behavior.
+- `specs/apps/beaver-nest/behavior/beaver-nest-be/gherkin/recovery/online-backup.feature` — created — specify online backup validation.
+- `specs/apps/beaver-nest/behavior/beaver-nest-be/gherkin/recovery/verified-restore.feature` — created — specify verified stopped-app restore.
+
+### Commands and Results
+
+- Worktree initialization (`npm install`, `npm run doctor -- --fix`) — passed; lockfile ordering-only churn was restored.
+- Package clearance: NVD, GitHub Advisory Database, Snyk, vendor pages, CISA KEV, and EPSS applicability reviewed; the vulnerable native SQLite transitive dependency required the recorded Path C override.
+- Backend unit, integration, specification, quick, dependency-audit, environment-contract, Rhino environment validation, and exact-pin/no-ORM checks — passed.
+- Linux Docker integration runner — passed all eight real SQLite and Kestrel tests.
+
+### Evidence
+
+- `plans/in-progress/beaver-nest-app-setup/evidence/phase-2-dependency-adoption.md` — exact Path A/Path B clearance evidence.
+
+## Phase 3
+
+### Task Status
+
+- In progress: readiness contract, aggregate E2E observations, final delivery ledger, and PR-quality cycle.
+
+### Files Changed
+
+- `specs/apps/beaver-nest/containers/contracts/openapi.yaml` — modified — add exact safe readiness contracts.
+- `specs/apps/beaver-nest/containers/contracts/project.json` — modified — replace the contract test no-op.
+- `specs/apps/beaver-nest/containers/contracts/tests/readiness-contract.sh` — created — assertion-only readiness contract validation.
+- `specs/apps/beaver-nest/containers/contracts/README.md` — modified — document readiness contract verification.
+- `apps/beaver-nest-be/src/BeaverNestBe/Domain/Readiness.fs` — modified — expose provider-independent readiness result.
+- `apps/beaver-nest-be/src/BeaverNestBe/Application/ReadinessPort.fs` — created — inject bounded readiness probes.
+- `apps/beaver-nest-be/src/BeaverNestBe/Api/ReadinessHandlers.fs` — created — return safe 200/503 readiness responses.
+- `apps/beaver-nest-be/src/BeaverNestBe/WebApp.fs` — modified — map the readiness route.
+- `apps/beaver-nest-be/src/BeaverNestBe/Program.fs` — modified — compose the real SQLite readiness probe.
+- `apps/beaver-nest-be/src/BeaverNestBe/BeaverNestBe.fsproj` — modified — register readiness source compilation.
+- `apps/beaver-nest-be/tests/unit/BeaverNestBe.UnitTests.fsproj` — modified — register readiness feature bindings and tests.
+- `apps/beaver-nest-be/tests/unit/Steps/HealthSteps.fs` — modified — retain liveness bindings.
+- `apps/beaver-nest-be/tests/unit/Steps/ReadinessSteps.fs` — created — bind readiness scenarios.
+- `apps/beaver-nest-be/tests/unit/Tests/HealthHandlerTests.fs` — modified — characterize liveness response safety.
+- `apps/beaver-nest-be/tests/unit/Tests/ReadinessHandlerTests.fs` — created — test safe ready and unavailable handlers.
+- `apps/beaver-nest-be/tests/integration/BeaverNestBe.IntegrationTests.fsproj` — modified — register real readiness HTTP tests.
+- `apps/beaver-nest-be/tests/integration/HostBootTests.fs` — modified — avoid proxying the loopback real-host probe.
+- `apps/beaver-nest-be/tests/integration/ReadinessHttpTests.fs` — created — verify real Kestrel readiness 200/503 behavior.
+- `specs/apps/beaver-nest/behavior/beaver-nest-be/gherkin/health/service-health.feature` — deleted — superseded liveness feature.
+- `specs/apps/beaver-nest/behavior/beaver-nest-be/gherkin/health/liveness.feature` — created — specify database-detail-free liveness.
+- `specs/apps/beaver-nest/behavior/beaver-nest-be/gherkin/health/readiness-ready.feature` — created — specify current-schema readiness.
+- `specs/apps/beaver-nest/behavior/beaver-nest-be/gherkin/health/readiness-unready.feature` — created — specify safe unavailable readiness.
+- `apps/beaver-nest-be-e2e/steps/readiness.steps.ts` — created — bind readiness HTTP observations.
+- `apps/beaver-nest-be-e2e/steps/persistence.steps.ts` — created — bind persistence observations.
+- `apps/beaver-nest-be-e2e/steps/recovery.steps.ts` — created — bind recovery observations.
+- `apps/beaver-nest-be-e2e/utils/readiness.ts` — created — share safe readiness response assertions.
+- `apps/beaver-nest-be/Dockerfile.integration` — modified — use sanitized disposable runtime defaults.
+- `apps/beaver-nest-be/docker-compose.integration.yml` — modified — mount a disposable database directory.
+- `apps/beaver-nest-be/scripts/run-e2e.sh` — modified — run generated E2E steps against the explicit loopback endpoint.
+
+### Commands and Results
+
+- Contract lint, assertion-only unit test, bundle, and backend/frontend code generation — passed.
+- Backend unit/specification/quick gates — passed; behavior coverage reports 11 specs, 15 scenarios, and 64 steps.
+- Backend E2E specification gate and Docker-backed E2E — passed; 13 passed with one environment-conditional unavailable-runtime skip, and no unconditional skips or coverage gaps.
+- Five-project build/typecheck/lint/quick/specification matrix — passed.
+- Controlled host-loopback smoke could not keep `dotnet watch` alive because the execution sandbox rejects the required background-process priority operation; the Docker E2E and Docker integration runner provide the successful equivalent real HTTP evidence.
+
+### Evidence
+
+- `plans/in-progress/beaver-nest-app-setup/evidence/phase-2-dependency-adoption.md` — retained as the dependency-policy clearance and waiver record for the combined delivery unit.

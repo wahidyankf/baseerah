@@ -1,7 +1,7 @@
 # beaver-nest-be
 
-F# / Giraffe / ASP.NET 10 REST API backend for BeaverNest. Phase 1 hello-world quad: exactly two
-`GET` routes and a JSON 404 handler. Stateless — no database, no in-memory store.
+F# / Giraffe / ASP.NET 10 REST API backend for BeaverNest. The application uses an explicit
+listener and SQLite directory contract; real values remain in uncommitted local environment files.
 
 ## Quick Start
 
@@ -28,10 +28,17 @@ nx dev beaver-nest-be   # http://localhost:19320
 
 ## Environment Variables
 
-| Variable                      | Default | Description           |
-| ----------------------------- | ------- | --------------------- |
-| `BEAVER_NEST_BE_PORT`         | `19320` | TCP port to listen on |
-| `BEAVER_NEST_BE_CORS_ORIGINS` | `*`     | Allowed CORS origins  |
+| Variable                                          | Default                | Description                                            |
+| ------------------------------------------------- | ---------------------- | ------------------------------------------------------ |
+| `BEAVER_NEST_BE_HTTP_LISTEN_ADDRESS`              | `127.0.0.1`            | Listener address; containers explicitly use `0.0.0.0`. |
+| `BEAVER_NEST_BE_HTTP_LISTEN_PORT`                 | `19300`                | Listener port; Nx development explicitly uses `19320`. |
+| `BEAVER_NEST_BE_DEVELOPMENT_DATA_DIRECTORY`       | —                      | Required developer-owned local SQLite directory.       |
+| `BEAVER_NEST_BE_DATA_DIRECTORY`                   | `/var/lib/beaver-nest` | In-process SQLite directory.                           |
+| `BEAVER_NEST_BE_HOST_DATA_DIRECTORY`              | —                      | Production Compose durable-data bind source.           |
+| `BEAVER_NEST_BE_SQLITE_BUSY_TIMEOUT_MILLISECONDS` | `1000`                 | Finite SQLite lock wait.                               |
+| `BEAVER_NEST_BE_VPN_HOST_IP`                      | —                      | Explicit production host publication address.          |
+| `BEAVER_NEST_BE_PUBLIC_PORT`                      | `19300`                | Production-facing host port.                           |
+| `BEAVER_NEST_BE_BACKUP_DIRECTORY`                 | —                      | Production Compose backup bind source.                 |
 
 See `.env.example` for a local template.
 
