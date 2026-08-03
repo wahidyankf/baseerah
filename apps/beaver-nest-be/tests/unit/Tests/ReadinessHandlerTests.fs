@@ -4,6 +4,7 @@ open System.Net
 open System.Net.Http
 open Xunit
 open BeaverNestBe.Application.ReadinessPort
+open BeaverNestBe.Domain.Readiness
 open BeaverNestBe.WebApp
 open BeaverNestBe.Tests.Unit.Steps.BddState
 
@@ -35,3 +36,8 @@ let ``unavailable port maps every failure to a safe 503 response`` () =
     assertNoStoreWithoutValidator response
     let body = response.Content.ReadAsStringAsync().Result
     Assert.Equal("{\"status\":\"not-ready\"}", body)
+
+[<Fact>]
+let ``schema state is current only when expected and recorded migrations match`` () =
+    Assert.Equal("current", schemaState [ "002.sql"; "001.sql" ] [ "001.sql"; "002.sql" ])
+    Assert.Equal("pending", schemaState [ "001.sql"; "002.sql" ] [ "001.sql" ])

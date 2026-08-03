@@ -26,6 +26,7 @@
     <Compile Include="Tests/NotFoundHandlerTests.fs" />
     <Compile Include="Tests/HttpConfigurationTests.fs" />
     <Compile Include="Tests/DatabaseConfigurationTests.fs" />
+    <Compile Include="Tests/SqliteInfrastructureTests.fs" />
     <Compile Include="Tests/DatabaseOperationsTests.fs" />
   </ItemGroup>
 

@@ -1,5 +1,6 @@
 module BeaverNestBe.Infrastructure.Migrations
 
+open System.IO
 open DbUp
 open BeaverNestBe.Domain.DatabaseConfiguration
 open BeaverNestBe.Infrastructure.Sqlite.Connection
@@ -9,6 +10,7 @@ let initializationScriptName = "001-initialize.sql"
 
 let apply configuration scripts =
     try
+        Directory.CreateDirectory(dataDirectory configuration) |> ignore
         let builder = DeployChanges.To.SqliteDatabase(connectionString configuration)
 
         let configured =

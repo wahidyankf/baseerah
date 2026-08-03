@@ -13,13 +13,13 @@ let private validName name =
     && name = Path.GetFileName name
     && name.EndsWith(".sqlite3", StringComparison.Ordinal)
 
-let private backupPath name =
+let private backupPath backupRoot name =
     if validName name then
-        Ok(Path.Combine(backupDirectory, name))
+        Ok(Path.Combine(backupRoot, name))
     else
         Error "backup name is invalid"
 
-let validateBackupName = backupPath
+let validateBackupName = backupPath backupDirectory
 
 let private verify (path: string) =
     use connection = new SqliteConnection($"Data Source={path};Mode=ReadOnly")
@@ -32,13 +32,16 @@ let private verify (path: string) =
     use rows = foreignKeys.ExecuteReader()
     integrityResult = "ok" && not (rows.Read())
 
-let backup configuration name =
-    match backupPath name with
+/// Shared operation body; the public command below supplies the fixed production
+/// directory, while this function makes filesystem behavior testable in a
+/// disposable directory without widening the production command surface.
+let backupAt backupRoot configuration name =
+    match backupPath backupRoot name with
     | Error error -> Error error
     | Ok destination when File.Exists destination -> Error "backup already exists"
     | Ok destination ->
         try
-            Directory.CreateDirectory backupDirectory |> ignore
+            Directory.CreateDirectory backupRoot |> ignore
             use source = openConfigured configuration
             use target = new SqliteConnection($"Data Source={destination}")
             target.Open()
@@ -51,8 +54,9 @@ let backup configuration name =
         with _ ->
             Error "backup failed"
 
-let restore configuration name =
-    match backupPath name with
+/// Shared restore body paired with `backupAt` for disposable real-SQLite tests.
+let restoreAt backupRoot configuration name =
+    match backupPath backupRoot name with
     | Error error -> Error error
     | Ok source when not (File.Exists source) -> Error "backup does not exist"
     | Ok source when not (verify source) -> Error "backup verification failed"
@@ -75,3 +79,9 @@ let restore configuration name =
             Ok()
         with _ ->
             Error "restore failed"
+
+let backup configuration name =
+    backupAt backupDirectory configuration name
+
+let restore configuration name =
+    restoreAt backupDirectory configuration name

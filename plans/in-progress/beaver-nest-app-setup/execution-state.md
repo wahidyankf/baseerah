@@ -66,6 +66,7 @@
 - `apps/beaver-nest-be/tests/unit/Tests/DatabaseConfigurationTests.fs` — created — database directory validation coverage.
 - `apps/beaver-nest-be/tests/unit/Tests/DatabaseOperationsTests.fs` — created — backup-name validation coverage.
 - `apps/beaver-nest-be/tests/unit/Tests/HttpConfigurationTests.fs` — created — listener configuration coverage.
+- `apps/beaver-nest-be/tests/unit/Tests/SqliteInfrastructureTests.fs` — created — SQLite connection, migration-state, and sanitized provider-error coverage.
 - `apps/beaver-nest-be/README.md` — modified — document additive local database operations.
 - `repo-config.yml` — modified — declare backend environment ownership and injection homes.
 - `infra/dev/beaver-nest-app/docker-compose.ci.yml` — modified — supply only explicit disposable CI database/listener values.
@@ -89,6 +90,7 @@
 - Package clearance: NVD, GitHub Advisory Database, Snyk, vendor pages, CISA KEV, and EPSS applicability reviewed; the vulnerable native SQLite transitive dependency required the recorded Path C override.
 - Backend unit, integration, specification, quick, dependency-audit, environment-contract, Rhino environment validation, and exact-pin/no-ORM checks — passed.
 - Linux Docker integration runner — passed all eight real SQLite and Kestrel tests.
+- Coverage follow-up — passed 36 unit tests with 94.91% line coverage against the unchanged 90% threshold; migration now creates its validated directory before DbUp opens the database.
 
 ### Evidence
 
@@ -117,6 +119,7 @@
 - `apps/beaver-nest-be/tests/unit/Steps/ReadinessSteps.fs` — created — bind readiness scenarios.
 - `apps/beaver-nest-be/tests/unit/Tests/HealthHandlerTests.fs` — modified — characterize liveness response safety.
 - `apps/beaver-nest-be/tests/unit/Tests/ReadinessHandlerTests.fs` — created — test safe ready and unavailable handlers.
+- `apps/beaver-nest-be/tests/unit/Tests/SqliteInfrastructureTests.fs` — created — complete provider-neutral SQLite infrastructure coverage.
 - `apps/beaver-nest-be/tests/integration/BeaverNestBe.IntegrationTests.fsproj` — modified — register real readiness HTTP tests.
 - `apps/beaver-nest-be/tests/integration/HostBootTests.fs` — modified — avoid proxying the loopback real-host probe.
 - `apps/beaver-nest-be/tests/integration/ReadinessHttpTests.fs` — created — verify real Kestrel readiness 200/503 behavior.
@@ -138,6 +141,7 @@
 - Backend unit/specification/quick gates — passed; behavior coverage reports 11 specs, 15 scenarios, and 64 steps.
 - Backend E2E specification gate and Docker-backed E2E — passed; 13 passed with one environment-conditional unavailable-runtime skip, and no unconditional skips or coverage gaps.
 - Five-project build/typecheck/lint/quick/specification matrix — passed.
+- Backend coverage follow-up — passed at 94.91% line coverage with unchanged exclusions and threshold.
 - Controlled host-loopback smoke could not keep `dotnet watch` alive because the execution sandbox rejects the required background-process priority operation; the Docker E2E and Docker integration runner provide the successful equivalent real HTTP evidence.
 
 ### Evidence
