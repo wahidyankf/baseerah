@@ -293,10 +293,6 @@ different working directory.
 
 ## Phase 2: Additive SQLite, Migration, and Recovery Backend
 
-- [ ] [AI] Append a `## Phase 2` block with the four required headings to
-      `plans/in-progress/beaver-nest-app-setup/execution-state.md`; acceptance: the phase begins with
-      no claimed files or results, and every subsequent Phase 2 path is appended when touched.
-
 After provisioning, run every Phase 2 and Phase 3 command from
 `/Users/wkf/ose-projects/beaver-nest/worktrees/beaver-nest-app-setup-backend/` unless the checkbox
 names a different working directory.
@@ -307,6 +303,11 @@ names a different working directory.
 - [ ] [AI] Run `npm install` inside `worktrees/beaver-nest-app-setup-backend/`; acceptance: npm exits 0.
 - [ ] [AI] Run `npm run doctor -- --fix` inside `worktrees/beaver-nest-app-setup-backend/`; acceptance:
       the doctor exits 0 without modifying git identity.
+- [ ] [AI] After entering the provisioned unit 2 worktree, append a `## Phase 2` block with the four
+      required headings to `plans/in-progress/beaver-nest-app-setup/execution-state.md`; acceptance:
+      the phase begins with no claimed files or results, every subsequent Phase 2 path is appended when
+      touched, and the execution-state record inherited from merged unit 1 remains committed history
+      rather than an uncommitted cross-worktree ledger.
 - [ ] [AI] Apply
       `repo-governance/development/workflow/dependency-bump-policy.md` to exact versions of
       `dbup-sqlite` and `Microsoft.Data.Sqlite`, recording sanitized Path A/B/C evidence in
@@ -384,6 +385,12 @@ names a different working directory.
       compile/content order in `apps/beaver-nest-be/src/BeaverNestBe/BeaverNestBe.fsproj`; run
       `npm exec -- nx run beaver-nest-be:test:integration`; acceptance: DbUp creates only its journal
       before the host listens.
+- [ ] [AI] **REFACTOR** — extract the fresh-database pre-listen migration orchestration into a focused
+      function in `apps/beaver-nest-be/src/BeaverNestBe/Infrastructure/Migrations.fs` while retaining
+      the literal bindings in `apps/beaver-nest-be/tests/unit/Steps/PersistenceSteps.fs`; run
+      `npm exec -- nx run beaver-nest-be:test:specs && npm exec -- nx run beaver-nest-be:test:integration`;
+      acceptance: the `fresh-database.feature` scenario remains bound, DbUp creates its journal before
+      listen, and no product or domain table is created.
 - [ ] [AI] **RED** — add `apps/beaver-nest-be/tests/unit/Tests/DatabaseConfigurationTests.fs` and its
       `.fsproj` compile entry; run `npm exec -- nx run beaver-nest-be:test:unit`; acceptance: tests fail
       until configuration derives only `beaver-nest.sqlite3` from a canonical data directory, rejects
@@ -759,12 +766,41 @@ names a different working directory.
       acceptance: one conventional commit is created without changing git identity.
 - [ ] [AI] Push with `git push -u origin beaver-nest-app-setup-backend`; acceptance: remote and local
       branch SHAs match.
+- [ ] [AI] Identify the unit 2 post-push CI blast radius with
+      `git diff origin/main...HEAD --name-only && npm exec -- nx show projects --affected --base=origin/main --head=HEAD`;
+      acceptance: the executor records every changed app, contract, library, and configuration surface
+      and maps the BeaverNest backend/frontend/contract blast radius to
+      `beaver-nest-app-test-local-deploy-stag.yml` under
+      `repo-governance/development/workflow/ci-post-push-verification.md`.
+- [ ] [AI] Before dispatching, inspect the newest
+      `beaver-nest-app-test-local-deploy-stag.yml` run for the unit 2 branch with
+      `gh run list --workflow=beaver-nest-app-test-local-deploy-stag.yml --branch=beaver-nest-app-setup-backend --limit=1 --json databaseId,headSha,status`;
+      trigger it exactly once with
+      `gh workflow run beaver-nest-app-test-local-deploy-stag.yml --ref beaver-nest-app-setup-backend`
+      only when no run for the current `git rev-parse HEAD` is `queued` or `in_progress`; acceptance: the
+      required app-group heavy workflow is either already running for the current head or is dispatched
+      once, never duplicated.
+- [ ] [AI] Record the current-head heavy-workflow run ID in
+      `local-temp/beaver-nest-app-setup-unit-2-post-push-app-ci-run-id.txt` using
+      `gh run list --workflow=beaver-nest-app-test-local-deploy-stag.yml --branch=beaver-nest-app-setup-backend --event=workflow_dispatch --limit=3 --json databaseId,headSha,status`;
+      acceptance: the recorded run has `headSha` equal to `git rev-parse HEAD` and one numeric
+      `databaseId`.
+- [ ] [AI] Monitor the recorded unit 2 heavy-workflow run every two minutes using exactly one
+      `gh run view "$(tr -d '\n' < local-temp/beaver-nest-app-setup-unit-2-post-push-app-ci-run-id.txt)" --json status,conclusion,jobs`
+      call per wakeup; acceptance: it reaches `completed` with conclusion `success`; on failure, inspect
+      `gh run view <run-id> --log-failed`, fix the root cause, push, and repeat this post-push sequence.
 - [ ] [AI] Create `local-temp/beaver-nest-app-setup-unit-2-pr.md` with exact additive scope, retained
       hello/current-FE compatibility, commands, SQLite evidence, dependency evidence, and no-private-
       value sections; acceptance: `test -s local-temp/beaver-nest-app-setup-unit-2-pr.md` exits 0.
 - [ ] [AI] Open the unit 2 draft PR with
       `gh pr create --draft --base main --head beaver-nest-app-setup-backend --title "feat(beaver-nest-be): add sqlite readiness foundation" --body-file local-temp/beaver-nest-app-setup-unit-2-pr.md`;
       acceptance: the PR targets `main` from only the backend worktree branch.
+- [ ] [AI] Identify and monitor the PR-triggered workflows `pr-quality-gate.yml` and `validate-env.yml`
+      in addition to the completed heavy workflow: run
+      `gh run list --branch=beaver-nest-app-setup-backend --event=pull_request --limit=20 --json databaseId,headSha,status,workflowName`;
+      acceptance: each named workflow has a run for the current PR head, and each run is checked every
+      two minutes with one `gh run view <run-id> --json status,conclusion,jobs` call per wakeup until
+      `completed/success`; fixes that change the head restart this full three-workflow verification.
 - [ ] [AI] Record the unit 2 PR URL with
       `gh pr view beaver-nest-app-setup-backend --json url --jq .url > local-temp/beaver-nest-app-setup-unit-2-pr-url.txt && test -s local-temp/beaver-nest-app-setup-unit-2-pr-url.txt`;
       acceptance: the file has exactly one HTTPS PR URL.
@@ -828,10 +864,6 @@ names a different working directory.
 
 ## Phase 4: Frontend Specs and Vite Client-Rendered Workspace
 
-- [ ] [AI] Append a `## Phase 4` block with the four required headings to
-      `plans/in-progress/beaver-nest-app-setup/execution-state.md`; acceptance: the phase begins with
-      no claimed files or results, and every subsequent Phase 4 path is appended when touched.
-
 After provisioning, run every Phase 4 through Phase 8 command from
 `/Users/wkf/ose-projects/beaver-nest/worktrees/beaver-nest-app-setup-client-runtime/` unless the
 checkbox names a different working directory.
@@ -843,6 +875,11 @@ checkbox names a different working directory.
       exits 0.
 - [ ] [AI] Run `npm run doctor -- --fix` inside the unit 3 worktree; acceptance: the doctor exits 0
       without modifying git identity.
+- [ ] [AI] After entering the provisioned unit 3 worktree, append a `## Phase 4` block with the four
+      required headings to `plans/in-progress/beaver-nest-app-setup/execution-state.md`; acceptance:
+      the phase begins with no claimed files or results, every subsequent Phase 4 path is appended when
+      touched, and the execution-state record inherited from merged unit 2 remains committed history
+      rather than an uncommitted cross-worktree ledger.
 - [ ] [AI] Apply the dependency-adoption policy to exact Vite, official React-plugin, and MSW versions,
       recording sanitized evidence in
       `plans/in-progress/beaver-nest-app-setup/evidence/phase-4-dependency-adoption.md`; acceptance: the
@@ -1437,10 +1474,16 @@ checkbox names a different working directory.
 - [ ] [AI] **REFACTOR** — keep local port overrides in the two Nx `dev` targets rather than production
       Compose; rerun `bash infra/dev/beaver-nest-app/tests/development-ports.sh`; acceptance: changing
       the production public-port default cannot change either local development port.
-- [ ] [AI] **RED** — add `infra/dev/beaver-nest-app/tests/development-data-isolation.sh`; run
-      `bash infra/dev/beaver-nest-app/tests/development-data-isolation.sh`; acceptance: it fails until
-      the local command requires a development-only SQLite directory, exports it as the backend data
-      directory, and neither loads nor inherits the production Compose host data-bind source.
+- [ ] [AI] **RED** — add
+      `specs/apps/beaver-nest/behavior/beaver-nest-be/gherkin/development/development-data-isolation.feature`,
+      its literal TickSpec bindings in `apps/beaver-nest-be/tests/unit/Steps/DevelopmentSteps.fs`, the
+      exact unit-test project compile entry, and its backend Gherkin README link; extend
+      `infra/dev/beaver-nest-app/tests/development-data-isolation.sh` as the executable consumer of the
+      same scenario; run `npm exec -- nx run beaver-nest-be:test:specs && bash infra/dev/beaver-nest-app/tests/development-data-isolation.sh`;
+      acceptance: the specs gate proves every step in only the named development-data feature has a
+      literal binding, and the script fails until the local command requires a development-only SQLite
+      directory, exports it as the backend data directory, and neither loads nor inherits the production
+      Compose host data-bind source.
 
   **Gherkin (binds) →** "Development uses a separate SQLite directory"
 
@@ -1455,15 +1498,17 @@ checkbox names a different working directory.
 - [ ] [AI] **GREEN** — implement the explicit development-data handoff in
       `apps/beaver-nest-be/scripts/start-development.sh`, update root `package.json`,
       `apps/beaver-nest-be/.env.example`, `repo-config.yml`, and the app/runtime READMEs; run
-      `bash infra/dev/beaver-nest-app/tests/development-data-isolation.sh`;
+      `npm exec -- nx run beaver-nest-be:test:specs && bash infra/dev/beaver-nest-app/tests/development-data-isolation.sh`;
       acceptance: an absent/unsafe development directory fails before either dev server starts, the
-      backend receives only the canonical development directory, and Compose never references
-      `BEAVER_NEST_BE_DEVELOPMENT_DATA_DIRECTORY`.
+      backend receives only the canonical development directory, Compose never references
+      `BEAVER_NEST_BE_DEVELOPMENT_DATA_DIRECTORY`, and the bound `Development uses a separate SQLite
+    directory` scenario passes.
 - [ ] [AI] **REFACTOR** — keep the development wrapper's environment handoff explicit and limited to
       its development directory, loopback ports, and `nx run-many` invocation; rerun
-      `bash infra/dev/beaver-nest-app/tests/development-data-isolation.sh && bash infra/dev/beaver-nest-app/tests/development-ports.sh`;
+      `npm exec -- nx run beaver-nest-be:test:specs && bash infra/dev/beaver-nest-app/tests/development-data-isolation.sh && bash infra/dev/beaver-nest-app/tests/development-ports.sh`;
       acceptance: changing a production host data-bind source or public port cannot change local
-      SQLite access or either local development port.
+      SQLite access or either local development port, and the named development-data feature remains
+      fully bound.
 - [ ] [AI] **RED** — extend `infra/dev/beaver-nest-app/tests/env-contract.sh` with final unit-3 owner
       assertions; run `bash infra/dev/beaver-nest-app/tests/env-contract.sh`; acceptance: it fails while
       the obsolete frontend env source/injection remains.
@@ -1886,6 +1931,29 @@ checkbox names a different working directory.
       fourth thematic Conventional Commit is created without changing git identity.
 - [ ] [AI] Push with `git push -u origin beaver-nest-app-setup-client-runtime`; acceptance: remote and
       local branch SHAs match.
+- [ ] [AI] Identify the unit 3 post-push CI blast radius with
+      `git diff origin/main...HEAD --name-only && npm exec -- nx show projects --affected --base=origin/main --head=HEAD`;
+      acceptance: the executor records every changed app, contract, library, workflow, and configuration
+      surface and maps the BeaverNest app-group blast radius to
+      `beaver-nest-app-test-local-deploy-stag.yml` under
+      `repo-governance/development/workflow/ci-post-push-verification.md`.
+- [ ] [AI] Before dispatching, inspect the newest
+      `beaver-nest-app-test-local-deploy-stag.yml` run for the unit 3 branch with
+      `gh run list --workflow=beaver-nest-app-test-local-deploy-stag.yml --branch=beaver-nest-app-setup-client-runtime --limit=1 --json databaseId,headSha,status`;
+      trigger it exactly once with
+      `gh workflow run beaver-nest-app-test-local-deploy-stag.yml --ref beaver-nest-app-setup-client-runtime`
+      only when no run for the current `git rev-parse HEAD` is `queued` or `in_progress`; acceptance: the
+      required app-group heavy workflow is either already running for the current head or is dispatched
+      once, never duplicated.
+- [ ] [AI] Record the current-head heavy-workflow run ID in
+      `local-temp/beaver-nest-app-setup-unit-3-post-push-app-ci-run-id.txt` using
+      `gh run list --workflow=beaver-nest-app-test-local-deploy-stag.yml --branch=beaver-nest-app-setup-client-runtime --event=workflow_dispatch --limit=3 --json databaseId,headSha,status`;
+      acceptance: the recorded run has `headSha` equal to `git rev-parse HEAD` and one numeric
+      `databaseId`.
+- [ ] [AI] Monitor the recorded unit 3 heavy-workflow run every two minutes using exactly one
+      `gh run view "$(tr -d '\n' < local-temp/beaver-nest-app-setup-unit-3-post-push-app-ci-run-id.txt)" --json status,conclusion,jobs`
+      call per wakeup; acceptance: it reaches `completed` with conclusion `success`; on failure, inspect
+      `gh run view <run-id> --log-failed`, fix the root cause, push, and repeat this post-push sequence.
 - [ ] [AI] Check GitHub Secret Scanning with
       `gh api 'repos/{owner}/{repo}/secret-scanning/alerts?state=open' --jq 'length'`;
       acceptance: the command returns `0`; if the API is unavailable, stop for a human repository-
@@ -1898,6 +1966,12 @@ checkbox names a different working directory.
       `gh pr create --draft --base main --head beaver-nest-app-setup-client-runtime --title "feat(beaver-nest): establish local vpn app" --body-file local-temp/beaver-nest-app-setup-unit-3-pr.md`;
       acceptance: the PR targets latest `main`, links units 1 and 2, and contains no private runtime
       value.
+- [ ] [AI] Identify and monitor the PR-triggered workflows `pr-quality-gate.yml` and `validate-env.yml`
+      in addition to the completed heavy workflow: run
+      `gh run list --branch=beaver-nest-app-setup-client-runtime --event=pull_request --limit=20 --json databaseId,headSha,status,workflowName`;
+      acceptance: each named workflow has a run for the current PR head, and each run is checked every
+      two minutes with one `gh run view <run-id> --json status,conclusion,jobs` call per wakeup until
+      `completed/success`; fixes that change the head restart this full three-workflow verification.
 - [ ] [AI] Record the unit 3 PR URL with
       `gh pr view beaver-nest-app-setup-client-runtime --json url --jq .url > local-temp/beaver-nest-app-setup-unit-3-pr-url.txt && test -s local-temp/beaver-nest-app-setup-unit-3-pr-url.txt`;
       acceptance: the file has exactly one HTTPS PR URL.
@@ -1937,6 +2011,11 @@ checkbox names a different working directory.
 - [ ] [AI] Merge unit 3 only after all five hardened preconditions hold; acceptance:
       `gh pr view beaver-nest-app-setup-client-runtime --json state,mergedAt,mergeCommit` reports
       `MERGED`, a non-null merge time, and a merge commit on `origin/main`.
+- [ ] [AI] Before any worktree cleanup, transition safely from the unit 3 worktree to the primary
+      checkout with
+      `cd /Users/wkf/ose-projects/beaver-nest && git fetch origin && git switch main && git merge-base --is-ancestor origin/main HEAD && test -z "$(git status --short)"`;
+      acceptance: the executor is in the clean primary checkout on `main`, its HEAD contains
+      `origin/main`, and no plan worktree is the current working directory for cleanup.
 - [ ] [AI+HUMAN] Present the exact three worktree/branch cleanup targets plus proof that all three PRs
       are merged, all commits are pushed, and all worktrees are clean; acceptance: the user explicitly
       approves cleanup or cleanup remains safely pending.
