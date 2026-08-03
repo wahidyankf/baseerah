@@ -74,16 +74,16 @@ Then the product should be created successfully
 
 **Purpose**: Verify that business logic works correctly with a real database, testing data persistence, migrations, constraints, and transactions.
 
-| Aspect            | Rule                                                                                  |
-| ----------------- | ------------------------------------------------------------------------------------- |
-| Dependencies      | **Real database only** — no HTTP, no external services                                |
-| Gherkin specs     | **Must consume** shared specs from the project's `specs/apps/<app-name>/` directory   |
-| Database          | **The app's real configured production database** (for example, PostgreSQL or SQLite) |
-| HTTP layer        | **None** — call service/repository functions directly, no HTTP dispatch               |
-| External services | None                                                                                  |
-| Coverage          | Not measured at this level                                                            |
-| Nx caching        | `cache: false` (real database = non-deterministic)                                    |
-| Runs in           | Scheduled CI (combined with E2E in per-service workflows)                             |
+| Aspect            | Rule                                                                                |
+| ----------------- | ----------------------------------------------------------------------------------- |
+| Dependencies      | **Real database only** — no HTTP, no external services                              |
+| Gherkin specs     | **Must consume** shared specs from the project's `specs/apps/<app-name>/` directory |
+| Database          | **The app's real configured production database**                                   |
+| HTTP layer        | **None** — call service/repository functions directly, no HTTP dispatch             |
+| External services | None                                                                                |
+| Coverage          | Not measured at this level                                                          |
+| Nx caching        | `cache: false` (real database = non-deterministic)                                  |
+| Runs in           | Scheduled CI (combined with E2E in per-service workflows)                           |
 
 **Architecture**: Step definitions call service/repository functions directly with a connection to
 the app's real configured production database. No HTTP framework is involved — no MockMvc, no

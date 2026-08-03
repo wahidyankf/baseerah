@@ -3,7 +3,7 @@
 ## Scope
 
 Phase 0 validated a local, dependency-free publication probe. It introduced no registry package,
-remote image, manifest, lockfile, Dockerfile, or compose-file change.
+remote image, manifest, lockfile, tracked Dockerfile, or compose-file change.
 
 ## Local Artifact Record
 

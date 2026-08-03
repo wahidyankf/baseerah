@@ -25,6 +25,7 @@
 - Phase 1 targeted Prettier, markdownlint, diff check, and audit-trail terminology scan — passed.
 - Phase 1 affected quality gates, repository markdown lint, harness-sync validation, and instruction-size validation — passed; no affected Nx project target was selected for governance-only changes.
 - Independent Phase 1 documentation review — five findings corrected and targeted format/lint/quality gates re-run successfully.
+- Unit 1 PR review cycle 1 — two medium documentation findings corrected; follow-up validation is pending the fix commit.
 
 ### Evidence
 
