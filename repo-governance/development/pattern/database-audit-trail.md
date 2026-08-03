@@ -45,13 +45,13 @@ graph TD
     T["Table<br/>(any domain entity)"] --> R[Required Audit Columns]
     T --> O[Optional Audit Columns]
 
-    R --> C1["created_at<br/>TIMESTAMPTZ NOT NULL"]
-    C1 --> C2["created_by<br/>VARCHAR NOT NULL"]
-    C2 --> C3["updated_at<br/>TIMESTAMPTZ NOT NULL"]
-    C3 --> C4["updated_by<br/>VARCHAR NOT NULL"]
+    R --> C1["created_at<br/>UTC timestamp NOT NULL"]
+    C1 --> C2["created_by<br/>String NOT NULL"]
+    C2 --> C3["updated_at<br/>UTC timestamp NOT NULL"]
+    C3 --> C4["updated_by<br/>String NOT NULL"]
 
-    O --> C5["deleted_at<br/>TIMESTAMPTZ NULL"]
-    C5 --> C6["deleted_by<br/>VARCHAR NULL"]
+    O --> C5["deleted_at<br/>UTC timestamp NULL"]
+    C5 --> C6["deleted_by<br/>String NULL"]
 
     classDef required fill:#0173B2,color:#ffffff,stroke:#0173B2
     classDef optional fill:#029E73,color:#ffffff,stroke:#029E73
@@ -95,9 +95,10 @@ For licensing decisions related to Liquibase's FSL-1.1-ALv2 licence (introduced 
 
 ## Schema Migration
 
-Every backend applies the six audit columns through explicit, versioned SQL migrations. The logical
-column definitions are identical regardless of database engine; only the physical SQL syntax differs.
-An ORM may map an already-migrated table, but it is optional and never replaces the SQL migration.
+Every backend applies the six audit columns through versioned migrations supported by its language and
+framework ecosystem. The logical column definitions are identical regardless of database engine; only
+the physical migration syntax differs. BeaverNest uses explicit SQL migrations and direct parameterized
+SQL; an ORM may map an already-migrated table when an app chooses one.
 
 Regardless of the tool used, migrations must satisfy:
 
@@ -149,7 +150,10 @@ let softDelete (connection: SqliteConnection) (id: string) (actor: string) =
     use command = connection.CreateCommand()
     command.CommandText <- """
         UPDATE members
-        SET deleted_at = strftime('%Y-%m-%dT%H:%M:%fZ', 'now'), deleted_by = $actor
+        SET updated_at = strftime('%Y-%m-%dT%H:%M:%fZ', 'now'),
+            updated_by = $actor,
+            deleted_at = strftime('%Y-%m-%dT%H:%M:%fZ', 'now'),
+            deleted_by = $actor
         WHERE id = $id AND deleted_at IS NULL
         """
     command.Parameters.AddWithValue("$id", id) |> ignore
@@ -260,14 +264,14 @@ When an admin or audit endpoint legitimately needs soft-deleted rows, name the f
 
 F# option types encode nullability directly. The audit field mapping is:
 
-| Column       | F# type                 | Rationale                          |
-| ------------ | ----------------------- | ---------------------------------- |
-| `created_at` | `DateTimeOffset`        | Non-null; database `DEFAULT now()` |
-| `created_by` | `string`                | Non-null; caller must supply actor |
-| `updated_at` | `DateTimeOffset`        | Non-null; database `DEFAULT now()` |
-| `updated_by` | `string`                | Non-null; caller must supply actor |
-| `deleted_at` | `DateTimeOffset option` | `None` means active row            |
-| `deleted_by` | `string option`         | `None` means active row            |
+| Column       | F# type                 | Rationale                             |
+| ------------ | ----------------------- | ------------------------------------- |
+| `created_at` | `DateTimeOffset`        | Non-null; database-native UTC default |
+| `created_by` | `string`                | Non-null; caller must supply actor    |
+| `updated_at` | `DateTimeOffset`        | Non-null; database-native UTC default |
+| `updated_by` | `string`                | Non-null; caller must supply actor    |
+| `deleted_at` | `DateTimeOffset option` | `None` means active row               |
+| `deleted_by` | `string option`         | `None` means active row               |
 
 EF Core maps `option` fields to nullable SQL columns via the `HasConversion` / nullable column configuration.
 
@@ -310,7 +314,7 @@ Use this checklist when adding a new table or reviewing an existing one.
 ### Direct Parameterized SQL (When Used)
 
 - [ ] All runtime values use command parameters; SQL text never interpolates untrusted values
-- [ ] No `DELETE` statement is issued against audited tables; soft-delete updates both audit columns
+- [ ] No `DELETE` statement is issued against audited tables; soft-delete refreshes `updated_at`, `updated_by`, `deleted_at`, and `deleted_by`
 - [ ] Active-row queries include `deleted_at IS NULL` unless the caller is an explicitly authorized audit flow
 
 ## Related Documentation
