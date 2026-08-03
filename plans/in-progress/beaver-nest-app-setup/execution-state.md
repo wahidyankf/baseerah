@@ -133,6 +133,7 @@
 - `apps/beaver-nest-be-e2e/steps/persistence.steps.ts` — created — bind persistence observations.
 - `apps/beaver-nest-be-e2e/steps/recovery.steps.ts` — created — bind recovery observations.
 - `apps/beaver-nest-be-e2e/utils/readiness.ts` — created — share safe readiness response assertions.
+- `apps/beaver-nest-be-e2e/README.md` — modified — replace the retired health-feature link with the current liveness feature.
 - `apps/beaver-nest-be/Dockerfile.integration` — modified — use sanitized disposable runtime defaults.
 - `apps/beaver-nest-be/docker-compose.integration.yml` — modified — mount a disposable database directory.
 - `apps/beaver-nest-be/scripts/run-e2e.sh` — modified — run generated E2E steps against the explicit loopback endpoint.
@@ -144,6 +145,7 @@
 - Backend E2E specification gate and Docker-backed E2E — passed; 13 passed with one environment-conditional unavailable-runtime skip, and no unconditional skips or coverage gaps.
 - Five-project build/typecheck/lint/quick/specification matrix — passed.
 - Backend coverage follow-up — passed at 94.91% line coverage with unchanged exclusions and threshold.
+- Repository link validation — repair the stale backend E2E health-feature link detected by the pre-push gate.
 - Controlled host-loopback smoke could not keep `dotnet watch` alive because the execution sandbox rejects the required background-process priority operation; the Docker E2E and Docker integration runner provide the successful equivalent real HTTP evidence.
 
 ### Evidence

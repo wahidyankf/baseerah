@@ -18,5 +18,5 @@ Playwright-BDD backend E2E tests for beaver-nest-be.
 
 ## Feature Files
 
-- [service-health.feature](../../specs/apps/beaver-nest/behavior/beaver-nest-be/gherkin/health/service-health.feature)
+- [liveness.feature](../../specs/apps/beaver-nest/behavior/beaver-nest-be/gherkin/health/liveness.feature)
 - [greeting.feature](../../specs/apps/beaver-nest/behavior/beaver-nest-be/gherkin/hello/greeting.feature)
