@@ -6,7 +6,7 @@
   "main": "src/index.ts",
   "types": "src/index.ts",
   "devDependencies": {
-    "@amiceli/vitest-cucumber": "6.3.0",
-    "vitest": "4.1.0"
+    "@amiceli/vitest-cucumber": "7.0.0",
+    "vitest": "4.1.8"
   }
 }

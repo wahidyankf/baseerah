@@ -101,7 +101,10 @@
         "{workspaceRoot}/apps/rhino-cli/src/**/*.rs",
         "{workspaceRoot}/specs/apps/beaver-nest/behavior/beaver-nest-fe/gherkin/**/*.feature",
         "{projectRoot}/steps/**/*.steps.ts",
+        "{projectRoot}/utils/**/*.ts",
+        "{projectRoot}/tests/**/*.spec.ts",
         "{projectRoot}/playwright.config.ts",
+        "{projectRoot}/playwright.viewport.config.ts",
         "{projectRoot}/e2e-coverage-baseline.json"
       ]
     },

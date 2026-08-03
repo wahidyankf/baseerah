@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from "@storybook/nextjs-vite";
+import type { Meta, StoryObj } from "@storybook/react-vite";
 
 import { Sheet, SheetContent, SheetDescription, SheetFooter, SheetHeader, SheetTitle, SheetTrigger } from "./sheet";
 import { Button } from "../button/button";
@@ -25,7 +25,7 @@ export const Default: Story = {
           <SheetDescription>Make changes here. Click save when done.</SheetDescription>
         </SheetHeader>
         <div className="flex-1 p-4">
-          <p className="text-sm text-muted-foreground">Sheet content goes here.</p>
+          <p className="text-muted-foreground text-sm">Sheet content goes here.</p>
         </div>
         <SheetFooter>
           <Button>Save changes</Button>
@@ -48,7 +48,7 @@ export const LeftSide: Story = {
           <SheetDescription>This sheet slides in from the left.</SheetDescription>
         </SheetHeader>
         <div className="flex-1 p-4">
-          <p className="text-sm text-muted-foreground">Left-side sheet content.</p>
+          <p className="text-muted-foreground text-sm">Left-side sheet content.</p>
         </div>
       </SheetContent>
     </Sheet>

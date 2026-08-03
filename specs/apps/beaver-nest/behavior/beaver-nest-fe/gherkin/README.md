@@ -1,16 +1,15 @@
 # beaver-nest-fe — Gherkin
 
-Behavioral scenarios for the `beaver-nest-fe` Next.js landing page, organized by domain.
+Behavioral scenarios for the BeaverNest Vite workspace readiness surface.
 
-## Feature Files (1)
+## Feature Files
 
-- [hello/landing-page.feature](./hello/landing-page.feature) — product name + greeting content,
-  and a baseline accessibility scan (2 scenarios)
-
-Copied verbatim from [prd.md US-5](../../../../../../plans/done/2026-07-31__baseerah-repo-reset/prd.md#us-5--render-hello-world-in-baseerah-fe).
+- [workspace/browser-readiness.feature](./workspace/browser-readiness.feature) — same-origin browser readiness.
+- [workspace/readiness-loading.feature](./workspace/readiness-loading.feature) — accessible checking state.
+- [network/readiness-recovery.feature](./network/readiness-recovery.feature) — in-place recovery.
+- [workspace/no-promotional-cta.feature](./workspace/no-promotional-cta.feature) — neutral foundation content.
 
 ## Related
 
 - [behavior/README.md](../../README.md) — behavior index
-- [../../../containers/contracts/](../../../containers/contracts/README.md) — the OpenAPI
-  contract `beaver-nest-fe` consumes to render the greeting
+- [../../../containers/contracts/](../../../containers/contracts/README.md) — the OpenAPI readiness contract.

@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from "@storybook/nextjs-vite";
+import type { Meta, StoryObj } from "@storybook/react-vite";
 
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell, TableCaption } from "./table";
 
@@ -50,7 +50,7 @@ export const Empty: Story = {
       </TableHeader>
       <TableBody>
         <TableRow>
-          <TableCell colSpan={2} className="text-center text-muted-foreground">
+          <TableCell colSpan={2} className="text-muted-foreground text-center">
             No cities match the selected filters.
           </TableCell>
         </TableRow>

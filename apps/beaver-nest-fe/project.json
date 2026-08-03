@@ -17,25 +17,18 @@
     "dev": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "next dev --port 19310",
+        "command": "vite --host 127.0.0.1 --port 19310",
         "cwd": "{projectRoot}"
       }
     },
     "build": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "next build",
+        "command": "vite build",
         "cwd": "{projectRoot}"
       },
       "dependsOn": ["codegen"],
-      "outputs": ["{projectRoot}/.next"]
-    },
-    "start": {
-      "executor": "nx:run-commands",
-      "options": {
-        "command": "next start --port 19310",
-        "cwd": "{projectRoot}"
-      }
+      "outputs": ["{projectRoot}/dist"]
     },
     "typecheck": {
       "executor": "nx:run-commands",
@@ -77,9 +70,10 @@
     "test:integration": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "echo 'no-op: target not applicable for this project'"
+        "command": "npx vitest run --config vitest.integration.config.ts",
+        "cwd": "{projectRoot}"
       },
-      "cache": true
+      "cache": false
     },
     "test:e2e": {
       "executor": "nx:run-commands",
@@ -152,6 +146,6 @@
   "namedInputs": {
     "specs": ["{workspaceRoot}/specs/apps/beaver-nest/behavior/beaver-nest-fe/gherkin/**/*.feature"]
   },
-  "tags": ["type:app", "platform:nextjs", "lang:ts", "domain:beaver-nest"],
+  "tags": ["type:app", "platform:vite", "lang:ts", "domain:beaver-nest"],
   "implicitDependencies": ["beaver-nest-contracts", "web-ui", "web-ui-token"]
 }

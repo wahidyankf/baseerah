@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from "@storybook/nextjs-vite";
+import type { Meta, StoryObj } from "@storybook/react-vite";
 
 import { CopyButton } from "./copy-button";
 
@@ -31,7 +31,7 @@ const meta: Meta<typeof CopyButton> = {
   decorators: [
     (Story) => (
       // A neutral card ground so the ghost button's resting/hover tokens are visible in both themes.
-      <div className="inline-flex rounded-md border border-border bg-card p-2">
+      <div className="border-border bg-card inline-flex rounded-md border p-2">
         <Story />
       </div>
     ),

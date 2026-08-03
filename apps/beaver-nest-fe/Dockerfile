@@ -1,53 +1,15 @@
-# Build context: workspace root (../../.. from apps/beaver-nest-fe/)
-#
-# WORKDIR preserves the real apps/beaver-nest-fe/ nesting under a synthetic /repo root — Next's
-# outputFileTracingRoot and turbopack.root (next.config.ts) are pinned to "two levels up from this
-# file" for both local dev (the real monorepo root) and this Docker build, so keeping the same
-# nesting here means the standalone output always lands at the same relative path in both:
-# .next/standalone/apps/beaver-nest-fe/server.js.
-FROM node:24-alpine AS build
-WORKDIR /repo/apps/beaver-nest-fe
+FROM node:24.16.0-alpine3.23@sha256:2bdb65ed1dab192432bc31c95f94155ca5ad7fc1392fb7eb7526ab682fa5bf14 AS build
 
-# Copy app package.json and strip workspace dependency before install
-COPY apps/beaver-nest-fe/package.json ./
-RUN node -e " \
-  const pkg = JSON.parse(require('fs').readFileSync('package.json','utf8')); \
-  delete pkg.dependencies['@open-sharia-enterprise/web-ui']; \
-  delete pkg.dependencies['@open-sharia-enterprise/web-ui-token']; \
-  require('fs').writeFileSync('package.json', JSON.stringify(pkg, null, 2)); \
-" && npm install --ignore-scripts --legacy-peer-deps
+WORKDIR /workspace
+COPY . .
+RUN npm ci --ignore-scripts
+RUN npm exec -- vite apps/beaver-nest-fe build
 
-# Install web-ui transitive dependencies
-RUN npm install --save @radix-ui/react-dialog@1.1.15 @radix-ui/react-dropdown-menu@2.1.16 @radix-ui/react-scroll-area@1.2.10 @radix-ui/react-separator@1.1.8 @radix-ui/react-slot@1.2.4 @radix-ui/react-tabs@1.1.13 @radix-ui/react-tooltip@1.2.8 class-variance-authority@0.7.1 clsx@2.1.1 cmdk@1.1.1 lucide-react@0.577.0 radix-ui@1.4.3 tailwind-merge@2.6.1 --ignore-scripts --legacy-peer-deps
+FROM node:24.16.0-alpine3.23@sha256:2bdb65ed1dab192432bc31c95f94155ca5ad7fc1392fb7eb7526ab682fa5bf14
 
-# Copy workspace libs as resolvable node_modules packages
-COPY libs/web-ui/src/ ./node_modules/@open-sharia-enterprise/web-ui/src/
-COPY libs/web-ui/package.json ./node_modules/@open-sharia-enterprise/web-ui/
-COPY libs/web-ui-token/src/ ./node_modules/@open-sharia-enterprise/web-ui-token/src/
-COPY libs/web-ui-token/package.json ./node_modules/@open-sharia-enterprise/web-ui-token/
-
-# Copy app source
-COPY apps/beaver-nest-fe/src/ ./src/
-COPY apps/beaver-nest-fe/package.json apps/beaver-nest-fe/tsconfig.json apps/beaver-nest-fe/next.config.ts apps/beaver-nest-fe/postcss.config.mjs ./
-
-ENV NEXT_TELEMETRY_DISABLED=1
-ARG BEAVER_NEST_FE_API_BASE_URL=http://beaver-nest-be:19320
-ENV BEAVER_NEST_FE_API_BASE_URL=${BEAVER_NEST_FE_API_BASE_URL}
-RUN npx next build
-
-FROM node:24-alpine
-
-LABEL org.opencontainers.image.source="https://github.com/wahidyankf/beaver-nest"
-LABEL org.opencontainers.image.description="BeaverNest hello-world frontend built with Next.js"
-
-RUN addgroup -S app && adduser -S app -G app
 WORKDIR /app
-COPY --from=build --chown=app:app /repo/apps/beaver-nest-fe/.next/standalone/apps/beaver-nest-fe/ ./
-COPY --from=build --chown=app:app /repo/apps/beaver-nest-fe/.next/static ./.next/static
-USER app
-EXPOSE 19310
-ENV PORT=19310 HOSTNAME="0.0.0.0" NODE_ENV=production NEXT_TELEMETRY_DISABLED=1
-HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
-  CMD wget --no-verbose --tries=1 --spider http://127.0.0.1:19310/ || exit 1
+COPY --from=build /workspace/apps/beaver-nest-fe/dist ./
+COPY --from=build /workspace/node_modules ./node_modules
 
-CMD ["node", "server.js"]
+EXPOSE 19310
+CMD ["./node_modules/.bin/vite", "preview", "--host", "0.0.0.0", "--port", "19310"]

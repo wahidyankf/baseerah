@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from "@storybook/nextjs-vite";
+import type { Meta, StoryObj } from "@storybook/react-vite";
 
 import { Input } from "../input/input";
 import { Label } from "./label";
@@ -67,7 +67,7 @@ export const InvalidField: Story = {
     <div className="grid w-80 gap-1.5">
       <Label htmlFor="invalid-input">Email</Label>
       <Input id="invalid-input" type="email" aria-invalid={true} defaultValue="not-an-email" />
-      <p className="text-xs text-destructive">Please enter a valid email address.</p>
+      <p className="text-destructive text-xs">Please enter a valid email address.</p>
     </div>
   ),
 };

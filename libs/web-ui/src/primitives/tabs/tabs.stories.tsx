@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from "@storybook/nextjs-vite";
+import type { Meta, StoryObj } from "@storybook/react-vite";
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "./tabs";
 
@@ -30,10 +30,10 @@ export const Default: Story = {
         <TabsTrigger value="password">Password</TabsTrigger>
       </TabsList>
       <TabsContent value="account">
-        <p className="text-sm text-muted-foreground">Account settings panel.</p>
+        <p className="text-muted-foreground text-sm">Account settings panel.</p>
       </TabsContent>
       <TabsContent value="password">
-        <p className="text-sm text-muted-foreground">Password settings panel.</p>
+        <p className="text-muted-foreground text-sm">Password settings panel.</p>
       </TabsContent>
     </Tabs>
   ),
@@ -49,13 +49,13 @@ export const LineVariant: Story = {
         <TabsTrigger value="reports">Reports</TabsTrigger>
       </TabsList>
       <TabsContent value="overview">
-        <p className="text-sm text-muted-foreground">Overview panel content.</p>
+        <p className="text-muted-foreground text-sm">Overview panel content.</p>
       </TabsContent>
       <TabsContent value="analytics">
-        <p className="text-sm text-muted-foreground">Analytics panel content.</p>
+        <p className="text-muted-foreground text-sm">Analytics panel content.</p>
       </TabsContent>
       <TabsContent value="reports">
-        <p className="text-sm text-muted-foreground">Reports panel content.</p>
+        <p className="text-muted-foreground text-sm">Reports panel content.</p>
       </TabsContent>
     </Tabs>
   ),
@@ -70,13 +70,13 @@ export const Vertical: Story = {
         <TabsTrigger value="notifications">Notifications</TabsTrigger>
       </TabsList>
       <TabsContent value="account">
-        <p className="text-sm text-muted-foreground">Account settings panel.</p>
+        <p className="text-muted-foreground text-sm">Account settings panel.</p>
       </TabsContent>
       <TabsContent value="password">
-        <p className="text-sm text-muted-foreground">Password settings panel.</p>
+        <p className="text-muted-foreground text-sm">Password settings panel.</p>
       </TabsContent>
       <TabsContent value="notifications">
-        <p className="text-sm text-muted-foreground">Notification settings panel.</p>
+        <p className="text-muted-foreground text-sm">Notification settings panel.</p>
       </TabsContent>
     </Tabs>
   ),
@@ -93,10 +93,10 @@ export const Disabled: Story = {
         <TabsTrigger value="other">Other</TabsTrigger>
       </TabsList>
       <TabsContent value="active">
-        <p className="text-sm text-muted-foreground">Active tab content.</p>
+        <p className="text-muted-foreground text-sm">Active tab content.</p>
       </TabsContent>
       <TabsContent value="other">
-        <p className="text-sm text-muted-foreground">Other tab content.</p>
+        <p className="text-muted-foreground text-sm">Other tab content.</p>
       </TabsContent>
     </Tabs>
   ),

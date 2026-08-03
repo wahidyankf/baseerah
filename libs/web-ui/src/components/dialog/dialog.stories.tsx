@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from "@storybook/nextjs-vite";
+import type { Meta, StoryObj } from "@storybook/react-vite";
 
 import { Button } from "../button/button";
 import {
@@ -107,7 +107,7 @@ export const FormDialog: Story = {
             <input
               id="name"
               defaultValue="John Doe"
-              className="h-9 rounded-md border border-input bg-transparent px-3 py-1 text-sm outline-none"
+              className="border-input h-9 rounded-md border bg-transparent px-3 py-1 text-sm outline-none"
             />
           </div>
           <div className="grid gap-1.5">
@@ -117,7 +117,7 @@ export const FormDialog: Story = {
             <input
               id="email"
               defaultValue="john@example.com"
-              className="h-9 rounded-md border border-input bg-transparent px-3 py-1 text-sm outline-none"
+              className="border-input h-9 rounded-md border bg-transparent px-3 py-1 text-sm outline-none"
             />
           </div>
         </div>
@@ -142,7 +142,7 @@ export const LongContent: Story = {
           <DialogTitle>Terms of service</DialogTitle>
           <DialogDescription>Please read the terms carefully before proceeding.</DialogDescription>
         </DialogHeader>
-        <div className="max-h-60 space-y-2 overflow-y-auto text-sm text-muted-foreground">
+        <div className="text-muted-foreground max-h-60 space-y-2 overflow-y-auto text-sm">
           <p>
             Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et
             dolore magna aliqua.

@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from "@storybook/nextjs-vite";
+import type { Meta, StoryObj } from "@storybook/react-vite";
 
 import { Separator } from "./separator";
 
@@ -28,7 +28,7 @@ export const Default: Story = {
     <div className="w-64">
       <div className="space-y-1">
         <h4 className="text-sm leading-none font-medium">Section Title</h4>
-        <p className="text-sm text-muted-foreground">Section description text.</p>
+        <p className="text-muted-foreground text-sm">Section description text.</p>
       </div>
       <Separator className="my-4" />
       <div className="flex h-5 items-center space-x-4 text-sm">

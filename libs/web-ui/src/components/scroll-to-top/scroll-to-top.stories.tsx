@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from "@storybook/nextjs-vite";
+import type { Meta, StoryObj } from "@storybook/react-vite";
 
 import ScrollToTop from "./scroll-to-top";
 
@@ -23,7 +23,7 @@ type Story = StoryObj<typeof ScrollToTop>;
 export const Default: Story = {
   render: () => (
     <div className="relative h-96 overflow-y-auto rounded-md border p-4">
-      <p className="mb-4 text-sm text-muted-foreground">
+      <p className="text-muted-foreground mb-4 text-sm">
         The ScrollToTop button appears after the user scrolls past the threshold. In this story the button is always
         rendered for demonstration purposes.
       </p>
@@ -43,7 +43,7 @@ export const WithScrollableContent: Story = {
   name: "With Scrollable Content",
   render: () => (
     <div style={{ height: "200px", overflow: "auto", border: "1px solid #ccc", padding: "1rem" }}>
-      <p className="text-sm text-muted-foreground">Scroll down to see the button appear.</p>
+      <p className="text-muted-foreground text-sm">Scroll down to see the button appear.</p>
       <ScrollToTop threshold={50} />
       {Array.from({ length: 20 }, (_, i) => (
         <p key={i} className="my-2 text-sm">

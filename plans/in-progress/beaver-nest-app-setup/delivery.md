@@ -888,19 +888,19 @@ After provisioning, run every Phase 4 through Phase 8 command from
 `/Users/wkf/ose-projects/beaver-nest/worktrees/beaver-nest-app-setup-client-runtime/` unless the
 checkbox names a different working directory.
 
-- [ ] [AI] Provision unit 3 with
+- [x] [AI] Provision unit 3 with
       `git fetch origin && git worktree add -b beaver-nest-app-setup-client-runtime worktrees/beaver-nest-app-setup-client-runtime origin/main`;
       acceptance: `git -C worktrees/beaver-nest-app-setup-client-runtime status --short` is empty.
-- [ ] [AI] Run `npm install` inside `worktrees/beaver-nest-app-setup-client-runtime/`; acceptance: npm
+- [x] [AI] Run `npm install` inside `worktrees/beaver-nest-app-setup-client-runtime/`; acceptance: npm
       exits 0.
-- [ ] [AI] Run `npm run doctor -- --fix` inside the unit 3 worktree; acceptance: the doctor exits 0
+- [x] [AI] Run `npm run doctor -- --fix` inside the unit 3 worktree; acceptance: the doctor exits 0
       without modifying git identity.
-- [ ] [AI] After entering the provisioned unit 3 worktree, append a `## Phase 4` block with the four
+- [x] [AI] After entering the provisioned unit 3 worktree, append a `## Phase 4` block with the four
       required headings to `plans/in-progress/beaver-nest-app-setup/execution-state.md`; acceptance:
       the phase begins with no claimed files or results, every subsequent Phase 4 path is appended when
       touched, and the execution-state record inherited from merged unit 2 remains committed history
       rather than an uncommitted cross-worktree ledger.
-- [ ] [AI] Apply `repo-governance/development/workflow/dependency-bump-policy.md` to exact Vite, official
+- [x] [AI] Apply `repo-governance/development/workflow/dependency-bump-policy.md` to exact Vite, official
       React-plugin, and MSW versions, plus the exact tag and immutable digest for every
       `docker.io/library/node` `FROM` reference retained or introduced in
       `apps/beaver-nest-fe/Dockerfile`, recording sanitized evidence in
@@ -910,39 +910,39 @@ checkbox names a different working directory.
       secret/private host values; copy each final clearance status, exact package version, and Node
       tag/digest plus its `FROM` occurrence into the `tech-docs.md` Security Clearance Status table before
       the manifest or Dockerfile edit.
-- [ ] [AI] Inventory the existing FE migration surface with
+- [x] [AI] Inventory the existing FE migration surface with
       `rg --files apps/beaver-nest-fe | sort`; acceptance: the executor records the exact root files,
       `src/app/{page,layout,error,not-found,icon,globals}` files/tests, `AppFrame`, `AppShell`, greeting
       client/tests, test registry/setup, PostCSS, Vitest, Dockerfile, and `.dockerignore` in the ledger
       before moving or deleting any of them.
-- [ ] [AI] **RED** — add a test-only Vite-entry contract at
+- [x] [AI] **RED** — add a test-only Vite-entry contract at
       `apps/beaver-nest-fe/src/test/vite-entry.test.ts`; run
       `npm exec -- nx run beaver-nest-fe:test:unit`; acceptance: it fails because `index.html`, the Vite
       config, the client entry, static `dist` output, canonical `platform:vite` tag, and Vite targets do
       not yet exist.
-- [ ] [AI] **GREEN** — edit `apps/beaver-nest-fe/package.json` to remove Next runtime dependencies and
+- [x] [AI] **GREEN** — edit `apps/beaver-nest-fe/package.json` to remove Next runtime dependencies and
       exact-pin approved Vite, React-plugin, and MSW dependencies; run `npm install`; acceptance: only
       `apps/beaver-nest-fe/package.json` and root `package-lock.json` change for this action, and the
       lockfile records the approved exact versions.
-- [ ] [AI] Verify the Phase 4 dependency edit with
+- [x] [AI] Verify the Phase 4 dependency edit with
       `grep -E '"\^|"~' apps/beaver-nest-fe/package.json && { echo 'FAIL: caret/tilde found'; exit 1; } || echo 'OK: all exact'`
       followed by `npm audit --audit-level=moderate`; acceptance: the exact-pin command reports `OK: all
 exact`, the audit exits 0, and their sanitized results are added to the Phase 4 evidence file and
       `tech-docs.md` clearance table before continuing.
-- [ ] [AI] **GREEN** — add `apps/beaver-nest-fe/{index.html,vite.config.ts}` and
+- [x] [AI] **GREEN** — add `apps/beaver-nest-fe/{index.html,vite.config.ts}` and
       `apps/beaver-nest-fe/src/{main,App}.tsx`; run `npm exec -- nx run beaver-nest-fe:test:unit`;
       acceptance: the Vite entry contract passes and `index.html` contains no inline theme script or
       server-generated data.
-- [ ] [AI] **GREEN** — edit `apps/beaver-nest-fe/{tsconfig.json,vitest.config.ts,postcss.config.mjs}`
+- [x] [AI] **GREEN** — edit `apps/beaver-nest-fe/{tsconfig.json,vitest.config.ts,postcss.config.mjs}`
       with the minimum Vite-compatible compiler, test, and CSS configuration needed to compile the new
       entry; run `npm exec -- nx run beaver-nest-fe:test:unit`; acceptance: the unit target runs the
       Vite entry test without a Next plugin, `.next` inclusion, or `next-env.d.ts` reference.
-- [ ] [AI] **GREEN** — edit `apps/beaver-nest-fe/project.json` so Vite `dev` binds loopback port
+- [x] [AI] **GREEN** — edit `apps/beaver-nest-fe/project.json` so Vite `dev` binds loopback port
       `19310`, `build` outputs `apps/beaver-nest-fe/dist`, `start` is removed, and `platform:nextjs`
       becomes canonical `platform:vite`; run
       `npm exec -- nx run beaver-nest-fe:test:unit`; acceptance: `nx show project beaver-nest-fe --json`
       reports Vite targets and `platform:vite`.
-- [ ] [AI] **REFACTOR** — migrate needed client-only CSS/components from
+- [x] [AI] **REFACTOR** — migrate needed client-only CSS/components from
       `apps/beaver-nest-fe/src/app/globals.css` and
       `apps/beaver-nest-fe/src/components/{AppFrame,AppShell}.tsx`, delete the exact obsolete
       `apps/beaver-nest-fe/next.config.ts`,
@@ -958,38 +958,38 @@ exact`, the audit exits 0, and their sanitized results are added to the Phase 4 
       `rg -n 'next/|next.config|use server|getHello|greeting-client|beaver-nest-be:19320|API_BASE|src/app/' apps/beaver-nest-fe/src apps/beaver-nest-fe/project.json`
       exits 1. Do not cite nonexistent `next-env.d.ts` as a deletion target.
 
-- [ ] [AI] **RED** — add `apps/beaver-nest-fe/src/theme.test.ts` covering initial system light/dark,
+- [x] [AI] **RED** — add `apps/beaver-nest-fe/src/theme.test.ts` covering initial system light/dark,
       import/call order before `createRoot`, system preference changes, repeated bootstrap, listener
       cleanup, and HMR disposal; run `npm exec -- nx run beaver-nest-fe:test:unit`; acceptance: tests
       fail because no external theme module exists.
-- [ ] [AI] **GREEN** — add bundled `apps/beaver-nest-fe/src/theme.ts`, import and invoke it from
+- [x] [AI] **GREEN** — add bundled `apps/beaver-nest-fe/src/theme.ts`, import and invoke it from
       `apps/beaver-nest-fe/src/main.tsx` before `createRoot`, and import BeaverNest token CSS from the
       client style graph; run `npm exec -- nx run beaver-nest-fe:test:unit`; acceptance: system dark is
       applied before React mount, system light remains light, and `index.html` has no inline bootstrap.
-- [ ] [AI] **REFACTOR** — make `apps/beaver-nest-fe/src/theme.ts` idempotent and return cleanup for
+- [x] [AI] **REFACTOR** — make `apps/beaver-nest-fe/src/theme.ts` idempotent and return cleanup for
       `matchMedia` listeners, wiring cleanup to Vite HMR dispose; run
       `npm exec -- nx run beaver-nest-fe:test:quick`; acceptance: repeated bootstrap/HMR leaves one
       listener and system preference changes update tokens without reload leaks.
 
-- [ ] [AI] **RED** — add
+- [x] [AI] **RED** — add
       `infra/dev/beaver-nest-app/tests/frontend-integration-target.sh`, replace the `test:integration`
       no-op in `apps/beaver-nest-fe/project.json`, and add
       `apps/beaver-nest-fe/src/test/readiness.integration.test.tsx` importing the not-yet-created MSW
       lifecycle; run `bash infra/dev/beaver-nest-app/tests/frontend-integration-target.sh && npm exec -- nx run beaver-nest-fe:test:integration`;
       acceptance: the target-contract script fails while the target is cacheable/no-op, and the real
       target fails because the MSW server/handlers are absent.
-- [ ] [AI] **GREEN** — add MSW lifecycle and readiness handlers under
+- [x] [AI] **GREEN** — add MSW lifecycle and readiness handlers under
       `apps/beaver-nest-fe/src/test/msw/`, wire them from `apps/beaver-nest-fe/vitest.config.ts`, and
       set the integration target to `cache: false`; run
       `bash infra/dev/beaver-nest-app/tests/frontend-integration-target.sh && npm exec -- nx run beaver-nest-fe:test:integration`;
       acceptance: the target executes a real request/response test, exits 0 rather than echoing no-op,
       and is non-cacheable.
-- [ ] [AI] **REFACTOR** — centralize exact generated-contract success/503 fixtures and reset handlers
+- [x] [AI] **REFACTOR** — centralize exact generated-contract success/503 fixtures and reset handlers
       after every test under `apps/beaver-nest-fe/src/test/msw/`; run
       `npm exec -- nx run beaver-nest-fe:test:integration`; acceptance: two consecutive runs are green
       with no handler state leak.
 
-- [ ] [AI] **RED** — remove obsolete frontend landing features, add
+- [x] [AI] **RED** — remove obsolete frontend landing features, add
       `specs/apps/beaver-nest/behavior/beaver-nest-fe/gherkin/workspace/browser-readiness.feature`, add
       its literal registry bindings to `apps/beaver-nest-fe/src/test/workspace.steps.ts`, update the FE
       Gherkin README, and add shell-before-readiness coverage to
@@ -1008,7 +1008,7 @@ exact`, the audit exits 0, and their sanitized results are added to the Phase 4 
     And the page reports Application Available, Database Ready and Schema Current
   ```
 
-- [ ] [AI] **GREEN** — add `apps/beaver-nest-fe/src/lib/readiness-client.ts`,
+- [x] [AI] **GREEN** — add `apps/beaver-nest-fe/src/lib/readiness-client.ts`,
       `apps/beaver-nest-fe/src/lib/readiness-state.ts`, and readiness rendering in
       `apps/beaver-nest-fe/src/App.tsx`; reuse `AppHeader`, `Card`, `Button`, and `Icon` from
       `@open-sharia-enterprise/web-ui` rather than app-local equivalents, removing `AppFrame`/`AppShell`
@@ -1016,11 +1016,11 @@ exact`, the audit exits 0, and their sanitized results are added to the Phase 4 
       `npm exec -- nx run beaver-nest-fe:test:unit`; acceptance: the shell assertion precedes response
       resolution, only relative `/api/v1/readiness` is requested after client mount, and all four
       shared components have observable rendered roles/content.
-- [ ] [AI] **REFACTOR** — model Loading/Ready/Unavailable as an immutable closed union with a pure
+- [x] [AI] **REFACTOR** — model Loading/Ready/Unavailable as an immutable closed union with a pure
       reducer in `apps/beaver-nest-fe/src/lib/readiness-state.ts`; run
       `npm exec -- nx run beaver-nest-fe:test:quick`; acceptance: typecheck/lint/coverage exit 0.
 
-- [ ] [AI] **RED** — add
+- [x] [AI] **RED** — add
       `specs/apps/beaver-nest/behavior/beaver-nest-fe/gherkin/workspace/readiness-loading.feature`, its
       literal registry bindings, and a delayed MSW case to
       `apps/beaver-nest-fe/src/test/readiness.integration.test.tsx`; update the FE Gherkin README and
@@ -1038,16 +1038,16 @@ exact`, the audit exits 0, and their sanitized results are added to the Phase 4 
     And the region does not falsely report the database as ready
   ```
 
-- [ ] [AI] **GREEN** — add accessible checking UI in
+- [x] [AI] **GREEN** — add accessible checking UI in
       `apps/beaver-nest-fe/src/components/ReadinessPanel.tsx`; run
       `npm exec -- nx run beaver-nest-fe:test:integration`; acceptance: checking is announced and no
       Ready text appears before resolution.
-- [ ] [AI] **REFACTOR** — render each state with semantic text/icon pairs rather than color alone in
+- [x] [AI] **REFACTOR** — render each state with semantic text/icon pairs rather than color alone in
       `apps/beaver-nest-fe/src/components/ReadinessPanel.tsx`; run
       `npm exec -- nx run beaver-nest-fe:test:quick`; acceptance: accessibility/component assertions
       pass.
 
-- [ ] [AI] **RED** — add
+- [x] [AI] **RED** — add
       `specs/apps/beaver-nest/behavior/beaver-nest-fe/gherkin/network/readiness-recovery.feature`, its
       literal registry bindings, and unavailable-then-ready MSW coverage to
       `apps/beaver-nest-fe/src/test/readiness.integration.test.tsx`; update the FE Gherkin README and
@@ -1065,14 +1065,14 @@ exact`, the audit exits 0, and their sanitized results are added to the Phase 4 
     And the region changes from Unavailable to Ready using a polite live announcement
   ```
 
-- [ ] [AI] **GREEN** — add in-place `Refresh status` and `aria-live="polite"` behavior in
+- [x] [AI] **GREEN** — add in-place `Refresh status` and `aria-live="polite"` behavior in
       `apps/beaver-nest-fe/src/components/ReadinessPanel.tsx`; run
       `npm exec -- nx run beaver-nest-fe:test:integration`; acceptance: one activation makes one new
       relative request and changes state without navigation.
-- [ ] [AI] **REFACTOR** — prevent duplicate in-flight requests and retain visible focus after retry;
+- [x] [AI] **REFACTOR** — prevent duplicate in-flight requests and retain visible focus after retry;
       run `npm exec -- nx run beaver-nest-fe:test:quick`; acceptance: keyboard/focus assertions pass.
 
-- [ ] [AI] **RED** — add
+- [x] [AI] **RED** — add
       `specs/apps/beaver-nest/behavior/beaver-nest-fe/gherkin/workspace/no-promotional-cta.feature`, its
       literal registry bindings, and visible-content/accessibility coverage to
       `apps/beaver-nest-fe/src/App.test.tsx`; update the FE Gherkin README and run
@@ -1090,12 +1090,12 @@ exact`, the audit exits 0, and their sanitized results are added to the Phase 4 
     And no external GitHub call to action is present
   ```
 
-- [ ] [AI] **GREEN** — replace promotional landing content with the selected neutral centered
+- [x] [AI] **GREEN** — replace promotional landing content with the selected neutral centered
       readiness workspace and normative copy `Foundation status` / `No workspace features yet` in
       `apps/beaver-nest-fe/src/App.tsx`; run
       `npm exec -- nx run beaver-nest-fe:test:unit`; acceptance: the obsolete description and external
       CTA are absent.
-- [ ] [AI] **REFACTOR** — reuse existing BeaverNest tokens without speculative navigation or a new
+- [x] [AI] **REFACTOR** — reuse existing BeaverNest tokens without speculative navigation or a new
       palette; run
       `npm exec -- nx run beaver-nest-fe:build && npm exec -- nx run beaver-nest-fe:test:quick && npm exec -- nx run beaver-nest-fe:test:integration`;
       acceptance: static build, system light/dark tests, and WCAG component checks exit 0.
@@ -1117,7 +1117,7 @@ exact`, the audit exits 0, and their sanitized results are added to the Phase 4 
       `npm exec -- playwright test --config apps/beaver-nest-fe-e2e/playwright.viewport.config.ts`
       from the unit 3 worktree root; acceptance: mobile/tablet/desktop remain green without pixel sleeps
       or production conditionals.
-- [ ] [AI] **RED** — replace `apps/beaver-nest-fe-e2e/steps/{landing,accessibility}.steps.ts` with
+- [x] [AI] **RED** — replace `apps/beaver-nest-fe-e2e/steps/{landing,accessibility}.steps.ts` with
       `apps/beaver-nest-fe-e2e/steps/{workspace,accessibility}.steps.ts`, update
       `apps/beaver-nest-fe-e2e/{playwright.config.ts,e2e-coverage-baseline.json,project.json,README.md}`,
       and import the not-yet-created route fixture;
@@ -1126,12 +1126,12 @@ exact`, the audit exits 0, and their sanitized results are added to the Phase 4 
       promotional call to action" (aggregate Playwright-BDD binder exception); run
       `npm exec -- nx run beaver-nest-fe-e2e:typecheck`; acceptance: it fails only because the imported
       route fixture is absent while scenario bodies remain unique.
-- [ ] [AI] **GREEN** — add delayed and unavailable-then-real-success fixtures exclusively with
+- [x] [AI] **GREEN** — add delayed and unavailable-then-real-success fixtures exclusively with
       Playwright `page.route()` in `apps/beaver-nest-fe-e2e/utils/readiness-route.ts`; run
       `npm exec -- nx run beaver-nest-fe-e2e:test:specs`; acceptance: all frontend scenarios bind and
       `rg -n 'test hook|test-hook|E2E_' apps/beaver-nest-be/src apps/beaver-nest-fe/src` exits 1 and no
       production backend test hook exists.
-- [ ] [AI] **REFACTOR** — reset every `page.route()` interception after each scenario and share exact
+- [x] [AI] **REFACTOR** — reset every `page.route()` interception after each scenario and share exact
       generated-contract fixtures in `apps/beaver-nest-fe-e2e/utils/readiness-route.ts`; run
       `npm exec -- nx run beaver-nest-fe-e2e:test:specs`; acceptance: typecheck/coverage are green with
       no duplicate scenario body or unconditional skip.
@@ -1140,27 +1140,27 @@ exact`, the audit exits 0, and their sanitized results are added to the Phase 4 
 
 > All checks below must pass before Phase 5. Unit 3 has not opened a PR.
 
-- [ ] [AI] Run
+- [x] [AI] Run
       `npm exec -- nx run beaver-nest-fe:build && npm exec -- nx run beaver-nest-fe:test:quick && npm exec -- nx run beaver-nest-fe:test:integration`;
       acceptance: all commands exit 0 and `apps/beaver-nest-fe/dist/index.html` is static CSR shell
       without readiness payload.
-- [ ] [AI] Run `npm exec -- nx run beaver-nest-fe:test:specs`; acceptance: the full FE spec gate exits 0.
-- [ ] [AI] Run `npm exec -- nx run beaver-nest-fe-e2e:test:specs`; acceptance: the full FE E2E spec
+- [x] [AI] Run `npm exec -- nx run beaver-nest-fe:test:specs`; acceptance: the full FE spec gate exits 0.
+- [x] [AI] Run `npm exec -- nx run beaver-nest-fe-e2e:test:specs`; acceptance: the full FE E2E spec
       gate exits 0.
-- [ ] [AI] Run
+- [x] [AI] Run
       `rg -n 'next/|next.config|force-dynamic|getHello|greeting-client|BEAVER_NEST_FE_API_BASE_URL' apps/beaver-nest-fe`;
       acceptance: `rg` exits 1.
-- [ ] [AI] Run `rtk git status --short`; acceptance: only ledgered unit 3 paths appear.
-- [ ] [AI] Export the Phase 4 task-state ledger to
+- [x] [AI] Run `rtk git status --short`; acceptance: only ledgered unit 3 paths appear.
+- [x] [AI] Export the Phase 4 task-state ledger to
       `local-temp/beaver-nest-app-setup-phase-4-ledger.txt`; acceptance:
       `test -s local-temp/beaver-nest-app-setup-phase-4-ledger.txt` exits 0 and every line is one
       repository-relative path already present in `execution-state.md`.
-- [ ] [AI] Stage the Phase 4 ledger with
+- [x] [AI] Stage the Phase 4 ledger with
       `while IFS= read -r beaver_nest_phase_4_stage_path; do case "$beaver_nest_phase_4_stage_path" in */.env.example) :;; /*|*..*|*.env|*.env.*) exit 1;; esac; git add -- "$beaver_nest_phase_4_stage_path" || exit 1; done < local-temp/beaver-nest-app-setup-phase-4-ledger.txt`;
       acceptance:
       `diff -u <(sort local-temp/beaver-nest-app-setup-phase-4-ledger.txt) <(git diff --cached --name-only | sort)`
       exits 0 and no unledgered path is staged.
-- [ ] [AI] Commit the Phase 4 theme with
+- [x] [AI] Commit the Phase 4 theme with
       `git commit -m "feat(beaver-nest-fe): migrate workspace to vite"`; acceptance: one local
       Conventional Commit is created on the unit 3 branch and no PR/push occurs yet.
 

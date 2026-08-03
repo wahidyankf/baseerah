@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from "@storybook/nextjs-vite";
+import type { Meta, StoryObj } from "@storybook/react-vite";
 
 import { Badge } from "./badge";
 
@@ -62,7 +62,7 @@ export const HoneyOutline: Story = {
   args: {
     variant: "outline",
     hue: "honey",
-    children: "⚗️ Pre-Alpha",
+    children: "Pre-Alpha",
   },
 };
 

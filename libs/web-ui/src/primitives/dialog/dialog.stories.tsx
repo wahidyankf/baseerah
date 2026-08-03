@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from "@storybook/nextjs-vite";
+import type { Meta, StoryObj } from "@storybook/react-vite";
 
 import {
   Dialog,
@@ -32,7 +32,7 @@ export const Default: Story = {
           <DialogTitle>Dialog Title</DialogTitle>
           <DialogDescription>This is a dialog description providing additional context.</DialogDescription>
         </DialogHeader>
-        <p className="text-sm text-muted-foreground">Dialog body content goes here.</p>
+        <p className="text-muted-foreground text-sm">Dialog body content goes here.</p>
         <DialogFooter>
           <Button variant="outline">Cancel</Button>
           <Button>Confirm</Button>

@@ -1,9 +1,18 @@
-import { defineConfig } from "vitest/config";
+import { fileURLToPath, URL } from "node:url";
 import react from "@vitejs/plugin-react";
-import tsconfigPaths from "vite-tsconfig-paths";
+import { defineConfig } from "vitest/config";
 
 export default defineConfig({
-  plugins: [react(), tsconfigPaths()],
+  plugins: [react()],
+  resolve: {
+    alias: {
+      "@": fileURLToPath(new URL("./src", import.meta.url)),
+      "@open-sharia-enterprise/web-ui": fileURLToPath(new URL("../../libs/web-ui/src/index.ts", import.meta.url)),
+      "@open-sharia-enterprise/web-ui-token": fileURLToPath(
+        new URL("../../libs/web-ui-token/src/index.ts", import.meta.url),
+      ),
+    },
+  },
   test: {
     name: "unit",
     passWithNoTests: true,
@@ -15,17 +24,7 @@ export default defineConfig({
     coverage: {
       provider: "v8",
       include: ["src/**/*.{ts,tsx}"],
-      exclude: [
-        // Next.js route infrastructure — covered by e2e, not unit tests
-        "src/app/layout.tsx",
-        // Uses next/og's ImageResponse, which jsdom can't meaningfully render; verified via
-        // curl/Playwright against a real build instead (see delivery.md EWT-005/UWT-006 fix).
-        "src/app/icon.tsx",
-        "src/env.ts",
-        "src/test/**",
-        "src/generated-contracts/**",
-        "**/*.{test,spec}.{ts,tsx}",
-      ],
+      exclude: ["src/test/**", "src/main.tsx", "src/generated-contracts/**", "**/*.{test,spec}.{ts,tsx}"],
       thresholds: {
         lines: 90,
         functions: 90,

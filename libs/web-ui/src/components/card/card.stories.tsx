@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from "@storybook/nextjs-vite";
+import type { Meta, StoryObj } from "@storybook/react-vite";
 
 import { Button } from "../button/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "./card";
@@ -31,7 +31,7 @@ export const Default: Story = {
         <CardDescription>Card description providing additional context.</CardDescription>
       </CardHeader>
       <CardContent>
-        <p className="text-sm text-muted-foreground">Card body content goes here.</p>
+        <p className="text-muted-foreground text-sm">Card body content goes here.</p>
       </CardContent>
       <CardFooter>
         <Button variant="outline" className="w-full">
@@ -59,7 +59,7 @@ export const ContentOnly: Story = {
   render: () => (
     <Card>
       <CardContent className="pt-6">
-        <p className="text-sm text-muted-foreground">A card with only content and no header or footer.</p>
+        <p className="text-muted-foreground text-sm">A card with only content and no header or footer.</p>
       </CardContent>
     </Card>
   ),
@@ -74,7 +74,7 @@ export const WithoutFooter: Story = {
         <CardDescription>This card does not have a footer section.</CardDescription>
       </CardHeader>
       <CardContent>
-        <p className="text-sm text-muted-foreground">Content without an action footer.</p>
+        <p className="text-muted-foreground text-sm">Content without an action footer.</p>
       </CardContent>
     </Card>
   ),
@@ -89,7 +89,7 @@ export const WithMultipleActions: Story = {
         <CardDescription>Card with primary and secondary actions in the footer.</CardDescription>
       </CardHeader>
       <CardContent>
-        <p className="text-sm text-muted-foreground">Review the details before proceeding.</p>
+        <p className="text-muted-foreground text-sm">Review the details before proceeding.</p>
       </CardContent>
       <CardFooter className="gap-2">
         <Button variant="outline" className="flex-1">
@@ -117,7 +117,7 @@ export const AsFormCard: Story = {
           <input
             id="card-name"
             placeholder="John Doe"
-            className="h-9 rounded-md border border-input bg-transparent px-3 py-1 text-sm outline-none placeholder:text-muted-foreground"
+            className="border-input placeholder:text-muted-foreground h-9 rounded-md border bg-transparent px-3 py-1 text-sm outline-none"
           />
         </div>
         <div className="grid gap-1.5">
@@ -128,7 +128,7 @@ export const AsFormCard: Story = {
             id="card-email"
             type="email"
             placeholder="john@example.com"
-            className="h-9 rounded-md border border-input bg-transparent px-3 py-1 text-sm outline-none placeholder:text-muted-foreground"
+            className="border-input placeholder:text-muted-foreground h-9 rounded-md border bg-transparent px-3 py-1 text-sm outline-none"
           />
         </div>
       </CardContent>
@@ -147,7 +147,7 @@ export const TitleOnly: Story = {
         <CardTitle>Title without description</CardTitle>
       </CardHeader>
       <CardContent>
-        <p className="text-sm text-muted-foreground">Card content when there is no description.</p>
+        <p className="text-muted-foreground text-sm">Card content when there is no description.</p>
       </CardContent>
     </Card>
   ),

@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from "@storybook/nextjs-vite";
+import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useState } from "react";
 
 import { SearchComponent } from "./search-component";
@@ -27,7 +27,7 @@ function SearchWrapper({ placeholder = "Search..." }: { placeholder?: string }) 
         placeholder={placeholder}
       />
       {searchTerm && (
-        <p className="mt-2 text-sm text-muted-foreground">
+        <p className="text-muted-foreground mt-2 text-sm">
           Searching for: <strong>{searchTerm}</strong>
         </p>
       )}
