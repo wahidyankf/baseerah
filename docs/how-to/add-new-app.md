@@ -298,13 +298,15 @@ pair) must satisfy these additional requirements:
 - [ ] `build` — production build; must include `dependsOn: ["codegen"]`
 - [ ] `test:unit` — unit tests with mocked dependencies; cacheable
 - [ ] `test:quick` — unit tests + coverage validation; cacheable
-- [ ] `test:integration` — real PostgreSQL via docker-compose; must set `cache: false`
+- [ ] `test:integration` — the app's real configured production database; must set `cache: false`
 
-**Docker Compose setup**: Apps with `test:integration` that use a real database must provide a
-`docker-compose.integration.yml` at the app root. The file defines the database service and a
-`test-runner` service that runs the integration test suite. The `test:integration` target invokes
-`docker compose -f docker-compose.integration.yml up --abort-on-container-exit --exit-code-from test-runner --build`
-and must set `"cache": false` in `project.json`.
+**Database integration setup**: An app with `test:integration` must exercise the database engine
+and configuration it uses in production. A containerized database commonly uses a
+`docker-compose.integration.yml` at the app root with database and test-runner services; the target
+invokes `docker compose -f docker-compose.integration.yml up --abort-on-container-exit
+--exit-code-from test-runner --build`. A SQLite app may instead create a fresh test-owned database
+file in a temporary directory. In either case, set `"cache": false` in `project.json` and do not
+substitute an in-memory mock for the configured production database.
 
 **Specs folder**: Create a `specs/apps/[domain]/` folder at the repository root following the
 C4-aware five-folder layout. Gherkin feature files must be placed here, not inside the app:

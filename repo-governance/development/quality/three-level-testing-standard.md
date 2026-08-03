@@ -78,17 +78,20 @@ Then the product should be created successfully
 | ----------------- | ----------------------------------------------------------------------------------- |
 | Dependencies      | **Real database only** — no HTTP, no external services                              |
 | Gherkin specs     | **Must consume** shared specs from the project's `specs/apps/<app-name>/` directory |
-| Database          | **Real PostgreSQL** via `docker-compose.integration.yml`                            |
+| Database          | **The app's real configured production database**                                   |
 | HTTP layer        | **None** — call service/repository functions directly, no HTTP dispatch             |
 | External services | None                                                                                |
 | Coverage          | Not measured at this level                                                          |
 | Nx caching        | `cache: false` (real database = non-deterministic)                                  |
 | Runs in           | Scheduled CI (combined with E2E in per-service workflows)                           |
 
-**Architecture**: Step definitions call service/repository functions directly with a real PostgreSQL connection. No HTTP framework is involved — no MockMvc, no TestClient, no httptest, no ConnTest, no WebApplicationFactory, no fetch, no clj-http, no Router.oneshot.
+**Architecture**: Step definitions call service/repository functions directly with a connection to
+the app's real configured production database. No HTTP framework is involved — no MockMvc, no
+TestClient, no httptest, no ConnTest, no WebApplicationFactory, no fetch, no clj-http, no
+Router.oneshot.
 
 ```
-Gherkin Step -> Service Function -> Real PostgreSQL
+Gherkin Step -> Service Function -> Real Configured Production Database
 ```
 
 **What "no HTTP" means**: The test harness must NOT:
@@ -104,10 +107,14 @@ The test harness MUST:
 - Pass domain objects (not HTTP requests) to the service layer
 - Assert on return values (not HTTP response codes)
 
-**Docker infrastructure**: Each backend has:
+**Integration infrastructure**: Each backend provisions an isolated instance of its configured
+production database. Container-based databases commonly use:
 
-- `docker-compose.integration.yml` — PostgreSQL + test runner services
+- `docker-compose.integration.yml` — database + test runner services
 - `Dockerfile.integration` — language runtime + test execution
+
+SQLite applications may instead create a fresh database file inside a test-owned temporary directory;
+that file is still the configured production database engine and must never be an in-memory mock.
 
 ### Level 3: E2E Tests (`test:e2e`)
 
@@ -117,28 +124,29 @@ The test harness MUST:
 | ----------------- | ----------------------------------------------------------------------------------- |
 | Dependencies      | **All real** — real HTTP, real database, real server                                |
 | Gherkin specs     | **Must consume** shared specs from the project's `specs/apps/<app-name>/` directory |
-| Database          | Real PostgreSQL (via docker-compose in CI)                                          |
+| Database          | The app's real configured production database                                       |
 | HTTP layer        | Real HTTP requests via Playwright                                                   |
 | External services | As needed                                                                           |
 | Coverage          | Not measured at this level                                                          |
 | Nx caching        | `cache: false` (full stack = non-deterministic)                                     |
 | Runs in           | Scheduled CI (per-service workflows)                                                |
 
-**Architecture**: Playwright sends real HTTP requests to a running server backed by a real database.
+**Architecture**: Playwright sends real HTTP requests to a running server backed by the app's
+real configured production database.
 
 ```
-Playwright -> HTTP Request -> Running Server -> Real PostgreSQL
+Playwright -> HTTP Request -> Running Server -> Real Configured Production Database
 ```
 
 ## Spec Consumption Summary
 
 All three levels consume the same shared Gherkin scenarios from the project's `specs/apps/<app-name>/` directory. The difference is HOW the step definitions execute them:
 
-| Level       | Step Implementation                          | What Varies                |
-| ----------- | -------------------------------------------- | -------------------------- |
-| Unit        | Calls service functions with mocked repos    | Repository implementations |
-| Integration | Calls service functions with real PostgreSQL | Database (real vs mock)    |
-| E2E         | Sends HTTP requests via Playwright           | Entire stack (HTTP + DB)   |
+| Level       | Step Implementation                                       | What Varies                |
+| ----------- | --------------------------------------------------------- | -------------------------- |
+| Unit        | Calls service functions with mocked repos                 | Repository implementations |
+| Integration | Calls service functions with the configured real database | Database (real vs mock)    |
+| E2E         | Sends HTTP requests via Playwright                        | Entire stack (HTTP + DB)   |
 
 ## Nx Cache Inputs Requirement
 
@@ -188,17 +196,17 @@ Different project types carry different coverage thresholds, reflecting the prac
 
 The table below states which test levels are mandatory per app type:
 
-| App Type                         | test:unit | test:integration                 | test:e2e               |
-| -------------------------------- | --------- | -------------------------------- | ---------------------- |
-| API backends                     | Mandatory | Mandatory (real PostgreSQL)      | Mandatory (Playwright) |
-| CLI apps                         | Mandatory | Mandatory (real filesystem)      | N/A                    |
-| Product app-web (app-tier)       | Mandatory | Mandatory (MSW / mocked backend) | Mandatory (Playwright) |
-| Content platforms & marketing FE | Mandatory | N/A (no-op `echo`)               | Mandatory (Playwright) |
-| Libraries                        | Mandatory | Optional                         | N/A                    |
-| E2E runners                      | N/A       | N/A                              | Mandatory              |
+| App Type                         | test:unit | test:integration                     | test:e2e               |
+| -------------------------------- | --------- | ------------------------------------ | ---------------------- |
+| API backends                     | Mandatory | Mandatory (configured real database) | Mandatory (Playwright) |
+| CLI apps                         | Mandatory | Mandatory (real filesystem)          | N/A                    |
+| Product app-web (app-tier)       | Mandatory | Mandatory (MSW / mocked backend)     | Mandatory (Playwright) |
+| Content platforms & marketing FE | Mandatory | N/A (no-op `echo`)                   | Mandatory (Playwright) |
+| Libraries                        | Mandatory | Optional                             | N/A                    |
+| E2E runners                      | N/A       | N/A                                  | Mandatory              |
 
 **The integration tier is for app-tier products that cross a real integration boundary** — API
-backends (real PostgreSQL), CLI apps (real filesystem), and **product frontend clients** (e.g.
+backends (their configured real production database), CLI apps (real filesystem), and **product frontend clients** (e.g.
 `beaver-nest-fe`, planned) that integrate with a real backend API (mocked in-process
 via MSW). **Content platforms and marketing front-ends** (`*-www`; none currently in this repo)
 have **no integration tier**: their `test:integration` target is a
@@ -220,19 +228,19 @@ The Gherkin spec is the shared contract. Unit tests honor it and extend it. Inte
 
 Integration tests must not make inbound or outbound network calls. This constraint applies across all project types:
 
-- **API backends**: The test harness calls service/repository functions directly. No HTTP server starts. No HTTP client library is used. The only real external dependency is the PostgreSQL database.
+- **API backends**: The test harness calls service/repository functions directly. No HTTP server starts. No HTTP client library is used. The only real external dependency is the app's configured production database.
 - **Content platforms & marketing FE**: Integration tests do not apply (N/A per "Mandatory Test Levels Matrix"); `test:integration` is a no-op `echo`. The Gherkin contract is consumed at the unit tier (mocked dependencies) and the e2e tier.
 - **CLI apps**: Integration tests drive commands via `cmd.RunE()` in-process. No network calls. The only real dependency is the local filesystem (via `/tmp` fixtures).
 - **Product app-web (app-tier)**: Integration tests use MSW (Mock Service Worker) or equivalent in-process mocking of the backend API. No real HTTP servers start and no real network calls are made.
 - **Libraries**: When integration tests apply, they use real filesystem or in-process fixtures. No network calls.
 
-The principle: integration tests introduce exactly one real dependency per project type (database for backends, filesystem for CLI apps, in-process backend mocking for product app-web). Everything else remains mocked.
+The principle: integration tests introduce exactly one real dependency per project type (the configured production database for backends, filesystem for CLI apps, in-process backend mocking for product app-web). Everything else remains mocked.
 
 ## External Dependencies Optional in E2E
 
-E2E tests require real HTTP and a real database. External service dependencies (payment gateways, email providers, SMS services, third-party APIs) are optional at the E2E level and may be mocked:
+E2E tests require real HTTP and the app's real configured production database. External service dependencies (payment gateways, email providers, SMS services, third-party APIs) are optional at the E2E level and may be mocked:
 
-- The core E2E requirement is real HTTP requests via Playwright against a running server backed by a real database
+- The core E2E requirement is real HTTP requests via Playwright against a running server backed by its configured production database
 - External services that are expensive, slow, or environment-dependent may be replaced with test doubles at the E2E level
 - When external services are mocked in E2E, the mock boundary must be documented in the test setup so future contributors understand what is real and what is not
 
@@ -241,13 +249,13 @@ E2E tests require real HTTP and a real database. External service dependencies (
 API backends must implement the repository pattern as the isolation boundary between test levels.
 
 - **Unit tests**: Inject mocked repository implementations into service functions. Service logic is tested without touching the database.
-- **Integration tests**: Inject real repository implementations backed by PostgreSQL. The same service layer code runs with a different repository implementation.
+- **Integration tests**: Inject real repository implementations backed by the configured production database. The same service layer code runs with a different repository implementation.
 
 This means the service layer is the same code at both levels — only the repository implementation changes. Any divergence between unit and integration test behavior indicates a bug in either the mock or the real repository implementation.
 
 ```
 Unit:        Service -> MockRepository (in-memory)
-Integration: Service -> RealRepository -> PostgreSQL
+Integration: Service -> RealRepository -> Configured Production Database
 ```
 
 ## Contract-Driven Development
@@ -269,7 +277,7 @@ The following table maps GitHub Actions workflows to the test levels they execut
 | PR quality gate         | Yes  | Via `test:quick` | No             | No               | No       | Every PR      |
 | `test-and-deploy-*.yml` | Yes  | Via `test:quick` | Yes            | Yes              | Yes      | CRON 2x daily |
 
-`lint` (including static a11y checks via oxlint jsx-a11y plugin for TypeScript UI projects) runs in all three enforcement gates: the pre-push hook, the PR quality gate, and Test CI workflows. `specs:coverage` runs in the pre-push hook and all Test CI workflows, ensuring every Gherkin step has a matching step definition. The pre-push hook intentionally omits integration and E2E tests. These tests require Docker infrastructure (PostgreSQL, running servers) and are too slow and environment-dependent to run on every push. The PR quality gate omits `specs:coverage` because it targets only the fast `test:quick` path used for merge checks. The scheduled `test-and-deploy-*.yml` workflows cover integration, E2E, and specs:coverage on a regular cadence for production apps.
+`lint` (including static a11y checks via oxlint jsx-a11y plugin for TypeScript UI projects) runs in all three enforcement gates: the pre-push hook, the PR quality gate, and Test CI workflows. `specs:coverage` runs in the pre-push hook and all Test CI workflows, ensuring every Gherkin step has a matching step definition. The pre-push hook intentionally omits integration and E2E tests. These tests require an isolated configured production database and running servers, and are too slow and environment-dependent to run on every push. The PR quality gate omits `specs:coverage` because it targets only the fast `test:quick` path used for merge checks. The scheduled `test-and-deploy-*.yml` workflows cover integration, E2E, and specs:coverage on a regular cadence for production apps.
 
 ## Spec-Coverage Validation
 
@@ -367,8 +375,8 @@ apps/{backend-name}/
   tests/
     unit/          # Unit test step definitions (mocked repos)
     integration/   # Integration test step definitions (real DB, no HTTP)
-  docker-compose.integration.yml   # PostgreSQL + test runner
-  Dockerfile.integration           # Integration test container
+  docker-compose.integration.yml   # Containerized database + test runner, when applicable
+  Dockerfile.integration           # Integration test container, when applicable
   project.json                     # test:unit, test:integration, test:e2e targets
 ```
 
@@ -398,18 +406,18 @@ Integration: Behaviour -> Command run   -> Real /tmp filesystem
 
 The three-level standard applies universally, with adaptations per project type:
 
-| Project Type                            | Unit                          | Integration                      | E2E                | test:quick | Gherkin Specs                          |
-| --------------------------------------- | ----------------------------- | -------------------------------- | ------------------ | ---------- | -------------------------------------- |
-| API backend (`beaver-nest-be`, planned) | All mocked + specs            | Real PostgreSQL, no HTTP + specs | Playwright + specs | Yes        | `specs/apps/<backend-name>/`           |
-| Product app-web (`*-app-web`)           | Vitest mocks + specs          | MSW in-process (cacheable)       | Playwright + specs | Yes        | `specs/apps/{domain}/{be,fe}/gherkin/` |
-| Content platform & marketing FE         | Vitest mocks + all specs      | N/A (no-op `echo`)               | Playwright + specs | Yes        | `specs/apps/{domain}/{be,fe}/gherkin/` |
-| CLI app (Rust)                          | cargo test unit + integration | cargo integration (cacheable)    | N/A                | Yes        | `specs/apps/<cli-name>/`               |
-| Library (Rust)                          | cargo test unit               | cargo integration (cacheable)    | N/A                | Yes        | `specs/libs/<lib-name>/`               |
-| E2E runner                              | N/A                           | N/A                              | Playwright         | N/A        | Shared specs                           |
+| Project Type                            | Unit                          | Integration                               | E2E                | test:quick | Gherkin Specs                          |
+| --------------------------------------- | ----------------------------- | ----------------------------------------- | ------------------ | ---------- | -------------------------------------- |
+| API backend (`beaver-nest-be`, planned) | All mocked + specs            | Configured real database, no HTTP + specs | Playwright + specs | Yes        | `specs/apps/<backend-name>/`           |
+| Product app-web (`*-app-web`)           | Vitest mocks + specs          | MSW in-process (cacheable)                | Playwright + specs | Yes        | `specs/apps/{domain}/{be,fe}/gherkin/` |
+| Content platform & marketing FE         | Vitest mocks + all specs      | N/A (no-op `echo`)                        | Playwright + specs | Yes        | `specs/apps/{domain}/{be,fe}/gherkin/` |
+| CLI app (Rust)                          | cargo test unit + integration | cargo integration (cacheable)             | N/A                | Yes        | `specs/apps/<cli-name>/`               |
+| Library (Rust)                          | cargo test unit               | cargo integration (cacheable)             | N/A                | Yes        | `specs/libs/<lib-name>/`               |
+| E2E runner                              | N/A                           | N/A                                       | Playwright         | N/A        | Shared specs                           |
 
 **Key rules by project type**:
 
-- **API backends**: All three levels mandatory; all consume Gherkin specs; integration uses real PostgreSQL with no HTTP
+- **API backends**: All three levels mandatory; all consume Gherkin specs; integration uses the configured real production database with no HTTP
 - **Product app-web (app-tier, `*-app-web`)**: All three levels mandatory; integration uses in-process backend mocking (MSW); cacheable
 - **Content platforms & marketing FE (`*-www`)**: Unit + e2e mandatory; **no integration tier** (`test:integration` is a no-op `echo`); the full Gherkin contract is consumed at the unit tier (external deps mocked) plus e2e; cacheable
 - **CLI apps**: Unit + integration mandatory; both levels cover the behaviour in the Gherkin specs; unit mocks all I/O via injected dependencies; integration uses real filesystem with `/tmp` fixtures; cacheable
@@ -428,7 +436,7 @@ The three-level standard applies universally, with adaptations per project type:
 
 Integration and E2E tests run together in per-service GitHub Actions workflows named "Test {service name}". Each workflow:
 
-1. Starts PostgreSQL via docker-compose
+1. Provisions an isolated configured production database (via Docker when containerized, or a fresh test-owned file for SQLite)
 2. Runs integration tests (direct service calls with real DB)
 3. Starts the application server
 4. Runs E2E tests via Playwright
