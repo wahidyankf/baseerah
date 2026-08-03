@@ -4,8 +4,9 @@
 
 [Judgment call] This increment is a private, shared, local-first application foundation. The browser
 loads a static Vite/React shell from the BeaverNest backend, then requests readiness from a relative
-same-origin API path. The backend owns one SQLite database directory and applies explicit SQL
-migrations before accepting traffic.
+same-origin API path. The backend owns one SQLite database directory per runtime environment and
+applies explicit SQL migrations before accepting traffic. Local development and production use
+distinct, explicitly configured directories.
 
 No assistant or content feature is introduced. The normative page title is “Foundation status” and
 the empty-state copy is “No workspace features yet.” A ready state means only that the application,
@@ -109,6 +110,12 @@ Feature: SQLite migration lifecycle
     When the BeaverNest application starts against a disposable database
     Then startup exits non-zero before publishing the HTTP endpoint
     And the migration failure is logged without exposing sensitive configuration
+
+  Scenario: Development uses a separate SQLite directory
+    Given the local development command receives an explicit developer-owned data directory
+    When it starts the backend on the local development port
+    Then the database resolves only within that development directory
+    And the command neither reads nor inherits the production host data-bind source
 ```
 
 ### US4 — Use SQLite safely for the intended concurrency

@@ -328,7 +328,8 @@ names a different working directory.
       `apps/beaver-nest-be/src/BeaverNestBe/Program.fs`, and register source compile order in
       `apps/beaver-nest-be/src/BeaverNestBe/BeaverNestBe.fsproj`; add placeholders/defaults for
       `BEAVER_NEST_BE_HTTP_LISTEN_ADDRESS`, `BEAVER_NEST_BE_HTTP_LISTEN_PORT`,
-      `BEAVER_NEST_BE_DATA_DIRECTORY`, `BEAVER_NEST_BE_HOST_DATA_DIRECTORY`,
+      `BEAVER_NEST_BE_DEVELOPMENT_DATA_DIRECTORY`, `BEAVER_NEST_BE_DATA_DIRECTORY`,
+      `BEAVER_NEST_BE_HOST_DATA_DIRECTORY`,
       `BEAVER_NEST_BE_SQLITE_BUSY_TIMEOUT_MILLISECONDS`,
       `BEAVER_NEST_BE_VPN_HOST_IP`, `BEAVER_NEST_BE_PUBLIC_PORT`,
       and `BEAVER_NEST_BE_BACKUP_DIRECTORY` to
@@ -392,8 +393,8 @@ names a different working directory.
       `apps/beaver-nest-be/src/BeaverNestBe/Domain/DatabaseConfiguration.fs` and wire it through
       `Program.fs`/`Connection.fs`; run `npm exec -- nx run beaver-nest-be:test:unit`; acceptance: the
       production database path is exactly `/var/lib/beaver-nest/beaver-nest.sqlite3`, local tests use
-      only their own canonical `mktemp` directory, and no arbitrary database-file environment variable
-      remains.
+      only their own canonical `mktemp` directory, the development wrapper can supply only its own
+      canonical directory, and no arbitrary database-file environment variable remains.
 - [ ] [AI] **REFACTOR** — centralize the fixed-name and canonical-directory predicates in
       `apps/beaver-nest-be/src/BeaverNestBe/Domain/DatabaseConfiguration.fs`; run
       `npm exec -- nx run beaver-nest-be:test:quick`; acceptance: strict F# lint and existing/new tests
@@ -1426,7 +1427,9 @@ checkbox names a different working directory.
 - [ ] [AI] **RED** — add `infra/dev/beaver-nest-app/tests/development-ports.sh`; run
       `bash infra/dev/beaver-nest-app/tests/development-ports.sh`; acceptance: it fails until the
       canonical local command fixes Vite/API to `19310`/`19320` independently of production `19300`.
-- [ ] [AI] **GREEN** — edit root `package.json` so real local development uses
+- [ ] [AI] **GREEN** — add `apps/beaver-nest-be/scripts/start-development.sh` and edit root
+      `package.json` so real local development uses that wrapper to require
+      `BEAVER_NEST_BE_DEVELOPMENT_DATA_DIRECTORY`, then run
       `npm exec -- nx run-many -t dev -p beaver-nest-be,beaver-nest-fe --parallel=2`, with Vite on
       loopback `19310` proxying the backend on loopback `19320`; run
       `bash infra/dev/beaver-nest-app/tests/development-ports.sh`; acceptance: split development does not
@@ -1434,6 +1437,33 @@ checkbox names a different working directory.
 - [ ] [AI] **REFACTOR** — keep local port overrides in the two Nx `dev` targets rather than production
       Compose; rerun `bash infra/dev/beaver-nest-app/tests/development-ports.sh`; acceptance: changing
       the production public-port default cannot change either local development port.
+- [ ] [AI] **RED** — add `infra/dev/beaver-nest-app/tests/development-data-isolation.sh`; run
+      `bash infra/dev/beaver-nest-app/tests/development-data-isolation.sh`; acceptance: it fails until
+      the local command requires a development-only SQLite directory, exports it as the backend data
+      directory, and neither loads nor inherits the production Compose host data-bind source.
+
+  **Gherkin (binds) →** "Development uses a separate SQLite directory"
+
+  ```gherkin
+  Scenario: Development uses a separate SQLite directory
+    Given the local development command receives an explicit developer-owned data directory
+    When it starts the backend on the local development port
+    Then the database resolves only within that development directory
+    And the command neither reads nor inherits the production host data-bind source
+  ```
+
+- [ ] [AI] **GREEN** — implement the explicit development-data handoff in
+      `apps/beaver-nest-be/scripts/start-development.sh`, update root `package.json`,
+      `apps/beaver-nest-be/.env.example`, `repo-config.yml`, and the app/runtime READMEs; run
+      `bash infra/dev/beaver-nest-app/tests/development-data-isolation.sh`;
+      acceptance: an absent/unsafe development directory fails before either dev server starts, the
+      backend receives only the canonical development directory, and Compose never references
+      `BEAVER_NEST_BE_DEVELOPMENT_DATA_DIRECTORY`.
+- [ ] [AI] **REFACTOR** — keep the development wrapper's environment handoff explicit and limited to
+      its development directory, loopback ports, and `nx run-many` invocation; rerun
+      `bash infra/dev/beaver-nest-app/tests/development-data-isolation.sh && bash infra/dev/beaver-nest-app/tests/development-ports.sh`;
+      acceptance: changing a production host data-bind source or public port cannot change local
+      SQLite access or either local development port.
 - [ ] [AI] **RED** — extend `infra/dev/beaver-nest-app/tests/env-contract.sh` with final unit-3 owner
       assertions; run `bash infra/dev/beaver-nest-app/tests/env-contract.sh`; acceptance: it fails while
       the obsolete frontend env source/injection remains.

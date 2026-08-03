@@ -36,7 +36,8 @@ plan creates no public, staging, Vercel, k3s, DNS, or VPN infrastructure.
 - Use no ORM. Use parameterized SQL directly; introduce a query builder only when a later concrete
   feature demonstrates a need.
 - Produce one Compose-managed runtime container: ASP.NET/Giraffe serves the built SPA and the API
-  on one origin and mounts a durable operator-owned directory outside the repository.
+  on one origin, mounts a durable operator-owned production directory outside the repository, and
+  never shares it with the explicit local-development SQLite directory.
 - Publish the application only on a configured VPN host address over HTTP inside the encrypted VPN;
   source-peer isolation remains an external VPN/firewall responsibility.
 - Add verified manual backup and restore tooling using SQLite's provider-aware online backup.
@@ -59,24 +60,24 @@ plan creates no public, staging, Vercel, k3s, DNS, or VPN infrastructure.
 
 ## Resolved Decisions
 
-| Concern           | Decision                                                               |
-| ----------------- | ---------------------------------------------------------------------- |
-| Product increment | Local-first foundation only                                            |
-| Trust model       | Existing VPN; one trusted shared workspace; no app auth                |
-| Database          | SQLite on one local host                                               |
-| Persisted schema  | Migration journal only; no product/domain tables                       |
-| Data access       | No ORM; explicit parameterized SQL; query builder only if later needed |
-| Migration runner  | `dbup-sqlite` with ordered plain SQL and fatal startup failure         |
-| Frontend          | Vite + React SPA; client-side rendering only                           |
-| Origin            | ASP.NET/Giraffe serves SPA and `/api/*` from one origin                |
-| Runtime           | One Docker Compose application container                               |
-| Network           | HTTP bound to an explicit existing VPN host address                    |
-| Ports             | Local Vite/API `19310`/`19320`; production public app `19300`          |
-| Durable data      | Bind-mounted operator directory outside the repository                 |
-| Backup            | Verified manual backup/restore plus operator off-host-copy attestation |
-| Workspace UI      | Compact header, centered readiness panel, neutral empty state          |
-| Theme             | Existing BeaverNest tokens with system light/dark preference           |
-| Delivery          | `worktree-to-pr`; three sequential delivery units                      |
+| Concern           | Decision                                                                         |
+| ----------------- | -------------------------------------------------------------------------------- |
+| Product increment | Local-first foundation only                                                      |
+| Trust model       | Existing VPN; one trusted shared workspace; no app auth                          |
+| Database          | SQLite on one local host                                                         |
+| Persisted schema  | Migration journal only; no product/domain tables                                 |
+| Data access       | No ORM; explicit parameterized SQL; query builder only if later needed           |
+| Migration runner  | `dbup-sqlite` with ordered plain SQL and fatal startup failure                   |
+| Frontend          | Vite + React SPA; client-side rendering only                                     |
+| Origin            | ASP.NET/Giraffe serves SPA and `/api/*` from one origin                          |
+| Runtime           | One Docker Compose application container                                         |
+| Network           | HTTP bound to an explicit existing VPN host address                              |
+| Ports             | Local Vite/API `19310`/`19320`; production public app `19300`                    |
+| Durable data      | Explicit local-development directory; distinct bind-mounted production directory |
+| Backup            | Verified manual backup/restore plus operator off-host-copy attestation           |
+| Workspace UI      | Compact header, centered readiness panel, neutral empty state                    |
+| Theme             | Existing BeaverNest tokens with system light/dark preference                     |
+| Delivery          | `worktree-to-pr`; three sequential delivery units                                |
 
 ## Approach Summary
 

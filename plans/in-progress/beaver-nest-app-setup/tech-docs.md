@@ -176,8 +176,9 @@ says `Foreign Keys=True` sends `PRAGMA foreign_keys = 1`. Accessed 2026-08-02.
 Required settings:
 
 - The database filename is fixed as `beaver-nest.sqlite3`. The backend derives it from the canonical
-  in-process data directory; production always resolves to
-  `/var/lib/beaver-nest/beaver-nest.sqlite3`. It accepts no arbitrary database-file path.
+  in-process data directory. Production always resolves to
+  `/var/lib/beaver-nest/beaver-nest.sqlite3`; local development resolves within its separately
+  supplied development directory. It accepts no arbitrary database-file path.
 - Configuration validation resolves the data directory without following a symlink, rejects root,
   home, repository, directory-as-file, and alias paths, and refuses a database file outside that
   directory. Tests use only disposable directories.
@@ -240,6 +241,17 @@ The host bind source and the in-process data directory are deliberately distinct
 `/var/lib/beaver-nest`; it does not inject the host path into the container. The backend reads only
 the container-visible `BEAVER_NEST_BE_DATA_DIRECTORY`, whose production value is the fixed mount
 target. This prevents a container process from being configured to access an arbitrary host path.
+
+Local development has an equally explicit but separate path. The canonical `npm run dev` command
+uses `apps/beaver-nest-be/scripts/start-development.sh`, which requires
+`BEAVER_NEST_BE_DEVELOPMENT_DATA_DIRECTORY`, validates that developer-owned directory, exports it as
+the backend's `BEAVER_NEST_BE_DATA_DIRECTORY`, and starts the loopback Vite/backend pair. The wrapper
+does not load a Compose or operator env file and clears any inherited production host-bind input. It
+therefore cannot select the production data directory by default. Production Compose neither reads,
+interpolates, nor injects the development-only variable. Both directories must be outside the
+repository, canonical, non-symlinked, and distinct; test/E2E runs continue to use unique `mktemp`
+directories. There is no environment-name switch or automatic fallback: each launch contract names
+its own data source.
 
 ### Decision 7 — Provider-aware manual backup and recoverable restore
 
@@ -379,141 +391,180 @@ validator, and never contain paths, migration names, SQL, driver codes, or excep
 Committed examples contain placeholders/defaults only; real operator values stay uncommitted and
 must not be read or written by agents.
 
-| Name                                              | Purpose                          | Example/default                                      |
-| ------------------------------------------------- | -------------------------------- | ---------------------------------------------------- |
-| `BEAVER_NEST_BE_VPN_HOST_IP`                      | Compose host publication address | placeholder in `.env.example`; no unsafe default     |
-| `BEAVER_NEST_BE_PUBLIC_PORT`                      | Production-facing host port      | `19300`                                              |
-| `BEAVER_NEST_BE_HTTP_LISTEN_PORT`                 | Kestrel listen port              | `19300`; local dev explicitly sets `19320`           |
-| `BEAVER_NEST_BE_HTTP_LISTEN_ADDRESS`              | Kestrel listen address           | `127.0.0.1`; container explicitly sets `0.0.0.0`     |
-| `BEAVER_NEST_BE_SQLITE_BUSY_TIMEOUT_MILLISECONDS` | Finite lock wait                 | `1000`                                               |
-| `BEAVER_NEST_BE_DATA_DIRECTORY`                   | In-process SQLite directory      | `/var/lib/beaver-nest`; local tests use `mktemp`     |
-| `BEAVER_NEST_BE_HOST_DATA_DIRECTORY`              | Compose host data-bind source    | placeholder in `.env.example`; never injected        |
-| `BEAVER_NEST_BE_BACKUP_DIRECTORY`                 | Separate host backup-bind source | placeholder in `.env.example`; no repo-local default |
+| Name                                              | Purpose                                  | Example/default                                              |
+| ------------------------------------------------- | ---------------------------------------- | ------------------------------------------------------------ |
+| `BEAVER_NEST_BE_VPN_HOST_IP`                      | Compose host publication address         | placeholder in `.env.example`; no unsafe default             |
+| `BEAVER_NEST_BE_PUBLIC_PORT`                      | Production-facing host port              | `19300`                                                      |
+| `BEAVER_NEST_BE_HTTP_LISTEN_PORT`                 | Kestrel listen port                      | `19300`; local dev explicitly sets `19320`                   |
+| `BEAVER_NEST_BE_HTTP_LISTEN_ADDRESS`              | Kestrel listen address                   | `127.0.0.1`; container explicitly sets `0.0.0.0`             |
+| `BEAVER_NEST_BE_SQLITE_BUSY_TIMEOUT_MILLISECONDS` | Finite lock wait                         | `1000`                                                       |
+| `BEAVER_NEST_BE_DEVELOPMENT_DATA_DIRECTORY`       | Local-dev wrapper source                 | required developer-owned directory; never Compose            |
+| `BEAVER_NEST_BE_DATA_DIRECTORY`                   | In-process SQLite directory              | development wrapper value; production `/var/lib/beaver-nest` |
+| `BEAVER_NEST_BE_HOST_DATA_DIRECTORY`              | Production Compose host data-bind source | placeholder in `.env.example`; never injected                |
+| `BEAVER_NEST_BE_BACKUP_DIRECTORY`                 | Separate host backup-bind source         | placeholder in `.env.example`; no repo-local default         |
 
 The committed owner is `apps/beaver-nest-be/.env.example`. CI and automated tests export explicit
 sanitized values and unique `mktemp` directories without loading any real `.env*` file. The runtime
 documentation assigns actual VPN values and peer execution to the human operator.
 
-Local development deliberately does not consume the production public-port default: Vite serves on
-loopback `19310` and proxies to the loopback backend on `19320`. The combined production-like stack
-publishes its one exact-address endpoint on `19300` and runs Kestrel internally on `19300`. Tests
-assert that one mode cannot silently inherit the other mode's listen/public ports.
+Local development deliberately does not consume the production public-port or data-bind defaults:
+Vite serves on loopback `19310`, proxies to the loopback backend on `19320`, and receives an explicit
+development SQLite directory. The combined production-like stack publishes its one exact-address
+endpoint on `19300`, runs Kestrel internally on `19300`, and obtains data only from its production
+host bind. Tests assert that one mode cannot silently inherit the other mode's listen/public ports or
+SQLite data source.
 
 Remove the unused wildcard CORS variable. The SPA uses relative URLs and no production CORS policy
 is needed.
 
 ## File-Impact Analysis
 
-Paths marked **New file/pattern** are creation targets; deletions are explicit.
+Legend: **[E]** edit, **[N]** new file/pattern, **[D]** delete, **[G]** generated or regenerated.
+Paths with `*` are a bounded file family; their exact members are discovered and recorded before the
+relevant delivery step changes them.
 
-### Governance and plan lifecycle
+```text
+.
+├── AGENTS.md [E] — current BeaverNest topology, apps, ports, and local-first runtime guidance
+├── README.md [E] — repository-facing BeaverNest runtime description
+├── ROADMAP.md [E] — remove the obsolete planned/stateless/landing-page description
+├── .dockerignore [E] — root-context inputs for the combined production image
+├── package-lock.json [E] — exact frontend/Vite dependency lock changes
+├── repo-config.yml [E] — sole backend env owner; Compose, preflight, and dev-data registrations
+├── .github/
+│   └── workflows/
+│       ├── beaver-nest-app-test-local-deploy-stag.yml [E] — one image/port and affected propagation
+│       ├── _reusable-app-test-local-deploy-stag.yml [E] — same combined-runtime contract
+│       ├── beaver-nest-app-test-stag.yml [E] — honest unprovisioned staging state
+│       ├── beaver-nest-be-build-deploy-stag.yml [E] — combined backend/frontend image path
+│       ├── publish-images.yml [E] — combined image publication inputs
+│       └── README.md [E] — current workflow topology
+├── .claude/
+│   ├── agents/
+│   │   ├── apps-beaver-nest-fe-content-{maker,checker,fixer}.md [E] — Vite CSR/status-only role
+│   │   └── README.md [E] — active BeaverNest agent index
+│   └── skills/
+│       ├── apps-beaver-nest-fe-developing-content/SKILL.md [E] — Vite client workflow
+│       └── swe-developing-frontend-ui/reference/brand-context.md [E] — selected workspace UI context
+├── .opencode/, .cursor/, .amazonq/ [G] — generated harness mirrors; never hand-edit
+├── apps/
+│   ├── beaver-nest-be/
+│   │   ├── .env.example [E] — explicit dev/production SQLite and network placeholders only
+│   │   ├── README.md [E] — local development, production, backup, and restore instructions
+│   │   ├── project.json [E] — local loopback target and combined-image dependencies
+│   │   ├── Dockerfile [E] — serve Vite output with the API as UID/GID 10001
+│   │   ├── Dockerfile.integration [E] — disposable real-SQLite integration runtime
+│   │   ├── docker-compose.integration.yml [E] — supplied disposable data directory only
+│   │   ├── scripts/
+│   │   │   ├── start-development.sh [N] — explicit local data-directory handoff and loopback start
+│   │   │   └── run-e2e.sh [E] — one disposable local stack, no independently booted backend
+│   │   ├── src/BeaverNestBe/
+│   │   │   ├── BeaverNestBe.fsproj [E] — package/content/compile order
+│   │   │   ├── Program.fs [E] — validated startup, migration-before-listen, command dispatch
+│   │   │   ├── WebApp.fs [E] — API/static/error/SPA-fallback order
+│   │   │   ├── Domain/
+│   │   │   │   ├── Readiness.fs [E] — repurpose existing readiness domain seam
+│   │   │   │   ├── HttpConfiguration.fs [N] — validated listen address and port
+│   │   │   │   ├── DatabaseConfiguration.fs [N] — canonical fixed-name SQLite directory
+│   │   │   │   └── Greeting.fs [D] — retired greeting contract
+│   │   │   ├── Application/ReadinessPort.fs [N] — readiness application boundary
+│   │   │   ├── Api/
+│   │   │   │   ├── ReadinessHandlers.fs [N] — safe readiness response mapping
+│   │   │   │   └── GreetingHandlers.fs [D] — retired greeting route
+│   │   │   ├── Infrastructure/
+│   │   │   │   ├── Migrations.fs [N] — DbUp startup runner
+│   │   │   │   └── Sqlite/*.fs [N] — connection, settings, and provider-error boundary
+│   │   │   ├── Operations/Database.fs [N] — validated backup, restore, and integrity commands
+│   │   │   └── Migrations/{timestamp}_Initialize.sql [N] — journal-only initialization migration
+│   │   └── tests/
+│   │       ├── unit/ [E] — configuration, health, readiness, and TickSpec bindings/compile lists
+│   │       └── integration/ [E] — direct real-SQLite migration/settings/recovery fixtures
+│   ├── beaver-nest-be-e2e/
+│   │   ├── steps/{routing,persistence,network}.steps.ts [E] — combined-runtime BDD coverage
+│   │   ├── playwright.config.ts [E] — wrapper-owned API base URL
+│   │   ├── e2e-coverage-baseline.json [G] — regenerated coverage baseline
+│   │   └── README.md [E] — current E2E runtime contract
+│   └── beaver-nest-fe/
+│       ├── .env.example [D] — frontend runtime env source is retired
+│       ├── README.md [E] — Vite CSR client operation
+│       ├── package.json [E] — Vite/React/MSW dependency manifest
+│       ├── project.json [E] — `platform:vite`, dev/build/test targets
+│       ├── tsconfig.json [E] — Vite TypeScript graph
+│       ├── Dockerfile [E] — build-only frontend stage for the backend image
+│       ├── .dockerignore [E] — Vite build context
+│       ├── postcss.config.mjs [E] — Vite build graph
+│       ├── vitest.config.ts [E] — Vite test graph
+│       ├── oxlint.json [E] — Vite source layout
+│       ├── next.config.ts [D] — Next.js runtime retired
+│       ├── src/
+│       │   ├── env.ts [D] — Next/server env path retired
+│       │   ├── app/{page,page.test,layout,error,error.test,not-found,not-found.test,icon}.tsx [D]
+│       │   ├── app/globals.css [D] — replaced by the Vite client stylesheet
+│       │   ├── components/{AppFrame,AppShell}.tsx [D/E] — remove or replace in the Vite transition
+│       │   ├── lib/{greeting-client,greeting-client.test}.ts [D] — greeting client retired
+│       │   ├── test/{landing.steps,setup}.ts [D/E] — landing setup replaced by client test support
+│       │   ├── theme.ts [N] — external theme bootstrap
+│       │   ├── main.tsx [N] — client entry
+│       │   ├── App.tsx [N] — workspace/readiness shell
+│       │   ├── lib/{readiness-client,readiness-state}.ts [N] — relative API and state reducer
+│       │   └── test/msw/* [N] — integration mock support
+│       ├── index.html [N] — Vite entry document
+│       └── tests/* [N/E] — CSR/readiness/loading/failure/retry/routing component and E2E coverage
+├── docs/
+│   ├── how-to/add-new-app.md [E] — real configured database, not PostgreSQL-only wording
+│   └── reference/
+│       ├── {code-coverage,monorepo-structure,nx-configuration,sdlc-gate-standard}.md [E]
+│       ├── project-dependency-graph.md [E]
+│       └── system-architecture/*.md [E] — combined Vite/Giraffe/SQLite topology
+├── infra/dev/beaver-nest-app/
+│   ├── docker-compose.yml [E] — one service, production data bind, exact VPN publication
+│   ├── docker-compose.ci.yml [E] — loopback/mktemp CI exception only
+│   ├── Dockerfile.be.dev [E] — backend development image support
+│   ├── Dockerfile.fe.dev [E] — frontend development image support
+│   ├── README.md [E] — production-like runtime, separate data/backup paths, failure-domain limits
+│   ├── .gitignore [E] — local/disposable artifacts remain untracked
+│   ├── scripts/{start,preflight,operations}.sh [N] — fail-closed startup and database operations
+│   └── tests/* [N/E] — ports, data isolation, env contract, topology, permissions, persistence, E2E
+├── libs/web-ui-token/
+│   ├── src/beaver-nest.css [E] — remove `next/font` assumption; Vite stylesheet entry
+│   └── README.md [E] — concrete token import path
+├── plans/
+│   ├── in-progress/beaver-nest-app-setup/
+│   │   ├── execution-state.md [N] — append-only phase/task/file/result/evidence ledger
+│   │   └── evidence/* [N] — sanitized verification evidence retained with the plan
+│   └── ideas/
+│       ├── beaver-nest-persistence-layer.md [E] — preserve as the next stateful product slice
+│       └── beaver-nest-first-deploy.md [E] — combined-image/Vite/status-only prerequisites
+├── repo-governance/
+│   ├── conventions/security/secrets-and-env-standards.md [E] — backend-only runtime env ownership
+│   ├── development/
+│   │   ├── README.md [E] — generalized real-database guidance
+│   │   ├── quality/{README,three-level-testing-standard}.md [E] — configured real DB requirement
+│   │   ├── infra/{bdd-spec-test-mapping,ci-conventions,nx-targets,vercel-deployment}.md [E]
+│   │   └── pattern/database-audit-trail.md [E] — explicit SQL with optional ORM mapping
+│   └── vision/beaver-nest.md [E] — private combined runtime, not a public landing site
+└── specs/apps/beaver-nest/
+    ├── {README.md,product/README.md,system-context/README.md} [E] — current product/context boundary
+    ├── containers/
+    │   ├── {README.md,container.md} [E] — replace stale C4 runtime stubs
+    │   ├── components/{README.md,overview.md} [E] — Vite/Giraffe/SQLite components
+    │   └── contracts/
+    │       ├── openapi.yaml [E] — health/readiness and retired greeting contract
+    │       ├── bundled/* [G] — regenerated OpenAPI bundle
+    │       └── tests/readiness-contract.sh [N] — shell-level readiness contract guard
+    └── behavior/
+        ├── beaver-nest-be/gherkin/ [E] — retire greeting; add readiness/persistence/routing behavior
+        └── beaver-nest-fe/gherkin/ [E] — CSR workspace/readiness behavior and README indexes
+```
 
-- Generalize real-database/ORM wording in:
-  - `repo-governance/development/quality/three-level-testing-standard.md`
-  - `repo-governance/development/infra/bdd-spec-test-mapping.md`
-  - `repo-governance/development/infra/ci-conventions.md`
-  - `repo-governance/development/infra/nx-targets.md`
-  - `repo-governance/development/pattern/database-audit-trail.md`
-  - `repo-governance/development/README.md`
-  - `repo-governance/development/quality/README.md`
-  - `docs/how-to/add-new-app.md`
-- Update `repo-config.yml` and
-  `repo-governance/conventions/security/secrets-and-env-standards.md` so the backend example is the
-  sole BeaverNest runtime-env owner, Compose/preflight-only keys are intentionally registered, and
-  stale Next/Vercel/frontend injection rules no longer apply to BeaverNest.
-- Keep `plans/ideas/beaver-nest-persistence-layer.md` as the later first concrete stateful product
-  slice; this foundation is only its prerequisite. When this plan archives, repoint that brief's two
-  prerequisite links to the actual-date `plans/done/` path in the same final PR.
-- **New file/pattern:** `plans/in-progress/beaver-nest-app-setup/execution-state.md`, the durable
-  append-only per-phase task, file-touch, command-result, and evidence ledger; maintain and ultimately
-  archive it with this plan and its evidence.
+### More Detail
 
-### Specs/contracts
-
-- Rewrite `specs/apps/beaver-nest/{README.md,product/README.md,system-context/README.md}`.
-- Replace stale C4 stubs in `containers/{README.md,container.md}` and
-  `components/{README.md,overview.md}` with current target diagrams/components.
-- Remove greeting behavior and add readiness/persistence/routing behavior under
-  `specs/apps/beaver-nest/behavior/{beaver-nest-be,beaver-nest-fe}/gherkin/`.
-- Update all Gherkin README indexes.
-- Edit `specs/apps/beaver-nest/containers/contracts/openapi.yaml`; regenerate its bundled output and
-  generated backend/frontend clients.
-
-### Backend
-
-- Edit `apps/beaver-nest-be/src/BeaverNestBe/BeaverNestBe.fsproj` compile order/dependencies.
-- **Edit/repurpose:** existing `Domain/Readiness.fs`. **New file/pattern:**
-  `Application/ReadinessPort.fs`,
-  `Infrastructure/Sqlite/*.fs`, `Infrastructure/Migrations.fs`, `Operations/Database.fs`,
-  `Api/ReadinessHandlers.fs`, and `Migrations/{timestamp}_Initialize.sql`.
-- Remove `Domain/Greeting.fs` and `Api/GreetingHandlers.fs`.
-- Edit `WebApp.fs`, `Program.fs`, `project.json`, `Dockerfile`, `Dockerfile.integration`,
-  `docker-compose.integration.yml`, `scripts/run-e2e.sh`, app README, and `.env.example`.
-- Replace backend integration Kestrel boot test with direct real-SQLite integration fixtures/tests;
-  update F# project compile lists.
-- Extend unit/E2E steps/tests and regenerate E2E coverage baseline.
-
-### Frontend
-
-- Edit `apps/beaver-nest-fe/package.json`, root `package-lock.json`, `project.json`, `tsconfig.json`, `Dockerfile`,
-  `.dockerignore`, README, and `.env.example`; change its Nx platform tag from `platform:nextjs` to
-  the canonical `platform:vite` vocabulary and update that vocabulary where defined. While touching
-  the controlled table, also register the backend's real `platform:giraffe`/`lang:fsharp` values or
-  normalize both project tags and docs together; do not leave active tags outside the vocabulary.
-- Delete `next.config.ts`, `src/env.ts`, the Next-only production start behavior, and current Next
-  App Router files/tests under `src/app/`:
-  `page.tsx`, `page.test.tsx`, `layout.tsx`, `error.tsx`, `error.test.tsx`, `not-found.tsx`,
-  `not-found.test.tsx`, `icon.tsx`, and `globals.css`.
-- Delete or replace `src/components/{AppFrame,AppShell}.tsx`,
-  `src/lib/{greeting-client,greeting-client.test}.ts`, and
-  `src/test/{landing.steps,setup}.ts` as part of the atomic Vite transition.
-- Adapt existing `postcss.config.mjs`, `vitest.config.ts`, `oxlint.json`, `tsconfig.json`,
-  `Dockerfile`, and `.dockerignore` to the Vite graph.
-- Edit `libs/web-ui-token/src/beaver-nest.css` and `libs/web-ui-token/README.md` to remove the
-  `next/font` assumption and point BeaverNest token imports at the concrete Vite stylesheet.
-- **New file/pattern:** root `index.html`, `vite.config.ts`, `src/theme.ts`, `src/main.tsx`, `src/App.tsx`,
-  `src/lib/readiness-client.ts`, `src/lib/readiness-state.ts`, component tests, and
-  `src/test/msw/*` integration support.
-- Retain/reuse BeaverNest token imports and shared `AppHeader` where compatible.
-- Replace landing-page E2E steps with CSR/readiness/loading/failure/retry/routing steps and update
-  baseline.
-
-### Runtime/docs
-
-- Edit root `.dockerignore` so a clean root-context production image receives only the required
-  BeaverNest contract/spec inputs while preserving the existing exclusions for unrelated specs and
-  host build outputs.
-- Replace separate production frontend/backend composition with one app service in
-  `infra/dev/beaver-nest-app/docker-compose.yml`, `docker-compose.ci.yml`,
-  `Dockerfile.be.dev`, and `Dockerfile.fe.dev`, plus backend integration/E2E composition.
-- Align `.github/workflows/beaver-nest-app-test-local-deploy-stag.yml`,
-  `_reusable-app-test-local-deploy-stag.yml`, `beaver-nest-app-test-stag.yml`,
-  `beaver-nest-be-build-deploy-stag.yml`, `publish-images.yml`, and `.github/workflows/README.md`
-  with one image/port, honest unprovisioned staging, and affected propagation. CI uses a loopback
-  host-IP exception and unique disposable data/backup directories; it never imports an operator
-  environment.
-- Make the backend build/image target depend on the frontend build, update Nx implicit dependencies
-  so frontend changes affect the combined image, and run backend E2E against a supplied
-  `API_BASE_URL` owned by the local-stack wrapper rather than an independently booted backend.
-- Add fail-closed `start.sh`, `preflight.sh`, and `operations.sh` scripts plus backup, restore,
-  integrity, and disposable-test-directory support under the nearest existing
-  `infra/dev/beaver-nest-app/` or `apps/beaver-nest-be/scripts/` pattern.
-- Edit `AGENTS.md`, root `README.md`/`ROADMAP.md`, app/E2E READMEs,
-  `docs/reference/{code-coverage,monorepo-structure,nx-configuration,sdlc-gate-standard}.md`,
-  `docs/reference/project-dependency-graph.md`, `docs/reference/system-architecture/*.md`, the BeaverNest vision,
-  `repo-governance/development/infra/vercel-deployment.md`, and specs indexes that still call the
-  apps planned/stateless/landing-page based. Reconcile stale documented Volta versions to the pinned
-  package manifest while touching those references; retain generic Vercel guidance but mark it
-  inapplicable to the private combined BeaverNest runtime.
-- Update the canonical app-naming rule so `[domain]-fe` remains the product client where the domain
-  has no separate marketing site.
-- Align the active BeaverNest frontend/backend deployer definitions,
-  `.claude/agents/apps-beaver-nest-fe-content-{maker,checker,fixer}.md`,
-  `.claude/skills/apps-beaver-nest-fe-developing-content/SKILL.md`,
-  `.claude/skills/swe-developing-frontend-ui/reference/brand-context.md`, `.claude/agents/README.md`,
-  and `plans/ideas/beaver-nest-first-deploy.md` with the combined-image, Vite CSR, status-only
-  architecture. Generate all harness mirrors in the same commit and validate synchronization;
-  never hand-edit a mirror.
+When archiving this plan, update the two prerequisite links in
+`plans/ideas/beaver-nest-persistence-layer.md` to the actual-date `plans/done/` location in the same
+final PR. Reconcile any stale documented Volta version encountered in the listed files with the
+pinned package manifest. The canonical app-naming rule is also an edit target: retain
+`[domain]-fe` for a product client whose domain has no marketing site, discovering and recording its
+authoritative source before changing it.
 
 ## Dependency Adoption
 
