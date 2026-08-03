@@ -367,7 +367,7 @@ Mobile:
 
 Finalist A — focused centered readiness panel:
 
-![Desktop and mobile mockups for the focused BeaverNest readiness panel](./assets/workspace-home-centered.excalidraw.png)
+![Desktop and mobile mockups for the focused BeaverNest readiness panel with the Beaver logo](./assets/workspace-home-centered-with-beaver.excalidraw.png)
 
 Finalist B — full-width readiness summary and blankslate:
 
