@@ -297,6 +297,9 @@ pub fn scan_ts_reads(root: &Path) -> Result<Vec<String>, Error> {
     Ok(keys.into_iter().collect())
 }
 
+/// Runtime-owned signals that are never application environment contract keys.
+const FRAMEWORK_OWNED_ENVIRONMENT_KEYS: &[&str] = &["DOTNET_RUNNING_IN_CONTAINER"];
+
 /// Scan F# source for environment variable keys consumed by the code.
 ///
 /// Detects:
@@ -316,7 +319,6 @@ pub fn scan_ts_reads(root: &Path) -> Result<Vec<String>, Error> {
 /// Returns an error when a source file cannot be read.
 pub fn scan_fsharp_reads(root: &Path) -> Result<Vec<String>, Error> {
     let mut keys: HashSet<String> = HashSet::new();
-    const FRAMEWORK_OWNED_ENVIRONMENT_KEYS: &[&str] = &["DOTNET_RUNNING_IN_CONTAINER"];
 
     let env_var_re = Regex::new(
         r#"(?:System\.)?Environment\.GetEnvironmentVariable\s*\(\s*"([A-Z][A-Z0-9_]*)"\s*\)"#,
