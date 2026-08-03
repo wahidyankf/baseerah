@@ -7,9 +7,8 @@ tags:
   - database
   - audit-trail
   - soft-delete
-  - dbup
-  - ef-core
   - migrations
+  - sql
 created: 2026-03-09
 ---
 
@@ -23,9 +22,9 @@ This pattern implements the following core principles:
 
 - **[Explicit Over Implicit](../../principles/software-engineering/explicit-over-implicit.md)**: All audit metadata is stored in dedicated, named columns with mandatory types and nullability. There is no implicit or hidden tracking; every change is visible in the schema.
 
-- **[Automation Over Manual](../../principles/software-engineering/automation-over-manual.md)**: DbUp discovers and applies migration scripts automatically at startup. EF Core handles entity mapping. Manual service code is only required for soft-delete columns (`deleted_at`, `deleted_by`).
+- **[Automation Over Manual](../../principles/software-engineering/automation-over-manual.md)**: The application runs versioned SQL migrations automatically before it accepts requests. Direct parameterized SQL and ORM mapping are both valid data-access implementations; neither may hide migration failure or bypass the audit columns.
 
-- **[Reproducibility First](../../principles/software-engineering/reproducibility.md)**: DbUp applies versioned SQL scripts in deterministic order, ensuring the schema is reproducible across PostgreSQL environments (dev/staging/prod) and Dockerised test databases without divergence.
+- **[Reproducibility First](../../principles/software-engineering/reproducibility.md)**: A migration runner applies versioned SQL scripts in deterministic order, ensuring that the schema is reproducible across the app's configured production database and isolated test databases without divergence.
 
 - **[Documentation First](../../principles/content/documentation-first.md)**: This pattern documents the required columns, types, and implementation approach before any table is created, ensuring teams follow a consistent and verifiable standard.
 
@@ -61,14 +60,14 @@ graph TD
     class O,C5,C6 optional
 ```
 
-| Column       | Type           | Nullable | Default    | Description                         |
-| ------------ | -------------- | -------- | ---------- | ----------------------------------- |
-| `created_at` | `TIMESTAMPTZ`  | NOT NULL | `NOW()`    | When the row was created (UTC)      |
-| `created_by` | `VARCHAR(255)` | NOT NULL | `'system'` | Who or what created the row         |
-| `updated_at` | `TIMESTAMPTZ`  | NOT NULL | `NOW()`    | When the row was last updated (UTC) |
-| `updated_by` | `VARCHAR(255)` | NOT NULL | `'system'` | Who or what last updated the row    |
-| `deleted_at` | `TIMESTAMPTZ`  | NULL     | —          | When the row was soft-deleted (UTC) |
-| `deleted_by` | `VARCHAR(255)` | NULL     | —          | Who or what soft-deleted the row    |
+| Column       | Logical type                  | Nullable | Default          | Description                         |
+| ------------ | ----------------------------- | -------- | ---------------- | ----------------------------------- |
+| `created_at` | Database-native UTC timestamp | NOT NULL | Current UTC time | When the row was created (UTC)      |
+| `created_by` | String (maximum 255 chars)    | NOT NULL | `'system'`       | Who or what created the row         |
+| `updated_at` | Database-native UTC timestamp | NOT NULL | Current UTC time | When the row was last updated (UTC) |
+| `updated_by` | String (maximum 255 chars)    | NOT NULL | `'system'`       | Who or what last updated the row    |
+| `deleted_at` | Database-native UTC timestamp | NULL     | —                | When the row was soft-deleted (UTC) |
+| `deleted_by` | String (maximum 255 chars)    | NULL     | —                | Who or what soft-deleted the row    |
 
 Blue columns (required) are always non-null and populated by the database default or the calling service. Green columns (optional by value) are always present in the schema but null for active rows.
 
@@ -86,9 +85,9 @@ Blue columns (required) are always non-null and populated by the database defaul
 
 Each backend uses the idiomatic migration tool for its language and framework ecosystem. All tools must apply the same six audit columns to every table.
 
-| App            | Migration Tool | License |
-| -------------- | -------------- | ------- |
-| beaver-nest-be | DbUp           | MIT     |
+| App            | Migration Tool and Data Access                                 | License |
+| -------------- | -------------------------------------------------------------- | ------- |
+| beaver-nest-be | DbUp SQL scripts + parameterized `Microsoft.Data.Sqlite` calls | MIT     |
 
 > For polyglot migration tool patterns (Liquibase, Ecto, Alembic, goose, Flyway, EF Core, Migratus, @effect/sql, SQLx, Drizzle), see the [ose-primer](https://github.com/wahidyankf/ose-primer) repository.
 
@@ -96,33 +95,38 @@ For licensing decisions related to Liquibase's FSL-1.1-ALv2 licence (introduced 
 
 ## Schema Migration
 
-Every backend applies the six audit columns through its migration tool. The canonical column definitions are identical regardless of tool — only the migration file format differs.
+Every backend applies the six audit columns through explicit, versioned SQL migrations. The logical
+column definitions are identical regardless of database engine; only the physical SQL syntax differs.
+An ORM may map an already-migrated table, but it is optional and never replaces the SQL migration.
 
 Regardless of the tool used, migrations must satisfy:
 
 - All six audit columns present in every table, in the order listed above
-- `created_at` and `updated_at` use timezone-aware timestamps (`TIMESTAMPTZ` for PostgreSQL, equivalent for other databases)
+- `created_at` and `updated_at` use database-native UTC timestamp representations (`TIMESTAMPTZ` for PostgreSQL; ISO-8601 UTC text or an equivalent invariant representation for SQLite)
 - `created_by` and `updated_by` default to `'system'` so raw migrations and background jobs produce a traceable actor
 - `deleted_at` and `deleted_by` are nullable with no default — `NULL` is the active-row state
-- Each migration is reversible (rollback support where the tool provides it)
+- A migration failure aborts startup before the application publishes its HTTP endpoint; migrations are additive and forward-only where the runner does not support rollback
 
-### F# / DbUp: versioned SQL scripts
+### F# / DbUp: versioned SQL scripts and direct parameterized SQLite access
 
-Use plain `.sql` files under `Migrations/`. DbUp discovers and applies them in filename order at startup — no compilation step required.
+Use plain `.sql` files under `Migrations/`. DbUp discovers and applies them in filename order at
+startup — no compilation step required. BeaverNest's planned SQLite backend uses SQLite's UTC-text
+timestamp representation. PostgreSQL remains a valid app-selected manifestation, using `TIMESTAMPTZ`
+and `now()` instead.
 
 The following example shows the `members` table as the reference implementation. Apply the same pattern to every new table.
 
 ```sql
 -- Migrations/20240101000001_CreateMembers.sql
 CREATE TABLE members (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid (),
+  id TEXT PRIMARY KEY,
   name TEXT NOT NULL,
   -- audit columns
-  created_at TIMESTAMPTZ NOT NULL DEFAULT now (),
+  created_at TEXT NOT NULL DEFAULT (strftime ('%Y-%m-%dT%H:%M:%fZ', 'now')),
   created_by VARCHAR(255) NOT NULL DEFAULT 'system',
-  updated_at TIMESTAMPTZ NOT NULL DEFAULT now (),
+  updated_at TEXT NOT NULL DEFAULT (strftime ('%Y-%m-%dT%H:%M:%fZ', 'now')),
   updated_by VARCHAR(255) NOT NULL DEFAULT 'system',
-  deleted_at TIMESTAMPTZ,
+  deleted_at TEXT,
   deleted_by VARCHAR(255)
 );
 ```
@@ -130,14 +134,32 @@ CREATE TABLE members (
 Key points:
 
 - Migration files are named `{timestamp}_{Description}.sql` so DbUp applies them in deterministic order.
-- `DEFAULT now()` provides a safe fallback for raw SQL inserts (migrations, seeds, background jobs).
+- The UTC default provides a safe fallback for raw SQL inserts (migrations, seeds, background jobs).
 - `created_by` and `updated_by` default to `'system'` so background jobs produce a traceable actor without caller intervention.
 - `deleted_at` and `deleted_by` are nullable with no default — `NULL` is the active-row state.
 - DbUp does not support rollback scripts; design migrations to be additive and forward-only.
 
-## F# Entity Implementation
+Use parameters for all runtime values. Direct parameterized SQL is the primary BeaverNest
+manifestation and remains valid for every audited table:
 
-### EF Core Entity Type
+```fsharp
+open Microsoft.Data.Sqlite
+
+let softDelete (connection: SqliteConnection) (id: string) (actor: string) =
+    use command = connection.CreateCommand()
+    command.CommandText <- """
+        UPDATE members
+        SET deleted_at = strftime('%Y-%m-%dT%H:%M:%fZ', 'now'), deleted_by = $actor
+        WHERE id = $id AND deleted_at IS NULL
+        """
+    command.Parameters.AddWithValue("$id", id) |> ignore
+    command.Parameters.AddWithValue("$actor", actor) |> ignore
+    command.ExecuteNonQuery()
+```
+
+## Optional ORM Mapping
+
+### EF Core Entity Type (when an app chooses EF Core)
 
 Map every audited table to an F# record type and configure audit columns explicitly via `IEntityTypeConfiguration`.
 
@@ -171,7 +193,8 @@ type MemberEntityConfiguration() =
 
 ### Run Migrations at Startup
 
-Call DbUp in `Program.fs` before the HTTP server starts accepting requests.
+Call DbUp in `Program.fs` before the HTTP server starts accepting requests. Use the DbUp database
+extension that matches the app's configured production database.
 
 ```fsharp
 // Program.fs (excerpt)
@@ -180,14 +203,14 @@ open DbUp
 let upgrader =
     DeployChanges
         .To
-        .PostgresqlDatabase(connectionString)
+        .SQLiteDatabase(connectionString)
         .WithScriptsFromFileSystem("Migrations")
         .LogToConsole()
         .Build()
 
 let result = upgrader.PerformUpgrade()
 if not result.Successful then
-    failwithf "DbUp migration failed: %s" (result.Error.Message)
+    failwith "Database migration failed before HTTP startup"
 ```
 
 ### Soft-Delete in the Repository Layer
@@ -266,29 +289,35 @@ Use this checklist when adding a new table or reviewing an existing one.
 - [ ] DbUp `PerformUpgrade()` is called in `Program.fs` before the server starts accepting requests
 - [ ] DbUp result is checked and startup aborts on failure
 
-### Entity Type (F# / EF Core)
+### Entity Type (F# / EF Core, When Chosen)
 
 - [ ] Entity record type is `[<CLIMutable>]` and mapped via `IEntityTypeConfiguration`
 - [ ] `CreatedAt` and `UpdatedAt` fields use `DateTimeOffset` (non-option)
 - [ ] `CreatedBy` and `UpdatedBy` fields use `string` (non-option)
 - [ ] `DeletedAt` and `DeletedBy` fields use `DateTimeOffset option` and `string option` respectively
 
-### Repository Layer (F# / EF Core)
+### Repository Layer (F# / EF Core, When Chosen)
 
 - [ ] No `DELETE` statement issued against audited tables
 - [ ] Soft-delete sets both `DeletedAt = DateTimeOffset.UtcNow` and `DeletedBy = actor`
 - [ ] Soft-delete filters `not m.DeletedAt.HasValue` to guard against double-deletes
 
-### Queries
+### Queries (F# / EF Core, When Chosen)
 
 - [ ] All EF Core queries filter `not m.DeletedAt.HasValue` unless the endpoint is explicitly an admin/audit endpoint
 - [ ] Functions that intentionally return soft-deleted rows are named clearly (e.g., `fetchAllIncludingDeleted`) and the route is restricted to admin roles
+
+### Direct Parameterized SQL (When Used)
+
+- [ ] All runtime values use command parameters; SQL text never interpolates untrusted values
+- [ ] No `DELETE` statement is issued against audited tables; soft-delete updates both audit columns
+- [ ] Active-row queries include `deleted_at IS NULL` unless the caller is an explicitly authorized audit flow
 
 ## Related Documentation
 
 - [Acceptance Criteria Convention](../infra/acceptance-criteria.md) - Writing testable criteria for features involving audited entities
 - [Functional Programming Practices](./functional-programming.md) - Pure functions for business logic separate from audit side effects
-- [Reproducible Environments Convention](../workflow/reproducible-environments.md) - Why consistent PostgreSQL environments across dev/staging/prod matter for test reliability
+- [Reproducible Environments Convention](../workflow/reproducible-environments.md) - Why consistent configured production database environments across dev/staging/prod matter for test reliability
 - [Licensing Decisions](../../../docs/explanation/software-engineering/licensing/licensing-decisions.md) - License analysis for migration tools (Liquibase FSL-1.1-ALv2 and others)
 
 ## References

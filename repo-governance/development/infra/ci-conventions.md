@@ -167,14 +167,14 @@ per-backend implementation patterns, see the
 Each app type implements the three levels according to its domain. The table below shows how each
 app type realises each level.
 
-| App Type                                           | Unit (`test:unit`)                                    | Integration (`test:integration`)                                              | E2E (`test:e2e`)                                     |
-| -------------------------------------------------- | ----------------------------------------------------- | ----------------------------------------------------------------------------- | ---------------------------------------------------- |
-| **BE API** (`beaver-nest-be`, planned)             | BDD, mocked repos, calls service fns directly         | Real PostgreSQL via docker-compose, calls service fns directly (no HTTP)      | Playwright, real HTTP + real PostgreSQL              |
-| **FE** (`beaver-nest-fe`, planned)                 | Vitest, all API calls mocked (MSW / mock services)    | MSW with real DOM; in-process mocking only                                    | Playwright against running FE + BE                   |
-| **CLI** (`*-cli`)                                  | `cargo test`, all I/O mocked via dependency injection | `cargo test` with real filesystem via tmp fixtures, real HTTP via mock server | Not applicable                                       |
-| **Content platform** (none currently in this repo) | Vitest, components and tRPC routes mocked             | MSW, in-process mocking                                                       | Playwright BE E2E (`*-be-e2e`) + FE E2E (`*-fe-e2e`) |
-| **Library** (`rust-commons`)                       | `cargo test`, mock closures                           | `cargo test` with real filesystem fixtures, cacheable                         | Not applicable                                       |
-| **E2E runner** (`*-e2e`)                           | Not applicable                                        | Not applicable                                                                | Playwright — this project IS the E2E suite           |
+| App Type                                           | Unit (`test:unit`)                                    | Integration (`test:integration`)                                              | E2E (`test:e2e`)                                       |
+| -------------------------------------------------- | ----------------------------------------------------- | ----------------------------------------------------------------------------- | ------------------------------------------------------ |
+| **BE API** (`beaver-nest-be`, planned)             | BDD, mocked repos, calls service fns directly         | Configured production database, calls service fns directly (no HTTP)          | Playwright, real HTTP + configured production database |
+| **FE** (`beaver-nest-fe`, planned)                 | Vitest, all API calls mocked (MSW / mock services)    | MSW with real DOM; in-process mocking only                                    | Playwright against running FE + BE                     |
+| **CLI** (`*-cli`)                                  | `cargo test`, all I/O mocked via dependency injection | `cargo test` with real filesystem via tmp fixtures, real HTTP via mock server | Not applicable                                         |
+| **Content platform** (none currently in this repo) | Vitest, components and tRPC routes mocked             | MSW, in-process mocking                                                       | Playwright BE E2E (`*-be-e2e`) + FE E2E (`*-fe-e2e`)   |
+| **Library** (`rust-commons`)                       | `cargo test`, mock closures                           | `cargo test` with real filesystem fixtures, cacheable                         | Not applicable                                         |
+| **E2E runner** (`*-e2e`)                           | Not applicable                                        | Not applicable                                                                | Playwright — this project IS the E2E suite             |
 
 ## Gherkin Consumption Matrix
 
@@ -263,11 +263,11 @@ CMD ["node", "dist/main.js"]
 
 Three docker-compose file roles exist per app:
 
-| Role            | Path                                        | Purpose                                                               |
-| --------------- | ------------------------------------------- | --------------------------------------------------------------------- |
-| **Dev**         | `infra/dev/{app}/docker-compose.yml`        | Local development services (databases, message queues, etc.)          |
-| **Integration** | `apps/{app}/docker-compose.integration.yml` | Real infrastructure for `test:integration` (PostgreSQL + test runner) |
-| **CI overlay**  | `infra/dev/{app}/docker-compose.ci.yml`     | Overrides for CI environment (no volume mounts, deterministic ports)  |
+| Role            | Path                                        | Purpose                                                                     |
+| --------------- | ------------------------------------------- | --------------------------------------------------------------------------- |
+| **Dev**         | `infra/dev/{app}/docker-compose.yml`        | Local development services (databases, message queues, etc.)                |
+| **Integration** | `apps/{app}/docker-compose.integration.yml` | Containerized configured production database + test runner, when applicable |
+| **CI overlay**  | `infra/dev/{app}/docker-compose.ci.yml`     | Overrides for CI environment (no volume mounts, deterministic ports)        |
 
 All compose files must pass `docker compose config` without errors before merging. The CI overlay
 is applied with `-f docker-compose.yml -f docker-compose.ci.yml` to keep dev and CI configs DRY.

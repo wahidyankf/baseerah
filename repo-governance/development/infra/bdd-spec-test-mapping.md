@@ -227,11 +227,11 @@ specs/apps/<backend-name>/behavior/<product>-be/gherkin/
 
 ### Three Levels
 
-| Level           | Nx Target          | Step Implementations                                        | Dependencies             | What's Real            |
-| --------------- | ------------------ | ----------------------------------------------------------- | ------------------------ | ---------------------- |
-| **Unit**        | `test:unit`        | Call service/repository functions directly with mocked deps | All mocked               | Application logic only |
-| **Integration** | `test:integration` | Call service/repository functions directly with real DB     | Real PostgreSQL (Docker) | Application + database |
-| **E2E**         | `test:e2e`         | Playwright HTTP requests to running server                  | Full running server      | Everything             |
+| Level           | Nx Target          | Step Implementations                                        | Dependencies                   | What's Real            |
+| --------------- | ------------------ | ----------------------------------------------------------- | ------------------------------ | ---------------------- |
+| **Unit**        | `test:unit`        | Call service/repository functions directly with mocked deps | All mocked                     | Application logic only |
+| **Integration** | `test:integration` | Call service/repository functions directly with real DB     | Configured production database | Application + database |
+| **E2E**         | `test:e2e`         | Playwright HTTP requests to running server                  | Full running server            | Everything             |
 
 ### Unit-Level Step Definitions
 
@@ -244,11 +244,13 @@ Unit steps call application service/repository functions directly. All dependenc
 
 ### Integration-Level Step Definitions
 
-Integration steps call application service/repository functions directly against a real PostgreSQL database via docker-compose. No HTTP layer.
+Integration steps call application service/repository functions directly against the app's real
+configured production database. No HTTP layer.
 
-- `docker-compose.integration.yml` starts PostgreSQL + test runner
-- `Dockerfile.integration` contains language runtime + test execution
-- Steps connect to PostgreSQL, run migrations, execute all shared scenarios
+- PostgreSQL applications commonly use `docker-compose.integration.yml` for the database and test runner
+- SQLite applications commonly create a fresh test-owned database file in a temporary directory
+- `Dockerfile.integration`, when used, contains the language runtime and test execution
+- Steps connect to the configured database, run migrations, and execute all shared scenarios
 - Coverage is NOT measured at this level
 - Must run all shared scenarios
 
@@ -290,7 +292,7 @@ To verify all scenarios pass at each level for a given backend:
 # Unit tests (mocked dependencies)
 nx run <backend-name>:test:unit
 
-# Integration tests (real PostgreSQL via docker-compose)
+# Integration tests (configured production database)
 nx run <backend-name>:test:integration
 
 # E2E tests (Playwright HTTP against running backend)
