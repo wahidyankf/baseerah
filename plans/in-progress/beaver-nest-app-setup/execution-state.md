@@ -67,6 +67,7 @@
 - `apps/beaver-nest-be/tests/unit/Tests/DatabaseOperationsTests.fs` — created — backup-name validation coverage.
 - `apps/beaver-nest-be/tests/unit/Tests/HttpConfigurationTests.fs` — created — listener configuration coverage.
 - `apps/beaver-nest-be/tests/unit/Tests/SqliteInfrastructureTests.fs` — created — SQLite connection, migration-state, and sanitized provider-error coverage.
+- `apps/rhino-cli/project.json` — modified — clear hook-provided Git context before Rhino fixture tests create isolated repositories.
 - `apps/beaver-nest-be/README.md` — modified — document additive local database operations.
 - `repo-config.yml` — modified — declare backend environment ownership and injection homes.
 - `infra/dev/beaver-nest-app/docker-compose.ci.yml` — modified — supply only explicit disposable CI database/listener values.
@@ -91,6 +92,7 @@
 - Backend unit, integration, specification, quick, dependency-audit, environment-contract, Rhino environment validation, and exact-pin/no-ORM checks — passed.
 - Linux Docker integration runner — passed all eight real SQLite and Kestrel tests.
 - Coverage follow-up — passed 36 unit tests with 94.91% line coverage against the unchanged 90% threshold; migration now creates its validated directory before DbUp opens the database.
+- Rhino quick gate under simulated pre-push `GIT_DIR` context — passed; fixture Git initialization is isolated from the active repository lock.
 
 ### Evidence
 
