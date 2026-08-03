@@ -1,10 +1,7 @@
 name: _reusable-app-test-local-deploy-stag
 
-# Reusable heavy-test pipeline for an app-group (web + be + e2e).
-# Spins the full stack locally via docker-compose, runs integration + e2e, then
-# on success force-pushes BOTH the staging web branch (Vercel builds it) and the
-# staging be branch (triggers {product}-be-build-deploy-stag.yml -> GHCR -> coralpolyp).
-
+# Combined same-origin runtime verification. It intentionally publishes no
+# staging branch: no combined staging target is provisioned yet.
 on:
   workflow_call:
     inputs:
@@ -20,197 +17,69 @@ on:
       compose-dir:
         required: true
         type: string
-      stag-web-branch:
-        required: true
-        type: string
-      stag-be-branch:
-        required: true
-        type: string
-      be-port:
-        required: true
-        type: number
-      web-port:
-        required: true
-        type: number
-      environment:
-        required: false
-        type: string
-        default: ""
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
-  specs-coverage:
-    name: Spec coverage
+  quality:
+    name: Combined runtime quality
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v6
       - uses: ./.github/actions/setup-node
-      - name: Run specs:behavior:coverage for the app group
+      - name: Run unit, integration, and specification gates
         run: |
-          npx nx run ${{ inputs.be-project }}:specs:behavior:coverage
-          npx nx run ${{ inputs.web-project }}:specs:behavior:coverage
-
-  fe-lint:
-    name: FE lint
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
-    steps:
-      - uses: actions/checkout@v6
-      - uses: ./.github/actions/setup-node
-      - run: npx nx run ${{ inputs.web-project }}:lint
-
-  be-integration:
-    name: BE integration tests
-    runs-on: ubuntu-latest
-    timeout-minutes: 15
-    environment: ${{ inputs.environment }}
-
-    steps:
-      - uses: actions/checkout@v6
-      - uses: ./.github/actions/setup-node
-
-      - name: Generate contract types for backend
-        run: |
-          npx nx run ${{ inputs.contracts-project }}:bundle
-          npx nx run ${{ inputs.be-project }}:codegen
-
-      - name: Run integration tests
-        run: |
-          docker compose -f apps/${{ inputs.be-project }}/docker-compose.integration.yml down -v 2>/dev/null || true
-          docker compose -f apps/${{ inputs.be-project }}/docker-compose.integration.yml up --abort-on-container-exit --build
-
-      - name: Teardown integration
-        if: always()
-        run: docker compose -f apps/${{ inputs.be-project }}/docker-compose.integration.yml down -v
-
-  fe-integration:
-    name: FE integration tests
-    runs-on: ubuntu-latest
-    timeout-minutes: 15
-
-    steps:
-      - uses: actions/checkout@v6
-      - uses: ./.github/actions/setup-node
-
-      - name: Generate contract types
-        run: |
-          npx nx run ${{ inputs.contracts-project }}:bundle
-          npx nx run ${{ inputs.web-project }}:codegen
-
-      - name: Run integration tests
-        run: npx nx run ${{ inputs.web-project }}:test:integration
+          npx nx run ${{ inputs.be-project }}:test:quick
+          npx nx run ${{ inputs.be-project }}:test:integration
+          npx nx run ${{ inputs.web-project }}:test:quick
+          npx nx run ${{ inputs.web-project }}:test:integration
+          npx nx run ${{ inputs.be-project }}-e2e:test:specs
+          npx nx run ${{ inputs.web-project }}-e2e:test:specs
 
   e2e:
-    name: E2E tests (BE + FE)
-    needs: [be-integration, fe-integration]
+    name: Combined same-origin E2E
+    needs: quality
     runs-on: ubuntu-latest
-    # Cold GitHub-hosted runners may need over 30 minutes to install Playwright's
-    # operating-system packages before either E2E suite starts.
-    timeout-minutes: 60
-    environment: ${{ inputs.environment }}
-
+    timeout-minutes: 40
     steps:
       - uses: actions/checkout@v6
       - uses: ./.github/actions/setup-node
-
-      - name: Generate contract types
-        run: |
-          npx nx run ${{ inputs.contracts-project }}:bundle
-          npx nx run ${{ inputs.be-project }}:codegen
-          npx nx run ${{ inputs.web-project }}:codegen
-
-      - name: Start full stack (backend + frontend)
-        run: docker compose -f ${{ inputs.compose-dir }}/docker-compose.yml -f ${{ inputs.compose-dir }}/docker-compose.ci.yml up --build -d
-
-      - name: Wait for backend to be healthy
-        run: |
-          echo "Waiting for backend on port ${{ inputs.be-port }}..."
-          for i in $(seq 1 36); do
-            if curl -sf "http://localhost:${{ inputs.be-port }}/api/v1/health" > /dev/null 2>&1; then
-              echo "Backend is healthy"
-              exit 0
-            fi
-            echo "[$i/36] Waiting..."
-            sleep 10
-          done
-          echo "Backend did not become healthy within 6 minutes"
-          docker compose -f ${{ inputs.compose-dir }}/docker-compose.yml -f ${{ inputs.compose-dir }}/docker-compose.ci.yml logs ${{ inputs.be-project }}
-          exit 1
-
-      - name: Wait for frontend to be ready
-        run: |
-          echo "Waiting for frontend on port ${{ inputs.web-port }}..."
-          for i in $(seq 1 36); do
-            if curl -sf "http://localhost:${{ inputs.web-port }}" > /dev/null 2>&1; then
-              echo "Frontend is ready"
-              exit 0
-            fi
-            echo "[$i/36] Waiting..."
-            sleep 10
-          done
-          echo "Frontend did not start within 6 minutes"
-          docker compose -f ${{ inputs.compose-dir }}/docker-compose.yml -f ${{ inputs.compose-dir }}/docker-compose.ci.yml logs ${{ inputs.web-project }}
-          exit 1
-
       - uses: ./.github/actions/setup-playwright
-
-      - name: Run BE E2E tests
-        run: npx nx run ${{ inputs.be-project }}-e2e:test:e2e
+      - name: Start one disposable combined runtime
+        shell: bash
+        run: |
+          set -euo pipefail
+          beaver_nest_ci_root=$(mktemp -d)
+          install -d -m 0700 "$beaver_nest_ci_root/data" "$beaver_nest_ci_root/backups"
+          {
+            echo "BEAVER_NEST_CI_ROOT=$beaver_nest_ci_root"
+            echo "BEAVER_NEST_BE_VPN_HOST_IP=127.0.0.1"
+            echo "BEAVER_NEST_BE_PUBLIC_PORT=19300"
+            echo "BEAVER_NEST_BE_HOST_DATA_DIRECTORY=$beaver_nest_ci_root/data"
+            echo "BEAVER_NEST_BE_BACKUP_DIRECTORY=$beaver_nest_ci_root/backups"
+          } >> "$GITHUB_ENV"
+          docker compose --env-file /dev/null -f ${{ inputs.compose-dir }}/docker-compose.yml -f ${{ inputs.compose-dir }}/docker-compose.ci.yml build beaver-nest-app
+          docker compose --env-file /dev/null -f ${{ inputs.compose-dir }}/docker-compose.yml -f ${{ inputs.compose-dir }}/docker-compose.ci.yml run --rm --no-deps --user 0:0 --entrypoint sh beaver-nest-app -ceu 'chown 10001:10001 /var/lib/beaver-nest && chmod 0700 /var/lib/beaver-nest'
+          docker compose --env-file /dev/null -f ${{ inputs.compose-dir }}/docker-compose.yml -f ${{ inputs.compose-dir }}/docker-compose.ci.yml up -d beaver-nest-app
+      - name: Wait for combined origin
+        run: |
+          for _ in $(seq 1 60); do
+            curl -fsS http://127.0.0.1:19300/api/v1/readiness >/dev/null && exit 0
+            sleep 2
+          done
+          docker compose --env-file /dev/null -f ${{ inputs.compose-dir }}/docker-compose.yml -f ${{ inputs.compose-dir }}/docker-compose.ci.yml logs beaver-nest-app
+          exit 1
+      - name: Run pure BE and FE E2E runners
+        run: |
+          npx nx run ${{ inputs.be-project }}-e2e:test:e2e:runner
+          npx nx run ${{ inputs.web-project }}-e2e:test:e2e:runner
         env:
-          API_BASE_URL: http://localhost:${{ inputs.be-port }}
-
-      - name: Upload BE E2E report
+          API_BASE_URL: http://127.0.0.1:19300
+          WEB_BASE_URL: http://127.0.0.1:19300
+      - name: Teardown combined runtime
         if: always()
-        uses: actions/upload-artifact@v7
-        with:
-          name: playwright-report-${{ inputs.be-project }}
-          path: apps/${{ inputs.be-project }}-e2e/playwright-report/
-          retention-days: 7
-
-      - name: Run FE E2E tests
-        run: npx nx run ${{ inputs.web-project }}-e2e:test:e2e
-        env:
-          WEB_BASE_URL: http://localhost:${{ inputs.web-port }}
-
-      - name: Upload FE E2E report
-        if: always()
-        uses: actions/upload-artifact@v7
-        with:
-          name: playwright-report-${{ inputs.web-project }}
-          path: apps/${{ inputs.web-project }}-e2e/playwright-report/
-          retention-days: 7
-
-      - name: Teardown
-        if: always()
-        run: docker compose -f ${{ inputs.compose-dir }}/docker-compose.yml -f ${{ inputs.compose-dir }}/docker-compose.ci.yml down -v
-
-  specs-gate:
-    name: Specs gate (BDD+DDD validators)
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
-    steps:
-      - uses: actions/checkout@v6
-      - uses: ./.github/actions/setup-node
-      - uses: ./.github/actions/setup-rust
-      - run: npx nx run-many -t specs:structure-validation --projects=rhino-cli
-
-  deploy:
-    name: Deploy to staging (force-push web + be branches)
-    needs: [specs-coverage, fe-lint, be-integration, fe-integration, e2e, specs-gate]
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v6
-        with:
-          fetch-depth: 0
-      # Force-push the staging web branch: Vercel listens to it and builds the
-      # preview. Allow ~2.5h before the *-app-test-stag run so the
-      # Vercel build + coralpolyp rollout have settled.
-      - name: Deploy web to staging branch
-        run: git push origin HEAD:${{ inputs.stag-web-branch }} --force
-      # Force-push the staging be branch: triggers {product}-be-build-deploy-stag.yml
-      # which builds + pushes the GHCR image consumed by ose-private coralpolyp.
-      - name: Deploy be to staging branch
-        run: git push origin HEAD:${{ inputs.stag-be-branch }} --force
+        run: |
+          docker compose --env-file /dev/null -f ${{ inputs.compose-dir }}/docker-compose.yml -f ${{ inputs.compose-dir }}/docker-compose.ci.yml down --remove-orphans
+          rm -rf -- "$BEAVER_NEST_CI_ROOT"

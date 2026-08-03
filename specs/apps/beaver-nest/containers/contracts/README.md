@@ -22,7 +22,7 @@ nx run beaver-nest-contracts:bundle
 ```
 contracts/
 ├── README.md
-├── openapi.yaml     # Full spec: health, readiness, hello, and the shared Error schema
+├── openapi.yaml     # Full spec: health, readiness, and the shared Error schema
 ├── project.json     # Nx project targets
 ├── tests/
 │   └── readiness-contract.sh # Assertion-only readiness contract guard
@@ -32,8 +32,7 @@ contracts/
 
 ## Rules
 
-- Exactly three `GET` routes (`/api/v1/health`, `/api/v1/readiness`, `/api/v1/hello`) — no write
-  operations this phase
+- Two declared `GET` routes (`/api/v1/health`, `/api/v1/readiness`) — no write operations this phase
 - Readiness exposes only the documented `200` ready and `503` not-ready bodies; both responses
   require `Cache-Control: no-store` and declare no response validator headers
 - Every schema has a `description`

@@ -1,12 +1,12 @@
 # beaver-nest-be
 
-F# / Giraffe / ASP.NET 10 REST API backend for BeaverNest. The application uses an explicit
-listener and SQLite directory contract; real values remain in uncommitted local environment files.
+F# / Giraffe / ASP.NET 10 combined BeaverNest runtime. Its production image serves the Vite CSR
+client and same-origin API from port `19300`; local API development remains loopback `19320`.
 
 ## Quick Start
 
 ```bash
-nx dev beaver-nest-be   # http://localhost:19320
+BEAVER_NEST_BE_DEVELOPMENT_DATA_DIRECTORY=/absolute/path nx dev beaver-nest-be
 ```
 
 ## Commands
@@ -46,7 +46,7 @@ See `.env.example` for a local template.
 
 - **Language**: F# (.NET 10)
 - **Web framework**: Giraffe (ASP.NET Core)
-- **Port**: 19320 | **API base**: `/api/v1`
+- **Ports**: 19320 local API; 19300 combined runtime | **API base**: `/api/v1`
 - **Linting**: F# strict (`TreatWarningsAsErrors`) + G-Research.FSharp.Analyzers + Fantomas
 
 ## Behavior & Architecture
@@ -55,6 +55,12 @@ See `.env.example` for a local template.
 | ------------- | ------------------------------------------------------------------------------------------------------------------ |
 | API reference | [specs/…/containers/contracts/](../../specs/apps/beaver-nest/containers/contracts/README.md)                       |
 | Gherkin specs | [specs/…/behavior/beaver-nest-be/gherkin/](../../specs/apps/beaver-nest/behavior/beaver-nest-be/gherkin/README.md) |
+
+## Backup Boundary
+
+The writable backup bind is not a second failure domain: same-host backups do not protect against
+host or disk loss. After validating a backup, the operator must copy it to designated independent or
+off-host storage.
 
 ## Related
 

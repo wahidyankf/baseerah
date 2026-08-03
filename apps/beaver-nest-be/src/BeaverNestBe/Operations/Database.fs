@@ -285,5 +285,19 @@ let restoreAt backupRoot configuration name =
 let backup configuration name =
     backupAt backupDirectory configuration name
 
+/// Verifies the live SQLite database while serializing against other one-shot
+/// operations. The long-running service remains available because verification
+/// opens the database read-only.
+let integrity configuration =
+    withDataDirectoryOperationLock configuration (fun () ->
+        try
+            if verify (databasePath configuration) then
+                Ok()
+            else
+                Error "database integrity verification failed"
+        with
+        | :? IOException -> Error "database integrity verification failed"
+        | :? SqliteException -> Error "database integrity verification failed")
+
 let restore configuration name =
     restoreAt backupDirectory configuration name

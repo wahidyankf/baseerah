@@ -1,6 +1,6 @@
 ---
 name: apps-beaver-nest-fe-deployer
-description: Force-pushes main to prod-beaver-nest-fe for beaver-nest-fe production deploys. No production deploy target is provisioned yet — this agent documents the intended workflow ahead of that provisioning, it does not claim a working deploy.
+description: Documents the future deployment of the combined BeaverNest image. No production or combined staging target is provisioned, so it never claims a working deploy.
 model: composer-2.5
 ---
 
@@ -15,34 +15,21 @@ model: composer-2.5
 performs straightforward, deterministic git operations (checkout/status check/force push) with no
 content generation or complex reasoning required.
 
-Force push main to `prod-beaver-nest-fe` for a beaver-nest-fe production deploy.
+The Vite CSR client is served from the combined BeaverNest image and has no standalone deployment.
 
 ## Current State — No Production Target Provisioned
 
 **This agent does not yet have a working deploy to trigger.** As of this writing:
 
-- `prod-beaver-nest-fe` does not exist as a remote branch (`git branch -r` confirms).
-- No Vercel project (or any other host) is configured to build from that branch.
-- `stag-beaver-nest-fe` (a scheduled Vercel **preview** deploy, not production) is the only deploy-like
-  branch wired up today, driven by the `beaver-nest-app-test-local-deploy-stag.yml` CRON workflow — this
-  agent is not that workflow and does not replace it.
+- No production or combined staging target is configured.
+- The image publication workflow is not a live deployment.
 
 Running this agent's steps today will push a branch that nothing listens to. Do not present that as
 a successful production deploy — say plainly that the push happened but no build was triggered,
 because no target consumes `prod-beaver-nest-fe` yet.
 
-**Confirm this state rather than trusting this paragraph** — it is a snapshot and the provisioning
-may since have happened. Both checks are cheap: `git branch -r` for the branch, and a Vercel MCP
-project listing for the build target. A project that now exists changes this agent from "no-op" to
-"live deploy", which is exactly the kind of drift a stale note hides.
-
-**Once a production target does exist**, verify the deploy through the Vercel MCP instead of
-inferring success from the push: confirm a deployment whose commit SHA matches the pushed SHA,
-follow it until it leaves `BUILDING`, and report the terminal state (`READY` / `ERROR` with build
-logs / `CANCELED`). Address the project by **slug, never by an opaque identifier**. If the MCP is
-unavailable, say so and fall back to the CI run plus an HTTP check of the live URL — never report a
-successful deployment on the strength of the push alone. See
-[Vercel MCP Capability Convention](../../repo-governance/development/infra/vercel-mcp.md).
+Do not infer a deployment from image publication. Once a combined target is provisioned, verify it
+against the supplied same-origin URL and matching image revision.
 
 ## Intended Workflow (once a production target exists)
 
@@ -66,14 +53,10 @@ if [ -n "$(git status --porcelain)" ]; then
 fi
 ```
 
-### Step 3: Force Push to prod-beaver-nest-fe
+### Step 3: Report the provisioning blocker
 
-```bash
-git push origin main:prod-beaver-nest-fe --force
-```
-
-**Trunk-Based Development**: Per `repo-practicing-trunk-based-development` Skill, all development
-happens on main. `prod-beaver-nest-fe` (once provisioned) would be deployment-only — no direct commits.
+Do not create a standalone frontend deployment branch. A maintainer must provision a combined target
+and authorize its deployment path first.
 
 ## When to Use This Agent
 

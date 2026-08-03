@@ -36,12 +36,12 @@ jobs:
           } >> "$GITHUB_OUTPUT"
           for project in $AFFECTED; do
             case "$project" in
-              beaver-nest-be) echo "build-beaver-nest-be=true" >> "$GITHUB_OUTPUT" ;;
+              beaver-nest-be | beaver-nest-fe) echo "build-beaver-nest-be=true" >> "$GITHUB_OUTPUT" ;;
             esac
           done
 
   publish-beaver-nest-be:
-    name: Publish beaver-nest-be
+    name: Publish combined beaver-nest image
     needs: detect
     if: needs.detect.outputs.build-beaver-nest-be == 'true'
     runs-on: ubuntu-latest
@@ -53,7 +53,7 @@ jobs:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-      - name: Build and push beaver-nest-be
+      - name: Build and push combined beaver-nest image
         run: |
           docker build -f apps/beaver-nest-be/Dockerfile \
             -t ghcr.io/wahidyankf/beaver-nest-be:latest \

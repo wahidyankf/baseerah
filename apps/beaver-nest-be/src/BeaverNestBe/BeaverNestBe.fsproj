@@ -17,7 +17,6 @@
     <Compile Include="Domain/HttpConfiguration.fs" />
     <Compile Include="Domain/DatabaseConfiguration.fs" />
     <Compile Include="Domain/Readiness.fs" />
-    <Compile Include="Domain/Greeting.fs" />
     <Compile Include="Domain/ErrorBody.fs" />
     <Compile Include="Infrastructure/Sqlite/Errors.fs" />
     <Compile Include="Infrastructure/Sqlite/Connection.fs" />
@@ -26,7 +25,8 @@
     <Compile Include="Application/ReadinessPort.fs" />
     <Compile Include="Api/HealthHandlers.fs" />
     <Compile Include="Api/ReadinessHandlers.fs" />
-    <Compile Include="Api/GreetingHandlers.fs" />
+    <Compile Include="Api/SecurityHeaders.fs" />
+    <Compile Include="Api/StaticContent.fs" />
     <!-- Composition root -->
     <Compile Include="WebApp.fs" />
     <Compile Include="Program.fs" />

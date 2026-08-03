@@ -82,14 +82,14 @@ Flat structure - all apps at the same level, no subdirectories.
 [baseerah-repo-reset plan](../../plans/done/2026-07-31__baseerah-repo-reset/README.md)):
 
 - `rhino-cli` - Repository management CLI (Rust application). Ported from Go 2026-05-23 (predecessor Go source recoverable from git history).
-- `beaver-nest-fe` - BeaverNest frontend (Next.js 16 App Router, port 19310)
+- `beaver-nest-fe` - BeaverNest Vite CSR client (local development port 19310)
 - `beaver-nest-fe-e2e` - Playwright FE E2E tests for beaver-nest-fe
-- `beaver-nest-be` - BeaverNest backend (F#/Giraffe/ASP.NET REST API, port 19320)
+- `beaver-nest-be` - BeaverNest F#/Giraffe/ASP.NET same-origin runtime (local API port 19320; combined port 19300)
 - `beaver-nest-be-e2e` - E2E tests for beaver-nest-be
 
 Every other app previously listed here (`ose-www`, `ose-be`, `ayokoding-www`, `ayokoding-cli`, `ose-cli`, `crane-cli`, `organiclever-www`, `organiclever-app-web`, `organiclever-be`, `wahidyankf-www`, and their `-e2e` counterparts) was deleted by the BeaverNest repo reset. The structural examples below use generic `apps/<app-name>/` placeholders except where `rhino-cli` illustrates a real, currently-scaffolded app.
 
-### App Structure (Next.js Application — planned, e.g. `beaver-nest-fe`)
+### App Structure (Vite CSR Application — e.g. `beaver-nest-fe`)
 
 ```
 apps/<app-name>/
@@ -528,10 +528,11 @@ Configured in `tsconfig.base.json`:
 
 ## Port Allocation
 
-| App                                    | Port    | Status  |
-| -------------------------------------- | ------- | ------- |
-| `beaver-nest-fe` (Next.js 16 frontend) | `19310` | Current |
-| `beaver-nest-be` (F#/Giraffe backend)  | `19320` | Current |
+| App                                           | Port    | Status  |
+| --------------------------------------------- | ------- | ------- |
+| `beaver-nest-fe` (Vite CSR local development) | `19310` | Current |
+| `beaver-nest-be` (F#/Giraffe local API)       | `19320` | Current |
+| Combined BeaverNest runtime                   | `19300` | Current |
 
 **Rule**: BeaverNest deliberately allocates outside every port band the sibling repos occupy, since all
 four repos (`ose-public`, `ose-primer`, `ose-private`, and this repo) can run concurrently on one

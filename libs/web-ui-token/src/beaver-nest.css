@@ -1,4 +1,4 @@
-/* NO @import url(google fonts) — fonts are loaded via next/font/google */
+/* No remote font import: the Vite client owns its font loading explicitly. */
 
 /* ── BeaverNest reference palette (raw vars, referenced by @theme and dark block) ── */
 /* Brand: indigo-violet tones for BeaverNest's palette */

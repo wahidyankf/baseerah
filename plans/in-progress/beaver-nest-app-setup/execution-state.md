@@ -422,3 +422,99 @@
   evidence and table update.
 - Completed: the Phase 4 Vite CSR workspace, behavior specs, MSW integration coverage, and isolated
   browser route fixtures are ready for the local delivery-unit commit; no Phase 4 push or PR is open.
+
+## Phase 5
+
+### Task Status
+
+- In progress: same-origin production runtime, security and routing boundaries, durable container
+  operations, and CI integration.
+
+### Files Changed
+
+- `plans/in-progress/beaver-nest-app-setup/execution-state.md` — modified — initialize the Phase 5
+  append-only ledger before any Dockerfile or runtime change.
+- `plans/in-progress/beaver-nest-app-setup/evidence/phase-5-container-base-images.md` — created —
+  record Path A base-image pins, immutable digests, source checks, and intended `FROM` occurrences
+  before Dockerfile edits.
+- `plans/in-progress/beaver-nest-app-setup/tech-docs.md` — modified — replace the Phase 5 pending
+  container-image rows with the selected exact tags, digests, and clearance statuses before Dockerfile
+  edits.
+- `infra/dev/beaver-nest-app/tests/affected-propagation.sh` — created — enforce that a changed Vite
+  workspace propagates to the combined backend image project.
+- `apps/beaver-nest-be/project.json` — modified — declare the production image's build-time frontend
+  dependency without creating an app-to-app source import.
+- `apps/beaver-nest-be/scripts/start-development.sh` — created — require a distinct external
+  development SQLite directory and start only the loopback backend process.
+- `infra/dev/beaver-nest-app/tests/development-ports.sh` — created — enforce the independent local
+  Vite/API ports and reject an obsolete Compose reset command.
+- `package.json` — modified — make the canonical local development command start the two loopback Nx
+  targets rather than the production Compose topology.
+- `.dockerignore` — modified — keep host artifacts out of the root build context while re-including only
+  BeaverNest contract inputs needed for in-container code generation.
+- `apps/beaver-nest-be/Dockerfile` — modified — build the contract and Vite output, publish the backend,
+  and run the combined production runtime as `10001:10001` on `19300`.
+- `apps/beaver-nest-be/Dockerfile.integration` and
+  `infra/dev/beaver-nest-app/Dockerfile.be.dev` — modified — use the approved exact .NET SDK image.
+- `apps/beaver-nest-fe/Dockerfile` and `infra/dev/beaver-nest-app/Dockerfile.fe.dev` — modified —
+  retain only Vite build/development semantics with the approved exact Node image.
+- `apps/beaver-nest-be/scripts/container-entrypoint.sh` — created — validate durable-directory ownership
+  and modes before the non-root runtime starts.
+- `infra/dev/beaver-nest-app/tests/{clean-image-build,container-permissions}.sh` — created — cover
+  source-only image construction and fail-closed persistent-storage permissions.
+- `apps/beaver-nest-be/src/BeaverNestBe/{WebApp,Program,BeaverNestBe.fsproj}.fs` — modified — begin
+  combined static/routing and security-header composition.
+- `apps/beaver-nest-be/src/BeaverNestBe/Api/{GreetingHandlers.fs}` and
+  `apps/beaver-nest-be/src/BeaverNestBe/Domain/Greeting.fs` — deleted — begin retirement of the obsolete
+  greeting surface.
+- `apps/beaver-nest-be/src/BeaverNestBe/Api/{SecurityHeaders,StaticContent}.fs` — created — begin
+  immutable security policy and static-routing helpers.
+- `apps/beaver-nest-be/tests/unit/{BeaverNestBe.UnitTests.fsproj,Steps/BddState.fs,Steps/RoutingSteps.fs,Tests/NotFoundHandlerTests.fs,Tests/SecurityHeaderTests.fs,Tests/StaticRoutingTests.fs,Fixtures/vite/index.html,Fixtures/vite/assets/app-12345678.js}` — modified or created — cover global headers and the API/static/SPA routing boundaries.
+- `apps/beaver-nest-be/tests/unit/Steps/HealthSteps.fs` — modified — remove the obsolete standalone-service binding so the specification suite has no orphaned step.
+- `apps/beaver-nest-be/tests/unit/{Steps/GreetingSteps.fs,Tests/GreetingHandlerTests.fs}` — deleted —
+  remove the retired greeting behavior bindings and tests.
+- `specs/apps/beaver-nest/containers/contracts/{openapi.yaml,README.md,tests/readiness-contract.sh}` — modified — remove the retired greeting operation/schema and make the contract guard reject its return.
+- `specs/apps/beaver-nest/behavior/beaver-nest-be/gherkin/{README.md,hello/greeting.feature,routing/*.feature}` — modified, deleted, or created — replace greeting behavior with explicit JSON API, static asset, SPA fallback, and retirement scenarios.
+- `apps/beaver-nest-be/src/BeaverNestBe/Operations/Database.fs`, `Program.fs`, and
+  `tests/unit/Tests/DatabaseOperationsTests.fs` — modified — add a lock-serialized live SQLite
+  integrity command with focused regression coverage.
+- `infra/dev/beaver-nest-app/{docker-compose.yml,docker-compose.ci.yml,scripts/{lib,preflight,operations,start}.sh,tests/{preflight,persistence,publication,operations-profile,start}.sh}` — modified or created — provide the fail-closed single-service production topology, explicit preflight, and bounded operational profiles.
+- `apps/beaver-nest-{be,fe}-e2e/{project.json,scripts/run-playwright.sh}` and
+  `apps/beaver-nest-be/scripts/run-e2e.sh` — modified or created — separate pure Playwright runners
+  from one disposable combined-stack lifecycle owner.
+- `infra/dev/beaver-nest-app/tests/{e2e-runner-ownership,development-data-isolation,token-entry,vocabulary-contract,workflow-contract}.sh` — created — preserve combined-topology contracts as executable checks.
+- `specs/apps/beaver-nest/behavior/beaver-nest-be/gherkin/development/development-data-isolation.feature`
+  and `apps/beaver-nest-be/tests/unit/Steps/DevelopmentSteps.fs` — created — bind the isolated local
+  development SQLite requirement.
+- `.github/workflows/{_reusable-app-test-local-deploy-stag,beaver-nest-app-test-local-deploy-stag,publish-images}.yml` — modified — make CI exercise one disposable combined runtime and publish the combined image for frontend or backend changes.
+- `.github/workflows/{beaver-nest-app-test-stag,beaver-nest-be-build-deploy-stag}.yml` — deleted — retire unsupported standalone staging claims.
+- `repo-config.yml`, `apps/beaver-nest-fe/.env.example`, and `infra/dev/beaver-nest-app/tests/env-contract.sh` — modified or deleted — make the backend template the sole runtime environment owner while retaining E2E URLs only in the CI harness registry.
+- `AGENTS.md`, `docs/reference/monorepo-structure.md`, `repo-governance/development/infra/nx-targets.md`, `apps/beaver-nest-{be,fe}/README.md`, `infra/dev/beaver-nest-app/README.md`, `.github/workflows/README.md`, `libs/web-ui-token/{README.md,src/beaver-nest.css}`, and `repo-governance/development/frontend/design-tokens.md` — modified — document Vite CSR, the combined runtime, same-origin publication, and token entry points.
+- `.claude/agents/apps-beaver-nest-{be,fe}-deployer.md`, `.claude/agents/apps-beaver-nest-fe-content-{maker,checker}.md`, `.claude/skills/apps-beaver-nest-fe-developing-content/SKILL.md`, `.claude/skills/swe-developing-frontend-ui/reference/brand-context.md`, and generated `.opencode/`/`.cursor/` mirrors — modified — align harness guidance with the Vite foundation-status screen and unprovisioned combined deployment target.
+
+### Commands and Results
+
+- MCR inspection resolves Node 24.16.0 Alpine, .NET SDK 10.0.302 Noble, and ASP.NET 10.0.10 Noble to
+  the evidence-recorded immutable multi-architecture digests. The policy evidence and clearance table
+  were updated before any consuming Dockerfile edit.
+- Container static checks — shellcheck, hadolint, exact-version-and-digest `FROM` audit, and the scoped
+  whitespace check pass. The Docker daemon probe stalled, so dynamic clean-image and permissions runs
+  remain for a working Docker executor/CI; they are not claimed as locally passed.
+- Backend routing and retirement checks — contract unit test, backend unit test (65 tests), backend
+  specification gate (14 specs, 14 scenarios, 60 steps), frontend contract code generation, and the
+  backend quick gate pass after formatting the two new F# API modules. The first specification run
+  correctly exposed missing literal route bindings and an obsolete health binding; both were added or
+  removed before the passing rerun.
+- Operations and topology contracts — preflight, persistence, publication, operations-profile, start,
+  E2E-runner ownership, development-data isolation, environment ownership, token-entry, vocabulary,
+  workflow, and affected-propagation checks pass. Compose renders successfully with an explicit
+  loopback/mktemp fixture and `--env-file /dev/null`; no operator file was read.
+- Backend integrity extension — 66 unit tests pass. Backend specifications pass with 15 specs, 15
+  scenarios, and 64 fully bound steps. Both E2E specification gates pass after retired greeting
+  bindings were removed.
+- CI and harness checks — `actionlint`, `npm run validate:sync`, `rhino-cli env validate`,
+  `repo-config validate`, selected Markdown checks, shellcheck, and `git diff --check` pass.
+
+### Evidence
+
+- `evidence/phase-5-container-base-images.md` — Path A LTS selection and sanitized digest inspection.

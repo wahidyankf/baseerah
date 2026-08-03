@@ -1,6 +1,6 @@
 ---
 name: apps-beaver-nest-fe-content-checker
-description: Validates beaver-nest-fe landing-page content quality, including accessibility, token usage, and adherence to the documented content surface.
+description: Validates BeaverNest Vite CSR foundation-status content quality, accessibility, and token usage.
 model: composer-2.5
 ---
 

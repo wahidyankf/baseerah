@@ -5,6 +5,8 @@ open Microsoft.AspNetCore.Hosting
 open Microsoft.Extensions.DependencyInjection
 open Microsoft.Extensions.Hosting
 open Giraffe
+open BeaverNestBe.Api.SecurityHeaders
+open BeaverNestBe.Api.StaticContent
 open BeaverNestBe.WebApp
 open BeaverNestBe.Domain.HttpConfiguration
 open BeaverNestBe.Domain.DatabaseConfiguration
@@ -13,7 +15,8 @@ open BeaverNestBe.Infrastructure.Sqlite.Errors
 open BeaverNestBe.Operations.Database
 open BeaverNestBe.Application.ReadinessPort
 
-let private configureApp readiness (app: IApplicationBuilder) = app.UseGiraffe(webAppWith readiness)
+let private configureApp readiness (app: IApplicationBuilder) =
+    app.Use(middleware).UseStaticFiles(staticFileOptions).UseGiraffe(webAppWith readiness)
 
 let private configureServices (services: IServiceCollection) = services.AddGiraffe() |> ignore
 
@@ -43,6 +46,10 @@ let private commandMode args databaseConfiguration =
     | [| "backup"; "--name"; name |] ->
         match backup databaseConfiguration name with
         | Ok _ -> Some 0
+        | Error error -> Some(fail error)
+    | [| "integrity" |] ->
+        match integrity databaseConfiguration with
+        | Ok() -> Some 0
         | Error error -> Some(fail error)
     | [| "restore"; "--name"; name |] ->
         match restore databaseConfiguration name with

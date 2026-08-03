@@ -20,6 +20,14 @@ generated-reports
 local-temp
 specs
 !specs/apps/rhino/
+# The combined production image regenerates its frontend client from the source
+# contract. Keep only those contract inputs in the root build context.
+!specs/
+!specs/apps/
+!specs/apps/beaver-nest/
+!specs/apps/beaver-nest/containers/
+!specs/apps/beaver-nest/containers/contracts/
+specs/apps/beaver-nest/containers/contracts/generated/
 infra
 .claude
 .opencode

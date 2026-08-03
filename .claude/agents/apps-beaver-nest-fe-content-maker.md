@@ -1,6 +1,6 @@
 ---
 name: apps-beaver-nest-fe-content-maker
-description: Creates and updates landing-page copy for beaver-nest-fe (tagline, footer, not-found/error text). Single-page hello-world scope, not a blog.
+description: Creates and updates the Vite CSR foundation-status screen for beaver-nest-fe.
 tools: Read, Write, Edit, Glob, Grep
 model: sonnet
 color: blue
@@ -26,7 +26,7 @@ to get right — not a rote templated fill-in:
 - Sonnet handles structured content generation against a documented rubric, matching this task's
   profile without the added cost of opus-tier reasoning
 
-Create and update landing page content for beaver-nest-fe (Next.js 16 App Router, hello-world scope).
+Create and update foundation-status content for the Vite CSR client.
 
 ## Reference
 

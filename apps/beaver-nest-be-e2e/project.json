@@ -61,6 +61,13 @@
         "command": "apps/beaver-nest-be/scripts/run-e2e.sh"
       }
     },
+    "test:e2e:runner": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "scripts/run-playwright.sh",
+        "cwd": "apps/beaver-nest-be-e2e"
+      }
+    },
     "test:e2e:ui": {
       "executor": "nx:run-commands",
       "options": {

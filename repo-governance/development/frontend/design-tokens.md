@@ -211,7 +211,7 @@ Verify WCAG AA contrast (4.5:1 for text, 3:1 for components) independently in bo
 An app imports the shared structural and semantic tokens, then declares its brand overrides in the same `globals.css`:
 
 ```css
-/* apps/my-app/src/app/globals.css */
+/* apps/my-app/src/styles.css */
 @import "@open-sharia-enterprise/web-ui-token/tokens.css";
 
 @theme {

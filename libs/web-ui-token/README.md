@@ -65,7 +65,7 @@ Indigo-violet OKLCH design system for BeaverNest apps (`beaver-nest-fe`):
 - **Dark mode block** — `[data-theme="dark"], .dark { … }` with indigo hue lifts
 
 ```css
-/* apps/beaver-nest-fe/src/app/globals.css */
+/* apps/beaver-nest-fe/src/styles.css */
 @import "@open-sharia-enterprise/web-ui-token/src/tokens.css";
 @import "@open-sharia-enterprise/web-ui-token/src/beaver-nest.css";
 ```
@@ -89,6 +89,6 @@ intentionally opt-in per app.
 
 1. **Structural tokens** (this package — `tokens.css`) — radius, base neutrals, dark variant
 2. **Brand token file** (this package — e.g. `organiclever.css`) — per-app OKLCH palette + overrides
-3. **App-level `@theme`** (app's globals.css) — font variables, any final overrides
+3. **App-level `@theme`** (the Vite client's `src/styles.css`) — font variables and final overrides
 4. **Component extensions** (app's src/components/) — app-specific wrappers
-5. **Tailwind config** (app's globals.css) — @source, @plugin directives
+5. **Tailwind config** (the Vite client's `src/styles.css`) — @source and @plugin directives

@@ -12,11 +12,10 @@ Per-app brand guidance for UI development decisions.
 - **Tone**: Direct, personal, no marketing gloss
 - **Palette**: Indigo-violet OKLCH — `--color-primary: var(--hue-sky)` (hue 265, insight/clarity);
   see `libs/web-ui-token/src/beaver-nest.css`
-- **Typography**: Shared `web-ui-token` typography scale; font loading via next/font
-- **Unique tokens**: none yet — the hello-world page uses only the shared semantic tokens
-- **UI character**: Minimal — current scope is a single landing page (header/main/footer shell)
-  rendering a greeting fetched from `beaver-nest-be`
-- **Framework**: Next.js 16, Tailwind v4, shadcn/ui
+- **Typography**: Shared `web-ui-token` typography scale; Vite client bootstrap owns theme selection
+- **Unique tokens**: none yet — the foundation-status screen uses shared semantic tokens
+- **UI character**: Minimal foundation-status workspace with readiness and refresh feedback
+- **Framework**: Vite CSR, React, Tailwind v4, shadcn/ui
 
 ## ayokoding-web
 

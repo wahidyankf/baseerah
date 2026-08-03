@@ -3,9 +3,10 @@ module BeaverNestBe.WebApp
 open Giraffe
 open BeaverNestBe.Domain.ErrorBody
 open BeaverNestBe.Api.HealthHandlers
-open BeaverNestBe.Api.GreetingHandlers
 open BeaverNestBe.Api.ReadinessHandlers
 open BeaverNestBe.Application.ReadinessPort
+open BeaverNestBe.Api.SecurityHeaders
+open BeaverNestBe.Api.StaticContent
 
 /// Single error-formatting function every non-2xx response goes through.
 let private errorBody (message: string) : ErrorBody = { Error = message }
@@ -13,21 +14,16 @@ let private errorBody (message: string) : ErrorBody = { Error = message }
 let private notFoundHandler: HttpHandler =
     setStatusCode 404 >=> json (errorBody "not found")
 
-/// Applied to every response, 2xx and 4xx alike — passive security hygiene per
-/// Rule-16 finding AET-001 (the `Server` header itself is suppressed separately
-/// in Program.fs, at the Kestrel level, since a Giraffe HttpHandler runs inside
-/// the pipeline after Kestrel has already decided that header).
-let private securityHeaders: HttpHandler =
-    setHttpHeader "X-Content-Type-Options" "nosniff"
-
-/// Composed HTTP handler. Routes are added incrementally as each Gherkin
-/// scenario turns green; the 404 fallback is the last-resort route.
+/// API routes precede JSON API errors, static assets, and the final SPA
+/// fallback so no API or file-like path can become a client-side route.
 let webAppWith (readiness: ReadinessPort) : HttpHandler =
-    securityHeaders
+    handler
     >=> choose
             [ GET >=> route "/api/v1/health" >=> healthHandler
               GET >=> route "/api/v1/readiness" >=> readinessHandler readiness
-              GET >=> route "/api/v1/hello" >=> greetingHandler
+              routeStartsWith "/api/" >=> notFoundHandler
+              routeStartsWith "/assets/" >=> notFoundHandler
+              spaFallbackHandler
               notFoundHandler ]
 
 /// Default composition keeps the existing in-process handler tests focused on

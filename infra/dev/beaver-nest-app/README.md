@@ -1,44 +1,28 @@
-# BeaverNest Local Development Infrastructure
+# BeaverNest Combined Runtime
 
-Docker Compose setup for running the BeaverNest stack locally.
+The production topology has one `beaver-nest-app` service. It serves the Vite CSR client and API
+from one ASP.NET origin on container port `19300`; no separate frontend or backend host port exists.
 
-## Services
+## Start
 
-| Service        | Port  | Description                   |
-| -------------- | ----- | ----------------------------- |
-| beaver-nest-be | 19320 | F# / Giraffe REST API backend |
-| beaver-nest-fe | 19310 | Next.js 16 frontend (Phase 8) |
-
-## Quick Start
+Create a value-only operator environment file from `apps/beaver-nest-be/.env.example`, prepare
+separate `0700` data and backup directories, then run:
 
 ```bash
-# Start the backend (no .env file required today)
-npm run beaver-nest:dev
-
-# Restart with a fresh build
-npm run beaver-nest:dev:restart
+bash infra/dev/beaver-nest-app/scripts/start.sh --env-file /absolute/path/operator.env
 ```
 
-## Environment Variables
+The wrapper runs fail-closed preflight before Compose. Exact host-address binding is the application
+guarantee; VPN admission, routing, and firewall policy remain operator-owned.
 
-`apps/beaver-nest-be/.env.example` is the sole backend environment-key owner. Local development
-uses an explicit loopback listener on port `19320`; the backend's default process contract is
-loopback `127.0.0.1:19300`. Production-only host publication and durable bind-source values remain
-empty placeholders in the template and are never committed here.
+## Operations
 
-## CI Variant
+Use `scripts/operations.sh backup --env-file PATH --name NAME.sqlite3`,
+`scripts/operations.sh integrity --env-file PATH`, or the analogous `restore` command.
+Restore refuses while the app is running. The backup bind is writable but not an independent failure
+domain; copy validated backups to independent or off-host storage.
 
-`docker-compose.ci.yml` is used in GitHub Actions for E2E tests. It explicitly configures the
-container listener as `0.0.0.0:19320`, a disposable `/tmp/beaver-nest` SQLite directory, and a
-finite busy timeout; it does not introduce a second environment-key template.
+## Local Development
 
-## beaver-nest-fe
-
-The `beaver-nest-fe` service is active in both compose files, alongside `beaver-nest-be`. It was
-commented out until `apps/beaver-nest-fe/` was scaffolded — see
-[learnings.md](../../../plans/done/2026-07-31__baseerah-repo-reset/learnings.md) for the rationale.
-
-## Behavior & Architecture
-
-See [specs/apps/beaver-nest/system-context/README.md](../../../specs/apps/beaver-nest/system-context/README.md)
-for the C4 system context.
+Use `BEAVER_NEST_BE_DEVELOPMENT_DATA_DIRECTORY=/absolute/path npm run beaver-nest:dev`. This starts
+Vite on `127.0.0.1:19310` and the API on `127.0.0.1:19320`, independently of production Compose.

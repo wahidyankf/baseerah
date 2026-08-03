@@ -11,7 +11,7 @@ built as an Nx monorepo. BeaverNest is a **product within the Open Sharia Enterp
 not a replacement for it — see [BeaverNest Vision](./repo-governance/vision/beaver-nest.md) and its parent
 [Open Sharia Enterprise Vision](./repo-governance/vision/open-sharia-enterprise.md).
 
-**Status**: Walking skeleton (`beaver-nest-be` + `beaver-nest-fe` hello world)
+**Status**: Foundation runtime (`beaver-nest-fe` Vite CSR served from the `beaver-nest-be` ASP.NET image)
 **License**: MIT
 **Main Branch**: `main` (Trunk Based Development)
 
@@ -375,10 +375,10 @@ modes) serving agents — not a governance layer.
 
 ## Web Sites
 
-| App            | Domain | Port  | Prod Branch |
-| -------------- | ------ | ----- | ----------- |
-| beaver-nest-fe | TBD    | 19310 | TBD         |
-| beaver-nest-be | TBD    | 19320 | TBD         |
+| App            | Domain      | Port                                        | Prod Branch |
+| -------------- | ----------- | ------------------------------------------- | ----------- |
+| beaver-nest-fe | same origin | 19310 (local dev)                           | TBD         |
+| beaver-nest-be | same origin | 19320 (local dev); 19300 (combined runtime) | TBD         |
 
 Each app README at `apps/[app-name]/README.md` covers framework, deployment, E2E tests, and content
 details.

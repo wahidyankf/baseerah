@@ -1,7 +1,7 @@
 import { expect, test } from "@playwright/test";
 import { readinessReady, routeReadiness } from "../utils/readiness-route";
 
-test.use({ colorScheme: "light", reducedMotion: "reduce" });
+test.use({ colorScheme: "light" });
 
 const viewports = [
   { name: "mobile-320", width: 320, height: 568 },

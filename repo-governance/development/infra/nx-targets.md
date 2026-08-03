@@ -224,14 +224,14 @@ Every project declares tags along four dimensions. Each dimension uses a fixed p
 
 ### Current Project Tags
 
-| Project          | Status                      | Tags                                                                                         |
-| ---------------- | --------------------------- | -------------------------------------------------------------------------------------------- |
-| `rhino-cli`      | Current                     | `["type:app", "platform:cli", "lang:rust", "domain:tooling"]`                                |
-| `web-ui`         | Current                     | `["type:lib", "lang:ts", "domain:ui"]`                                                       |
-| `web-ui-token`   | Current                     | `["type:lib", "lang:ts", "domain:ui"]`                                                       |
-| `rust-commons`   | Current                     | `["type:lib", "lang:rust"]`                                                                  |
-| `beaver-nest-fe` | Planned, not yet scaffolded | `["type:app", "platform:nextjs", "lang:ts", "domain:beaver-nest"]`                           |
-| `beaver-nest-be` | Planned, not yet scaffolded | `["type:app", "domain:beaver-nest"]` (platform/lang TBD pending backend tech-stack decision) |
+| Project          | Status  | Tags                                                                    |
+| ---------------- | ------- | ----------------------------------------------------------------------- |
+| `rhino-cli`      | Current | `["type:app", "platform:cli", "lang:rust", "domain:tooling"]`           |
+| `web-ui`         | Current | `["type:lib", "lang:ts", "domain:ui"]`                                  |
+| `web-ui-token`   | Current | `["type:lib", "lang:ts", "domain:ui"]`                                  |
+| `rust-commons`   | Current | `["type:lib", "lang:rust"]`                                             |
+| `beaver-nest-fe` | Current | `["type:app", "platform:vite", "lang:ts", "domain:beaver-nest"]`        |
+| `beaver-nest-be` | Current | `["type:app", "platform:giraffe", "lang:fsharp", "domain:beaver-nest"]` |
 
 ### Example: Complete Tag Declaration
 

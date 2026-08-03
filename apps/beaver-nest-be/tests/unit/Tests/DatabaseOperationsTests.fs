@@ -34,6 +34,23 @@ let ``backup and restore report safe errors when a valid backup is unavailable``
     Assert.True(restore configuration "snapshot.sqlite3" |> Result.isError)
 
 [<Fact>]
+let ``integrity verifies a migrated live database through the operation lock`` () =
+    let directory =
+        Path.Combine(Path.GetTempPath(), "beaver-nest-integrity-" + Guid.NewGuid().ToString("N"))
+
+    let configuration = create directory 100 |> Result.defaultWith failwith
+
+    try
+        use connection = openConfigured configuration
+        use setup = connection.CreateCommand()
+        setup.CommandText <- "CREATE TABLE IntegrityProof (Value TEXT NOT NULL);"
+        setup.ExecuteNonQuery() |> ignore
+        connection.Close()
+        Assert.Equal(Ok(), integrity configuration)
+    finally
+        Directory.Delete(directory, true)
+
+[<Fact>]
 let ``backup operations reject blank, privileged, and file-shaped backup roots`` () =
     let root =
         Path.Combine(Path.GetTempPath(), "beaver-nest-invalid-backup-root-" + Guid.NewGuid().ToString("N"))

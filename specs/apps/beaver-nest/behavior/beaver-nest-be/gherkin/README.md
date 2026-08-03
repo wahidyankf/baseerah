@@ -7,12 +7,20 @@ Behavioral scenarios for the `beaver-nest-be` F#/Giraffe REST API, organized by 
 - [health/liveness.feature](./health/liveness.feature) — liveness without persistence detail
 - [health/readiness-ready.feature](./health/readiness-ready.feature) — ready database state
 - [health/readiness-unready.feature](./health/readiness-unready.feature) — safe unavailable state
-- [hello/greeting.feature](./hello/greeting.feature) — greeting + unknown-route handling
-  (2 scenarios)
+- [routing/greeting-retirement.feature](./routing/greeting-retirement.feature) — retired greeting
+  route returns 404
+- [routing/missing-asset.feature](./routing/missing-asset.feature) — missing static assets do not
+  return the application shell
+- [routing/spa-fallback.feature](./routing/spa-fallback.feature) — dotless client routes return the
+  application shell
+- [routing/unknown-api.feature](./routing/unknown-api.feature) — unmatched API paths return JSON
+  errors
+- [development/development-data-isolation.feature](./development/development-data-isolation.feature) — local
+  development uses an explicit isolated SQLite directory
 - [persistence/](./persistence/) — migration and SQLite safety behavior
 - [recovery/](./recovery/) — verified online backup and restore behavior
 
-Copied verbatim from [prd.md US-4](../../../../../../plans/done/2026-07-31__baseerah-repo-reset/prd.md#us-4--serve-hello-world-from-baseerah-be).
+Derived from the current BeaverNest foundation behavior contract.
 
 ## Related
 

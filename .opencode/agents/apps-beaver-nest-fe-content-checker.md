@@ -1,5 +1,5 @@
 ---
-description: Validates beaver-nest-fe landing-page content quality, including accessibility, token usage, and adherence to the documented content surface.
+description: Validates BeaverNest Vite CSR foundation-status content quality, accessibility, and token usage.
 model: zai-coding-plan/glm-5.2
 permission:
   bash: allow

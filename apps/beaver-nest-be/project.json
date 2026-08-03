@@ -67,7 +67,7 @@
     "dev": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "BEAVER_NEST_BE_HTTP_LISTEN_ADDRESS=127.0.0.1 BEAVER_NEST_BE_HTTP_LISTEN_PORT=19320 dotnet watch run --project apps/beaver-nest-be/src/BeaverNestBe/BeaverNestBe.fsproj"
+        "command": "scripts/start-development.sh"
       }
     },
     "run": {
@@ -195,5 +195,5 @@
     "specs": ["{workspaceRoot}/specs/apps/beaver-nest/behavior/beaver-nest-be/gherkin/**/*.feature"]
   },
   "tags": ["type:app", "platform:giraffe", "lang:fsharp", "domain:beaver-nest"],
-  "implicitDependencies": ["beaver-nest-contracts", "rhino-cli"]
+  "implicitDependencies": ["beaver-nest-contracts", "beaver-nest-fe", "rhino-cli"]
 }

@@ -175,13 +175,6 @@ env-contract:
         - BEAVER_NEST_BE_PUBLIC_PORT
         - BEAVER_NEST_BE_BACKUP_DIRECTORY
 
-    - root: apps/beaver-nest-fe
-      kind: app
-      lang: typescript
-      allowlist:
-        - PORT
-        - HOSTNAME
-
 env-injection:
   # Value-less injection contract (extends env-contract:).
   # Declares, per app, the injection HOME for its env keys at every deploy stage
@@ -197,10 +190,6 @@ env-injection:
     - app: beaver-nest-be
       keys-from: apps/beaver-nest-be/.env.example
       runtime: { local: env-local, local-ci: compose }
-
-    - app: beaver-nest-fe
-      keys-from: apps/beaver-nest-fe/.env.example
-      runtime: { local-ci: compose }
 
   # CI test-harness keys — test-only, NEVER in any apps/<app>/.env.example.
   ci-harness:

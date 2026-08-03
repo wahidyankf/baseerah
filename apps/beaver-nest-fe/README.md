@@ -1,36 +1,28 @@
 # beaver-nest-fe
 
-Next.js 16 hello-world frontend for BeaverNest. Renders one route, `/`, showing the product name
-and a greeting fetched live from `beaver-nest-be`.
+Vite CSR foundation-status client for BeaverNest. During local development it runs on loopback port
+`19310` and proxies same-origin API requests to the loopback backend on `19320`. Production is the
+combined `beaver-nest-be` ASP.NET image, which serves this static client on port `19300`.
 
 ## Quick Start
 
-1. Install dependencies: `npm install`
-2. Copy env: `cp .env.example .env.local`
-3. Start `beaver-nest-be` (see `apps/beaver-nest-be/README.md`) or the full stack:
-   `npm run beaver-nest:dev`
-4. Start dev server: `nx dev beaver-nest-fe`
-5. Open: <http://localhost:19310>
+1. Create a developer-owned SQLite directory outside the repository.
+2. Run `BEAVER_NEST_BE_DEVELOPMENT_DATA_DIRECTORY=/absolute/path npm run beaver-nest:dev`.
+3. Open <http://127.0.0.1:19310>.
 
 ## Commands
 
-| Command                            | Description                    |
-| ---------------------------------- | ------------------------------ |
-| `nx dev beaver-nest-fe`            | Dev server (port 19310)        |
-| `nx build beaver-nest-fe`          | Production build               |
-| `nx run beaver-nest-fe:test:quick` | Unit tests + coverage          |
-| `nx run beaver-nest-fe:typecheck`  | TypeScript typecheck           |
-| `nx run beaver-nest-fe:lint`       | oxlint                         |
-| `nx run beaver-nest-fe:codegen`    | Generate TS types from OpenAPI |
+| Command                                  | Description                                    |
+| ---------------------------------------- | ---------------------------------------------- |
+| `nx dev beaver-nest-fe`                  | Vite local development server                  |
+| `nx build beaver-nest-fe`                | Static `dist/` production build                |
+| `nx run beaver-nest-fe:test:quick`       | Unit, coverage, lint, and specification checks |
+| `nx run beaver-nest-fe:test:integration` | MSW client integration checks                  |
 
 ## Tech Stack
 
-- **Next.js 16** — App Router, React 19
-- **TypeScript** — Strict mode
-- **Tailwind v4** — Styling
-- **@open-sharia-enterprise/web-ui** — Shared component library
-- **Vitest** — Unit testing
+- Vite and React
+- TypeScript and Tailwind v4
+- Vitest and Playwright-BDD
 
-## Related
-
-- [beaver-nest-be](../beaver-nest-be/README.md) — the backend this page fetches its greeting from
+The client has no runtime environment template: it uses same-origin API paths only.

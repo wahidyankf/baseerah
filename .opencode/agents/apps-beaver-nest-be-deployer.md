@@ -1,5 +1,5 @@
 ---
-description: Force-pushes main to stag-beaver-nest-be, which triggers the existing beaver-nest-be-build-deploy-stag.yml image build. No running staging server is provisioned yet — this agent documents the intended workflow ahead of that provisioning, it does not claim a working deploy.
+description: Documents the future deployment of the combined BeaverNest image. No production or combined staging target is provisioned, so it never claims a working deploy.
 model: zai-coding-plan/glm-5.2
 permission:
   bash: allow
@@ -20,20 +20,16 @@ skills:
 performs straightforward, deterministic git operations (checkout/status check/force push) with no
 content generation or complex reasoning required.
 
-Force push main to `stag-beaver-nest-be`, triggering the container image build.
+The combined `apps/beaver-nest-be/Dockerfile` image contains the Vite client and ASP.NET runtime. No
+production or combined staging target is provisioned.
 
 ## Current State — No Running Staging Server Provisioned
 
 **This agent's push triggers a real CI job, but there is nothing yet consuming its output.** As of
 this writing:
 
-- `stag-beaver-nest-be` does not exist as a remote branch (`git branch -r` confirms).
-- `.github/workflows/beaver-nest-be-build-deploy-stag.yml` already exists and fires on a push to that
-  branch — it builds `apps/beaver-nest-be/Dockerfile` and pushes `ghcr.io/wahidyankf/beaver-nest-be` at
-  `:latest` and `:${sha}`. That part is real and already wired up.
-- Per `.github/workflows/_reusable-be-build-deploy.yml`'s own comment, the actual k3s rollout that
-  would run this image is orchestrated by the separate `ose-private` repo's `coralpolyp` — out of
-  scope for this repo, and `coralpolyp` does not yet know about `beaver-nest-be` at all.
+- `publish-images.yml` can publish the combined image after a main push.
+- No production or combined staging runtime consumes that image yet.
 
 Running this agent's steps today will produce a real GHCR image, but say plainly that no staging
 **server** is running it — pushing the image is not the same as a live staging deploy.
@@ -60,14 +56,10 @@ if [ -n "$(git status --porcelain)" ]; then
 fi
 ```
 
-### Step 3: Force Push to stag-beaver-nest-be
+### Step 3: Report the provisioning blocker
 
-```bash
-git push origin main:stag-beaver-nest-be --force
-```
-
-**Trunk-Based Development**: Per `repo-practicing-trunk-based-development` Skill, all development
-happens on main. `stag-beaver-nest-be` is deployment-only — no direct commits.
+Do not create or force-push deployment branches. A maintainer must first provision a combined runtime
+target and explicitly authorize its deployment path.
 
 ## When to Use This Agent
 

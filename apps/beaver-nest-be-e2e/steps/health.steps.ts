@@ -15,10 +15,6 @@ Before(() => {
   clearResponse();
 });
 
-Given("the beaver-nest-be service is running on port {int}", async () => {
-  // No-op: the test suite assumes beaver-nest-be is running at baseURL.
-});
-
 Given("the service has finished starting", async () => {
   // No-op: same assumption as above.
 });
@@ -34,7 +30,9 @@ Then("the response status is {int}", async ({}, expectedStatus: number) => {
 });
 
 // oxlint-disable-next-line no-empty-pattern
-Then("the response body field {string} equals {string}", async ({}, field: string, value: string) => {
+Then("the response body field {string} is a non-empty string", async ({}, field: string) => {
   const body = (await getResponse().json()) as Record<string, unknown>;
-  expect(body[field]).toBe(value);
+  const value = body[field];
+  expect(typeof value).toBe("string");
+  expect((value as string).length).toBeGreaterThan(0);
 });

@@ -1,53 +1,32 @@
 ---
 name: apps-beaver-nest-fe-developing-content
-description: Structure, tone, and accessibility rules for beaver-nest-fe's landing-page content (tagline, footer, not-found/error copy). Auto-loads when authoring or validating beaver-nest-fe copy.
+description: Structure, tone, and accessibility rules for the BeaverNest Vite CSR foundation-status screen.
 ---
 
 # Developing Content for beaver-nest-fe
 
 ## Purpose
 
-`beaver-nest-fe` is a Next.js 16 App Router hello-world skeleton, not a blog or CMS-backed content
-platform — it has no `content/` collection, no date-prefixed files, and no MDX pipeline. Its entire
-content surface today is inline JSX copy inside a handful of components and routes. This Skill
-documents that surface so content agents change the right files in the right way instead of
-inventing a blog-style structure that doesn't exist here.
-
-**When to use this Skill**: creating or editing copy in `apps/beaver-nest-fe/src/components/AppShell.tsx`,
-`AppFrame.tsx`, `src/app/page.tsx`, `src/app/not-found.tsx`, `src/app/error.tsx`, or `src/app/layout.tsx`
-metadata.
+`beaver-nest-fe` is a Vite CSR foundation-status client, not a marketing site, blog, or CMS. It is
+served by the combined ASP.NET runtime and uses same-origin readiness requests.
 
 ## Content Surface
 
-| File                          | Content                                                                        |
-| ----------------------------- | ------------------------------------------------------------------------------ |
-| `src/components/AppFrame.tsx` | Shared header title (`AppHeader title="BeaverNest"`) and footer copyright line |
-| `src/components/AppShell.tsx` | Landing page tagline, the backend-greeting line, and the "View on GitHub" link |
-| `src/app/not-found.tsx`       | 404 heading, "Back to home" link, and its own `<title>` metadata               |
-| `src/app/error.tsx`           | Client-side error heading and "Try again" reset button                         |
-| `src/app/layout.tsx`          | Root `<html lang>`, default `<title>`/`<meta description>`                     |
+| File             | Content                                                                               |
+| ---------------- | ------------------------------------------------------------------------------------- |
+| `src/App.tsx`    | BeaverNest heading, foundation-status labels, readiness feedback, and refresh control |
+| `src/styles.css` | Client stylesheet and token imports                                                   |
+| `src/theme.ts`   | External system-theme bootstrap                                                       |
 
 ## Rules
 
-- **No hardcoded entities in JSX attributes**: HTML named entities (e.g. `&middot;`) decode inside
-  JSX text children but not inside plain string attribute values (like `title="..."`) — use the
-  literal Unicode character (`·`) directly in attributes instead.
-- **Design tokens over raw values**: use the `@open-sharia-enterprise/web-ui-token` Tailwind classes
-  (`text-primary`, `bg-accent`, `border-border`, etc.) already in use in these files — never introduce
-  a raw hex color or arbitrary Tailwind value.
-- **Shared chrome via `AppFrame`**: every route-level page (`page.tsx`, `not-found.tsx`, `error.tsx`)
-  renders through `AppFrame` so the header/footer stay consistent — don't duplicate header/footer
-  markup in a new route.
-- **Accessibility**: exactly one `<h1>` per rendered page, landmark elements (`header`/`main`/`footer`)
-  present, and any new interactive element needs a visible label or `aria-label`.
-- **Coverage note**: `src/app/icon.tsx` (favicon, via `next/og`'s `ImageResponse`) is excluded from
-  unit-test coverage in `vitest.config.ts` because jsdom cannot render it — verify icon changes via a
-  real build or Playwright instead of chasing unit coverage there.
+- Keep copy direct and operational; do not add promotional calls to action or greeting content.
+- Use shared semantic design tokens, never raw colors or arbitrary values.
+- Preserve one visible `h1`, readable status feedback, and an explicitly labelled refresh control.
+- Test content changes with the Vite unit/integration and Gherkin gates.
 
 ## Reference
 
 - [Content Quality Principles](../../../repo-governance/conventions/writing/quality.md)
-- `docs-applying-content-quality` Skill for universal markdown/content rules (this Skill only covers
-  what's specific to `beaver-nest-fe`'s JSX content surface)
-- `specs/apps/beaver-nest/behavior/beaver-nest-fe/gherkin/hello/landing-page.feature` — the Gherkin
-  scenarios this content must keep satisfying
+- `docs-applying-content-quality` for universal content rules
+- `specs/apps/beaver-nest/behavior/beaver-nest-fe/gherkin/` for the bound browser behavior

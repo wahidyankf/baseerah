@@ -65,8 +65,10 @@ assert_text_contains "$unavailable_schema" '          const: not-ready'
 assert_text_contains "$unavailable_schema" '              const: unavailable'
 assert_text_contains "$unavailable_schema" '              const: unknown'
 
-assert_contains '      operationId: getHello'
-assert_contains '    Greeting:'
+if grep -Eq 'getHello|^[[:space:]]+Greeting:' "$contract"; then
+	printf 'Retired greeting operation or schema must not remain in the OpenAPI contract\n' >&2
+	exit 1
+fi
 
 if grep -Eq '(^|[^[:alnum:]])(ETag|Last-Modified)([^[:alnum:]]|$)' "$contract"; then
 	printf 'Readiness contract must not declare a response validator header\n' >&2

@@ -2,9 +2,8 @@ openapi: 3.1.0
 info:
   title: BeaverNest API
   description: >-
-    Phase 1 hello-world contract for beaver-nest-be. Exactly three GET routes: a liveness
-    check, a greeting, and a 404 handler for anything else. No write operations exist
-    in this phase.
+    BeaverNest foundation contract. Liveness and readiness are the declared operations;
+    unmatched API routes return a JSON error envelope. No write operations exist in this phase.
   version: 1.0.0
   license:
     name: MIT
@@ -64,24 +63,6 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ReadinessUnavailable"
-        "404":
-          description: No matching route.
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Error"
-  /api/v1/hello:
-    get:
-      operationId: getHello
-      summary: Greeting
-      description: Returns the hello-world greeting beaver-nest-fe renders on its landing page.
-      responses:
-        "200":
-          description: The greeting.
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Greeting"
         "404":
           description: No matching route.
           content:
@@ -156,16 +137,6 @@ components:
               type: string
               description: Fixed unknown schema state.
               const: unknown
-    Greeting:
-      type: object
-      description: Greeting response body.
-      required:
-        - message
-      properties:
-        message:
-          type: string
-          description: The hello-world greeting text.
-          example: Hello from BeaverNest
     Error:
       type: object
       description: Response body for any unmatched route (404).

@@ -15,9 +15,6 @@ let mutable private lastStatus = 0
 let mutable private lastBody = ""
 
 [<Given>]
-let ``the beaver-nest-be service is running on port 19320`` () = client <- Some(buildClient webApp)
-
-[<Given>]
 let ``the service has finished starting`` () = client <- Some(buildClient webApp)
 
 [<Given>]

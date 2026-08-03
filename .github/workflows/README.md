@@ -18,19 +18,17 @@ Decision 15 for the full invariant list and verification commands.
 
 ## Reusable templates
 
-| Workflow                                   | Role                                                                                                     |
-| ------------------------------------------ | -------------------------------------------------------------------------------------------------------- |
-| `_reusable-app-test-local-deploy-stag.yml` | App-group local-stack pipeline; on pass force-pushes BOTH the `stag-*-app-web` and `stag-*-be` branches. |
-| `_reusable-app-test-stag.yml`              | FE E2E gate against the deployed staging URL (Vercel bypass secret). Stops on pass — no promote.         |
-| `_reusable-be-build-deploy.yml`            | Build a backend image and push it to GHCR.                                                               |
+| Workflow                                   | Role                                                                                                                    |
+| ------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------- |
+| `_reusable-app-test-local-deploy-stag.yml` | Combined same-origin local-stack pipeline; it performs no deployment because no combined staging target is provisioned. |
+| `_reusable-app-test-stag.yml`              | Generic staging E2E template; no active BeaverNest caller uses it.                                                      |
+| `_reusable-be-build-deploy.yml`            | Build a backend image and push it to GHCR.                                                                              |
 
 ## App-group callers (beaver-nest-app)
 
-| Workflow                                     | Trigger                       | Role                                                                                                                                                            |
-| -------------------------------------------- | ----------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `beaver-nest-app-test-local-deploy-stag.yml` | Twice-daily CRON + dispatch   | Calls `_reusable-app-test-local-deploy-stag.yml` for `beaver-nest-fe` + `beaver-nest-be`; on pass force-pushes `stag-beaver-nest-fe` and `stag-beaver-nest-be`. |
-| `beaver-nest-app-test-stag.yml`              | Twice-daily CRON + dispatch   | Calls `_reusable-app-test-stag.yml`; runs `beaver-nest-fe-e2e` against the deployed staging URL, +2.5h after the local-deploy-stag run.                         |
-| `beaver-nest-be-build-deploy-stag.yml`       | Push to `stag-beaver-nest-be` | Calls `_reusable-be-build-deploy.yml`; builds the `beaver-nest-be` image and pushes it to GHCR.                                                                 |
+| Workflow                                     | Trigger                     | Role                                                                |
+| -------------------------------------------- | --------------------------- | ------------------------------------------------------------------- |
+| `beaver-nest-app-test-local-deploy-stag.yml` | Twice-daily CRON + dispatch | Verifies one disposable combined runtime and both pure E2E runners. |
 
 ## PR and repo-wide gates
 
@@ -43,6 +41,6 @@ Decision 15 for the full invariant list and verification commands.
 
 ## Backend images
 
-| Workflow             | Role                                                                                                                             |
-| -------------------- | -------------------------------------------------------------------------------------------------------------------------------- |
-| `publish-images.yml` | Detects affected backend image projects on push to `main` and publishes them to GHCR — currently one case arm, `beaver-nest-be`. |
+| Workflow             | Role                                                                                                                                |
+| -------------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
+| `publish-images.yml` | Detects affected combined image projects on push to `main`; either BeaverNest client or backend changes publish the combined image. |
