@@ -124,11 +124,14 @@ CREATE TABLE members (
   name TEXT NOT NULL,
   -- audit columns
   created_at TEXT NOT NULL DEFAULT (strftime ('%Y-%m-%dT%H:%M:%fZ', 'now')),
-  created_by VARCHAR(255) NOT NULL DEFAULT 'system',
+  created_by TEXT NOT NULL DEFAULT 'system' CHECK (length (created_by) <= 255),
   updated_at TEXT NOT NULL DEFAULT (strftime ('%Y-%m-%dT%H:%M:%fZ', 'now')),
-  updated_by VARCHAR(255) NOT NULL DEFAULT 'system',
+  updated_by TEXT NOT NULL DEFAULT 'system' CHECK (length (updated_by) <= 255),
   deleted_at TEXT,
-  deleted_by VARCHAR(255)
+  deleted_by TEXT CHECK (
+    deleted_by IS NULL
+    OR length (deleted_by) <= 255
+  )
 );
 ```
 
