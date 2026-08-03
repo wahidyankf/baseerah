@@ -24,8 +24,10 @@
       "cache": true,
       "inputs": [
         "{projectRoot}/src/**/*.fs",
+        "{projectRoot}/src/**/*.sql",
         "{projectRoot}/src/BeaverNestBe/BeaverNestBe.fsproj",
-        "{projectRoot}/generated-contracts/**/*.fs"
+        "{projectRoot}/generated-contracts/**/*.fs",
+        "env"
       ]
     },
     "typecheck": {
@@ -37,8 +39,10 @@
       "cache": true,
       "inputs": [
         "{projectRoot}/src/**/*.fs",
+        "{projectRoot}/src/**/*.sql",
         "{projectRoot}/src/BeaverNestBe/BeaverNestBe.fsproj",
-        "{projectRoot}/generated-contracts/**/*.fs"
+        "{projectRoot}/generated-contracts/**/*.fs",
+        "env"
       ]
     },
     "lint": {
@@ -53,12 +57,17 @@
         "parallel": false
       },
       "cache": true,
-      "inputs": ["{projectRoot}/src/**/*.fs", "{projectRoot}/src/BeaverNestBe/BeaverNestBe.fsproj"]
+      "inputs": [
+        "{projectRoot}/src/**/*.fs",
+        "{projectRoot}/src/**/*.sql",
+        "{projectRoot}/src/BeaverNestBe/BeaverNestBe.fsproj",
+        "env"
+      ]
     },
     "dev": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "dotnet watch run --project apps/beaver-nest-be/src/BeaverNestBe/BeaverNestBe.fsproj"
+        "command": "BEAVER_NEST_BE_HTTP_LISTEN_ADDRESS=127.0.0.1 BEAVER_NEST_BE_HTTP_LISTEN_PORT=19320 dotnet watch run --project apps/beaver-nest-be/src/BeaverNestBe/BeaverNestBe.fsproj"
       }
     },
     "run": {
@@ -76,8 +85,10 @@
       "cache": true,
       "inputs": [
         "{projectRoot}/src/**/*.fs",
+        "{projectRoot}/src/**/*.sql",
         "{projectRoot}/tests/unit/**/*.fs",
-        "{projectRoot}/src/BeaverNestBe/BeaverNestBe.fsproj"
+        "{projectRoot}/src/BeaverNestBe/BeaverNestBe.fsproj",
+        "env"
       ]
     },
     "test:coverage": {
@@ -86,7 +97,7 @@
         "command": "dotnet test apps/beaver-nest-be/tests/unit/BeaverNestBe.UnitTests.fsproj /p:CollectCoverage=true /p:Threshold=90 /p:ThresholdType=line \"/p:ExcludeByFile=**/Program.fs\""
       },
       "cache": true,
-      "inputs": ["{projectRoot}/src/**/*.fs", "{projectRoot}/tests/unit/**/*.fs"]
+      "inputs": ["{projectRoot}/src/**/*.fs", "{projectRoot}/src/**/*.sql", "{projectRoot}/tests/unit/**/*.fs", "env"]
     },
     "test:quick": {
       "executor": "nx:run-commands",
@@ -102,14 +113,20 @@
       },
       "dependsOn": ["typecheck", "lint"],
       "cache": true,
-      "inputs": ["default", "specs"]
+      "inputs": ["default", "env", "specs"]
     },
     "test:integration": {
       "executor": "nx:run-commands",
       "options": {
         "command": "dotnet test apps/beaver-nest-be/tests/integration/BeaverNestBe.IntegrationTests.fsproj"
       },
-      "cache": false
+      "cache": false,
+      "inputs": [
+        "{projectRoot}/src/**/*.fs",
+        "{projectRoot}/src/**/*.sql",
+        "{projectRoot}/tests/integration/**/*.fs",
+        "{projectRoot}/src/BeaverNestBe/BeaverNestBe.fsproj"
+      ]
     },
     "specs:behavior:coverage": {
       "executor": "nx:run-commands",
@@ -119,7 +136,8 @@
       "cache": true,
       "inputs": [
         "{workspaceRoot}/specs/apps/beaver-nest/behavior/beaver-nest-be/gherkin/**/*.feature",
-        "{projectRoot}/src/**/*.fs"
+        "{projectRoot}/src/**/*.fs",
+        "{projectRoot}/src/**/*.sql"
       ]
     },
     "specs:domain:coverage": {
@@ -139,7 +157,7 @@
     "deps:audit": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "dotnet list apps/beaver-nest-be/src/BeaverNestBe/BeaverNestBe.fsproj package --vulnerable"
+        "command": "dotnet list apps/beaver-nest-be/src/BeaverNestBe/BeaverNestBe.fsproj package --vulnerable --include-transitive"
       },
       "cache": false
     },
@@ -169,10 +187,11 @@
         "parallel": false
       },
       "cache": true,
-      "inputs": ["default", "specs"]
+      "inputs": ["default", "env", "specs"]
     }
   },
   "namedInputs": {
+    "env": ["{projectRoot}/.env.example"],
     "specs": ["{workspaceRoot}/specs/apps/beaver-nest/behavior/beaver-nest-be/gherkin/**/*.feature"]
   },
   "tags": ["type:app", "platform:giraffe", "lang:fsharp", "domain:beaver-nest"],

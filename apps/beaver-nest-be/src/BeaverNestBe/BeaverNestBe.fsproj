@@ -14,14 +14,26 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Include="Domain/HttpConfiguration.fs" />
+    <Compile Include="Domain/DatabaseConfiguration.fs" />
     <Compile Include="Domain/Readiness.fs" />
     <Compile Include="Domain/Greeting.fs" />
     <Compile Include="Domain/ErrorBody.fs" />
+    <Compile Include="Infrastructure/Sqlite/Errors.fs" />
+    <Compile Include="Infrastructure/Sqlite/Connection.fs" />
+    <Compile Include="Infrastructure/Migrations.fs" />
+    <Compile Include="Operations/Database.fs" />
+    <Compile Include="Application/ReadinessPort.fs" />
     <Compile Include="Api/HealthHandlers.fs" />
+    <Compile Include="Api/ReadinessHandlers.fs" />
     <Compile Include="Api/GreetingHandlers.fs" />
     <!-- Composition root -->
     <Compile Include="WebApp.fs" />
     <Compile Include="Program.fs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Migrations/**/*.sql" />
   </ItemGroup>
 
   <ItemGroup>
@@ -31,6 +43,9 @@
          intermittently fail downstream tools (fsharplint) that expect a stable lock. -->
     <PackageReference Update="FSharp.Core" Version="10.1.302" />
     <PackageReference Include="Giraffe" Version="8.2.0" />
+    <PackageReference Include="dbup-sqlite" Version="6.0.4" />
+    <PackageReference Include="Microsoft.Data.Sqlite" Version="10.0.10" />
+    <PackageReference Include="SQLitePCLRaw.lib.e_sqlite3" Version="2.1.12" />
     <!-- F# static analyzers (G-Research) — runs via dotnet msbuild /t:AnalyzeFSharpProject -->
     <PackageReference Include="FSharp.Analyzers.Build" Version="0.5.0">
       <PrivateAssets>all</PrivateAssets>

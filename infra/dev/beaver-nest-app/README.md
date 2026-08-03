@@ -21,13 +21,16 @@ npm run beaver-nest:dev:restart
 
 ## Environment Variables
 
-No required environment variables today. The backend runs the health endpoint without
-configuration and is stateless.
+`apps/beaver-nest-be/.env.example` is the sole backend environment-key owner. Local development
+uses an explicit loopback listener on port `19320`; the backend's default process contract is
+loopback `127.0.0.1:19300`. Production-only host publication and durable bind-source values remain
+empty placeholders in the template and are never committed here.
 
 ## CI Variant
 
-`docker-compose.ci.yml` is used in GitHub Actions for E2E tests. It overrides only what differs
-from the default compose file (making `BEAVER_NEST_BE_PORT` and `BEAVER_NEST_BE_CORS_ORIGINS` explicit).
+`docker-compose.ci.yml` is used in GitHub Actions for E2E tests. It explicitly configures the
+container listener as `0.0.0.0:19320`, a disposable `/tmp/beaver-nest` SQLite directory, and a
+finite busy timeout; it does not introduce a second environment-key template.
 
 ## beaver-nest-fe
 

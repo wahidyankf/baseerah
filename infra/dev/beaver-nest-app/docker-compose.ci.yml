@@ -1,9 +1,26 @@
 services:
   beaver-nest-be:
+    build:
+      context: .
+      dockerfile: Dockerfile.be.dev
     environment:
-      BEAVER_NEST_BE_PORT: "19320"
-      BEAVER_NEST_BE_CORS_ORIGINS: "*"
+      BEAVER_NEST_BE_HTTP_LISTEN_ADDRESS: "0.0.0.0"
+      BEAVER_NEST_BE_HTTP_LISTEN_PORT: "19320"
+      BEAVER_NEST_BE_DATA_DIRECTORY: "/var/lib/beaver-nest"
+      BEAVER_NEST_BE_SQLITE_BUSY_TIMEOUT_MILLISECONDS: "1000"
+    volumes:
+      - beaver-nest-be-e2e-data:/var/lib/beaver-nest
+      - beaver-nest-be-e2e-backups:/var/backups/beaver-nest
 
   beaver-nest-fe:
+    build:
+      context: ../../..
+      dockerfile: apps/beaver-nest-fe/Dockerfile
+      args:
+        BEAVER_NEST_FE_API_BASE_URL: http://beaver-nest-be:19320
     environment:
       BEAVER_NEST_FE_API_BASE_URL: "http://beaver-nest-be:19320"
+
+volumes:
+  beaver-nest-be-e2e-data:
+  beaver-nest-be-e2e-backups:

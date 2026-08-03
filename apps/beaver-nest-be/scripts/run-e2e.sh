@@ -18,20 +18,33 @@ fi
 COMPOSE_FILES=(-f "${ROOT}/infra/dev/beaver-nest-app/docker-compose.yml" -f "${ROOT}/infra/dev/beaver-nest-app/docker-compose.ci.yml")
 PROJECT_NAME="beaver-nest-be-e2e"
 PORT=19320
+USES_EXISTING_SERVICE=false
+
+if [[ -n "${API_BASE_URL:-}" ]]; then
+	USES_EXISTING_SERVICE=true
+else
+	API_BASE_URL="http://127.0.0.1:${PORT}"
+fi
 
 cleanup() {
-	docker compose -p "${PROJECT_NAME}" "${COMPOSE_FILES[@]}" down -v >/dev/null 2>&1 || true
+	if [[ "${USES_EXISTING_SERVICE}" == false ]]; then
+		docker compose -p "${PROJECT_NAME}" "${COMPOSE_FILES[@]}" down -v >/dev/null 2>&1 || true
+	fi
 }
 trap cleanup EXIT
 
-# Start the backend
-docker compose -p "${PROJECT_NAME}" "${COMPOSE_FILES[@]}" down -v >/dev/null 2>&1 || true
-docker compose -p "${PROJECT_NAME}" "${COMPOSE_FILES[@]}" up -d --build beaver-nest-be
+if [[ "${USES_EXISTING_SERVICE}" == false ]]; then
+	# Start the isolated backend used by local E2E runs.
+	docker compose -p "${PROJECT_NAME}" "${COMPOSE_FILES[@]}" down -v >/dev/null 2>&1 || true
+	docker compose -p "${PROJECT_NAME}" "${COMPOSE_FILES[@]}" up -d --build beaver-nest-be
+else
+	echo "Using existing beaver-nest-be service at ${API_BASE_URL}"
+fi
 
 # Wait until the health endpoint responds (up to 120s - cold NuGet restore in-container)
-echo "Waiting for beaver-nest-be on port ${PORT}..."
+echo "Waiting for beaver-nest-be at ${API_BASE_URL}..."
 for i in $(seq 1 120); do
-	if curl -sf "http://localhost:${PORT}/api/v1/health" >/dev/null 2>&1; then
+	if curl -sf "${API_BASE_URL}/api/v1/health" >/dev/null 2>&1; then
 		echo "beaver-nest-be is ready (${i}s)"
 		break
 	fi
@@ -44,4 +57,10 @@ done
 
 # Run the Playwright e2e suite
 cd "${ROOT}/apps/beaver-nest-be-e2e"
-npx bddgen && npx playwright test
+if [[ "${USES_EXISTING_SERVICE}" == false ]]; then
+	BEAVER_NEST_BE_E2E_COMPOSE_PROJECT="${PROJECT_NAME}" API_BASE_URL="${API_BASE_URL}" npx bddgen
+	BEAVER_NEST_BE_E2E_COMPOSE_PROJECT="${PROJECT_NAME}" API_BASE_URL="${API_BASE_URL}" npx playwright test
+else
+	API_BASE_URL="${API_BASE_URL}" npx bddgen
+	API_BASE_URL="${API_BASE_URL}" npx playwright test
+fi

@@ -107,7 +107,9 @@ jobs:
     name: E2E tests (BE + FE)
     needs: [be-integration, fe-integration]
     runs-on: ubuntu-latest
-    timeout-minutes: 35
+    # Cold GitHub-hosted runners may need over 30 minutes to install Playwright's
+    # operating-system packages before either E2E suite starts.
+    timeout-minutes: 60
     environment: ${{ inputs.environment }}
 
     steps:

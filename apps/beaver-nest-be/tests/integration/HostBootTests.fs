@@ -34,7 +34,7 @@ let ``the host boots and serves /api/v1/health over real HTTP`` () =
         host.Services.GetRequiredService<IServer>().Features.Get<IServerAddressesFeature>().Addresses
         |> Seq.head
 
-    use client = new HttpClient()
+    use client = new HttpClient(new HttpClientHandler(UseProxy = false))
     let resp = client.GetAsync(address + "/api/v1/health").Result
     Assert.Equal(HttpStatusCode.OK, resp.StatusCode)
 

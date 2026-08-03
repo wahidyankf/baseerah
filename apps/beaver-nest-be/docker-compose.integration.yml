@@ -6,3 +6,10 @@ services:
     build:
       context: ../..
       dockerfile: apps/beaver-nest-be/Dockerfile.integration
+    environment:
+      BEAVER_NEST_BE_DATA_DIRECTORY: "/tmp/beaver-nest-integration"
+      BEAVER_NEST_BE_HTTP_LISTEN_ADDRESS: "127.0.0.1"
+      BEAVER_NEST_BE_HTTP_LISTEN_PORT: "19320"
+      BEAVER_NEST_BE_SQLITE_BUSY_TIMEOUT_MILLISECONDS: "1000"
+    tmpfs:
+      - /tmp/beaver-nest-integration:mode=0700

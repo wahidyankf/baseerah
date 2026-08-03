@@ -15,11 +15,19 @@
   <ItemGroup>
     <Compile Include="Steps/BddState.fs" />
     <Compile Include="Steps/HealthSteps.fs" />
+    <Compile Include="Steps/ReadinessSteps.fs" />
     <Compile Include="Steps/GreetingSteps.fs" />
     <Compile Include="Steps/NotFoundSteps.fs" />
+    <Compile Include="Steps/PersistenceSteps.fs" />
+    <Compile Include="Steps/RecoverySteps.fs" />
     <Compile Include="Tests/HealthHandlerTests.fs" />
+    <Compile Include="Tests/ReadinessHandlerTests.fs" />
     <Compile Include="Tests/GreetingHandlerTests.fs" />
     <Compile Include="Tests/NotFoundHandlerTests.fs" />
+    <Compile Include="Tests/HttpConfigurationTests.fs" />
+    <Compile Include="Tests/DatabaseConfigurationTests.fs" />
+    <Compile Include="Tests/SqliteInfrastructureTests.fs" />
+    <Compile Include="Tests/DatabaseOperationsTests.fs" />
   </ItemGroup>
 
   <ItemGroup>

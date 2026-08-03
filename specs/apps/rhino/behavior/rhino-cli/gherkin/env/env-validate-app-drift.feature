@@ -18,3 +18,8 @@ Feature: `env validate` detects declared-but-unread and read-but-undeclared env-
     When the developer runs env validate
     Then the command exits with a failure code
     And the output names the key as read-but-undeclared
+
+  Scenario: A key read through a pure F# environment-reader wrapper passes validation
+    Given an F# app surface whose .env.example declares keys read through a pure environment-reader wrapper
+    When the developer runs env validate
+    Then the command exits successfully
