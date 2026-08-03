@@ -137,6 +137,8 @@
 - `apps/beaver-nest-be/scripts/run-e2e.sh` — modified — reuse a supplied CI backend rather than competing for its host port.
 - `apps/beaver-nest-be-e2e/project.json` — modified — execute the E2E wrapper regression test as its unit target.
 - `apps/beaver-nest-be-e2e/tests/run-e2e-existing-service.test.sh` — created — reproduce and guard the CI port-collision regression.
+- `apps/beaver-nest-be/src/BeaverNestBe/Infrastructure/Sqlite/Connection.fs` — modified — satisfy strict typed interpolation analysis.
+- `apps/beaver-nest-be/src/BeaverNestBe/Operations/Database.fs` — modified — satisfy strict typed interpolation and string-conversion analysis.
 - `apps/beaver-nest-be/Dockerfile.integration` — modified — use sanitized disposable runtime defaults.
 - `apps/beaver-nest-be/docker-compose.integration.yml` — modified — mount a disposable database directory.
 - `apps/beaver-nest-be/scripts/run-e2e.sh` — modified — run generated E2E steps against the explicit loopback endpoint.
@@ -150,6 +152,7 @@
 - Backend coverage follow-up — passed at 94.91% line coverage with unchanged exclusions and threshold.
 - Repository link validation — repair the stale backend E2E health-feature link detected by the pre-push gate.
 - Heavy CI E2E failure — avoid a second Compose binding to port 19320 when CI has already started the full stack.
+- PR .NET analyzer failure — add explicit interpolation formats and string result type annotations without changing SQLite behavior.
 - Controlled host-loopback smoke could not keep `dotnet watch` alive because the execution sandbox rejects the required background-process priority operation; the Docker E2E and Docker integration runner provide the successful equivalent real HTTP evidence.
 
 ### Evidence

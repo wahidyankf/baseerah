@@ -22,11 +22,11 @@ let private backupPath backupRoot name =
 let validateBackupName = backupPath backupDirectory
 
 let private verify (path: string) =
-    use connection = new SqliteConnection($"Data Source={path};Mode=ReadOnly")
+    use connection = new SqliteConnection($"Data Source=%s{path};Mode=ReadOnly")
     connection.Open()
     use integrity = connection.CreateCommand()
     integrity.CommandText <- "PRAGMA integrity_check;"
-    let integrityResult = string (integrity.ExecuteScalar())
+    let integrityResult: string = string (integrity.ExecuteScalar())
     use foreignKeys = connection.CreateCommand()
     foreignKeys.CommandText <- "PRAGMA foreign_key_check;"
     use rows = foreignKeys.ExecuteReader()
@@ -43,7 +43,7 @@ let backupAt backupRoot configuration name =
         try
             Directory.CreateDirectory backupRoot |> ignore
             use source = openConfigured configuration
-            use target = new SqliteConnection($"Data Source={destination}")
+            use target = new SqliteConnection($"Data Source=%s{destination}")
             target.Open()
             source.BackupDatabase target
 

@@ -18,7 +18,7 @@ let openConfigured configuration =
     use command = connection.CreateCommand()
 
     command.CommandText <-
-        $"PRAGMA foreign_keys = ON; PRAGMA journal_mode = WAL; PRAGMA busy_timeout = {busyTimeoutMilliseconds configuration};"
+        $"PRAGMA foreign_keys = ON; PRAGMA journal_mode = WAL; PRAGMA busy_timeout = %d{busyTimeoutMilliseconds configuration};"
 
     command.ExecuteNonQuery() |> ignore
     connection
