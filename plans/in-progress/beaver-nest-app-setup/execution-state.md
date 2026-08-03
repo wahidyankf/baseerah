@@ -186,3 +186,13 @@
   or acquire a database/service lock, so this is not evidence of double lock acquisition. The direct
   Docker E2E invocation likewise produced no output before it was stopped; neither local run is
   claimed as passed. Post-push CI must verify the changed Docker flow.
+
+### CI Blocker Follow-Up
+
+- `.github/workflows/_reusable-app-test-local-deploy-stag.yml` — modified — give the combined E2E
+  job enough budget for Playwright operating-system dependency provisioning before either suite runs.
+- Heavy CI run `30809428411` — all prerequisite gates passed; its E2E job was cancelled after the
+  35-minute job timeout while `npx playwright install-deps` was still downloading Ubuntu packages.
+  The log confirms neither BE nor FE E2E test had started, so this is provisioning-budget exhaustion,
+  not a skipped test or application-test failure. The job limit is therefore raised to 60 minutes;
+  both suites remain mandatory.
