@@ -444,11 +444,7 @@ See: [Related Repositories reference](./docs/reference/related-repositories.md).
 
 ## Models
 
-Model selection by capability tier: **Planning-grade** (complex multi-step planning),
-**Execution-grade** (standard coding and review), **Fast** (simple/low-latency). Concrete vendor model
-IDs in each platform binding's agent definition files.
-
-See [repo-governance/development/agents/model-selection.md](./repo-governance/development/agents/model-selection.md).
+See [Model Selection](./repo-governance/development/agents/model-selection.md).
 
 ## General Guidelines for Working with Nx
 

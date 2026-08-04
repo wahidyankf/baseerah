@@ -542,6 +542,8 @@
 - `apps/beaver-nest-be-e2e/README.md` and
   `plans/in-progress/beaver-nest-app-setup/evidence/phase-4-dependency-adoption.md` — modified —
   repair the retired-greeting and dependency-policy links reported by the pre-push validator.
+- `AGENTS.md` — modified — replace the inline model-selection summary with its canonical policy link
+  to satisfy the instruction-size gate through progressive disclosure.
 
 ### Commands and Results
 
