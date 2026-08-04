@@ -530,6 +530,13 @@
 
 - `plans/in-progress/beaver-nest-app-setup/execution-state.md` — modified — initialize the Phase 6
   append-only ledger before human-runtime evidence work.
+- `libs/web-ui-token/project.json`, `libs/web-ui-token/vitest.config.ts`, and `package.json` —
+  modified — run the unit-test command from the workspace root while preserving the library test
+  root, and force the existing patched Vitest 4.1.8 resolution so the runner and Gherkin adapter
+  share one module instance.
+- `plans/in-progress/beaver-nest-app-setup/evidence/phase-4-dependency-adoption.md` and
+  `plans/in-progress/beaver-nest-app-setup/tech-docs.md` — modified — record the renewed Vitest
+  4.1.8 security clearance and shared-instance regression resolution.
 
 ### Commands and Results
 

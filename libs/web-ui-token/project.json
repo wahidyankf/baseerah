@@ -20,11 +20,10 @@
       "executor": "nx:run-commands",
       "options": {
         "commands": [
-          "npx vitest run",
+          "npx vitest run --config libs/web-ui-token/vitest.config.ts",
           "! grep -rnE '\\.(skip|todo)\\(' --include='*.test.*' --include='*.steps.*' src"
         ],
-        "parallel": false,
-        "cwd": "libs/web-ui-token"
+        "parallel": false
       },
       "cache": true
     },
