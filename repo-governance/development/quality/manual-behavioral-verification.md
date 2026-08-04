@@ -1,6 +1,6 @@
 ---
 title: "Manual Behavioral Verification Convention"
-description: Practice requiring manual verification of UI features and API endpoints using Playwright MCP tools and curl after implementing changes
+description: Practice requiring manual verification of UI features in a real browser and API endpoints with curl after implementing changes
 category: explanation
 subcategory: development
 tags:
@@ -51,9 +51,33 @@ This applies to:
 
 ## UI Verification
 
-Use Playwright MCP tools to verify UI features and bugs in a real browser environment.
+Verify UI features and bugs through an available real-browser integration. Before starting the
+verification, discover which browser integrations are installed and callable in the active harness
+instead of assuming a fixed tool is present.
 
-### Required Tools
+### Browser Tool Discovery and Selection
+
+Follow this sequence for every browser-facing verification:
+
+1. Inspect the active harness's callable tools, connected MCP servers, plugins, and installed browser
+   automation integrations.
+2. Prefer Chrome or Chrome DevTools MCP when it is available and connected.
+3. Otherwise, use Playwright MCP when it is available and connected.
+4. If neither preferred integration is usable, select an equivalent installed real-browser tool that
+   supports navigation, interaction, rendered-state inspection, console inspection, network
+   inspection, and screenshots.
+5. If a selected integration fails, record the failure and try the next available integration before
+   declaring verification blocked.
+
+Static source inspection, component markup review, and automated test output may supplement this
+procedure. They do not count as browser verification when a live application and a usable real-browser
+integration are available. If no real-browser integration is usable, document the discovery attempts
+and missing capability; do not claim that static inspection completed live browser verification.
+
+### Required Browser Capabilities
+
+The selected browser integration must provide operations equivalent to these Playwright MCP examples;
+tool names may differ between integrations.
 
 | Tool                       | Purpose                                                |
 | -------------------------- | ------------------------------------------------------ |
@@ -67,7 +91,7 @@ Use Playwright MCP tools to verify UI features and bugs in a real browser enviro
 
 ### UI Verification Checklist
 
-After implementing a UI change, verify:
+After implementing a UI change with the selected real-browser integration, verify:
 
 1. **Page renders**: Navigate to the page and take a snapshot. Confirm the expected elements are present.
 2. **Interactions work**: Click buttons, fill forms, and navigate between pages. Confirm the expected behavior occurs.
@@ -78,7 +102,7 @@ After implementing a UI change, verify:
 7. **All breakpoints verified**: Repeat at mobile (375 px), tablet (768 px), and desktop (1280 px). Responsive behavior at one viewport does not imply correct behavior at others.
 8. **Evidence captured**: Save one screenshot per breakpoint per locale to the plan's `evidence/` subfolder; reference each from the `delivery.md` implementation notes. See [Evidence Capture Convention](./evidence-capture.md).
 
-### Example: UI Feature Verification (multi-locale app)
+### Example: UI Feature Verification With Playwright MCP (multi-locale app)
 
 ```
 For each locale in ["en", "id"]:
@@ -190,7 +214,7 @@ A feature is not complete until **both** automated tests pass **and** manual ver
 2. Write/update automated tests (unit, integration, E2E as appropriate)
 3. Run test:quick -- all pass
 4. Start dev server
-5. Manually verify UI renders correctly in ALL locales at ALL breakpoints
+5. Manually verify UI renders correctly with an available real-browser integration in ALL locales at ALL breakpoints
    (browser_navigate, browser_snapshot, browser_take_screenshot → evidence/)
 6. Manually verify API responds correctly (curl → inline in delivery.md)
 7. Check for console errors (browser_console_messages)
@@ -234,7 +258,9 @@ It does not apply to:
 
 ## Tools and Automation
 
-- **Playwright MCP tools**: Available to all agents for browser-based verification
+- **Chrome or Chrome DevTools MCP**: Preferred real-browser integration when installed and connected
+- **Playwright MCP tools**: Preferred fallback real-browser integration when installed and connected
+- **Equivalent installed browser tools**: Allowed fallback when neither preferred integration is usable
 - **curl**: Available via Bash for API verification
 - **jq**: Available via Bash for JSON response inspection
 
