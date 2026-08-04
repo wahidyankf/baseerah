@@ -537,6 +537,8 @@
 - `plans/in-progress/beaver-nest-app-setup/evidence/phase-4-dependency-adoption.md` and
   `plans/in-progress/beaver-nest-app-setup/tech-docs.md` — modified — record the renewed Vitest
   4.1.8 security clearance and shared-instance regression resolution.
+- `apps/beaver-nest-be/tests/unit/BeaverNestBe.UnitTests.fsproj` — modified — force VSTest mode so
+  Coverlet's MSBuild driver can instrument .NET 10 test execution.
 
 ### Commands and Results
 

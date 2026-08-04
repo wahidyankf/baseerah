@@ -5,6 +5,7 @@
     <IsPackable>false</IsPackable>
     <Nullable>enable</Nullable>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <TestingPlatformDotnetTestSupport>false</TestingPlatformDotnetTestSupport>
     <!-- 3261/3264: F# nullness interop noise in test data.
          0044: the in-process Giraffe TestServer harness (WebHostBuilder/TestServer
          in Steps/BddState.fs) is deprecated in ASP.NET 10 but remains the standard,
