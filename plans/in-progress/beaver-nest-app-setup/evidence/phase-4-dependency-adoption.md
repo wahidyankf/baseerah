@@ -18,7 +18,7 @@
 
 ## Sources and Reproducibility
 
-- [Dependency Bump Stability & Safety Policy](../../../repo-governance/development/workflow/dependency-bump-policy.md)
+- [Dependency Bump Stability & Safety Policy](../../../../repo-governance/development/workflow/dependency-bump-policy.md)
 - [NVD CVE-2026-39365](https://nvd.nist.gov/vuln/detail/CVE-2026-39365)
 - [GitHub Advisory Database](https://github.com/advisories)
 - [Snyk Vite package record](https://security.snyk.io/package/npm/vite)

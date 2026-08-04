@@ -22,4 +22,4 @@ Compose stack. This is required by the full-stack CI workflow.
 ## Feature Files
 
 - [liveness.feature](../../specs/apps/beaver-nest/behavior/beaver-nest-be/gherkin/health/liveness.feature)
-- [greeting.feature](../../specs/apps/beaver-nest/behavior/beaver-nest-be/gherkin/hello/greeting.feature)
+- [readiness-ready.feature](../../specs/apps/beaver-nest/behavior/beaver-nest-be/gherkin/health/readiness-ready.feature)
