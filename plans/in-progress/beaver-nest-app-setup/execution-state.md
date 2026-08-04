@@ -518,3 +518,25 @@
 ### Evidence
 
 - `evidence/phase-5-container-base-images.md` — Path A LTS selection and sanitized digest inspection.
+
+## Phase 6
+
+### Task Status
+
+- Awaiting the required human-only production runtime attestation. No operator environment file, real
+  address, hostname, directory path, username, or credential has been read, printed, or modified.
+
+### Files Changed
+
+- `plans/in-progress/beaver-nest-app-setup/execution-state.md` — modified — initialize the Phase 6
+  append-only ledger before human-runtime evidence work.
+
+### Commands and Results
+
+- No production runtime command has been run by the AI. The local sandbox cannot satisfy the required
+  real VPN/operator attestation and must not receive the operator environment file.
+
+### Evidence
+
+- Pending the human confirmation described in Phase 6 of `delivery.md`; any later evidence will use
+  placeholders only and contain no private runtime values.
