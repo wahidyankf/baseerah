@@ -111,26 +111,52 @@ flowchart LR
 | 2-3      | Additive SQLite and readiness backend           | `worktrees/beaver-nest-app-setup-backend/` / `beaver-nest-app-setup-backend`               | yes — at Phase 3 end |
 | 4-8      | Vite CSR, combined same-origin runtime, archive | `worktrees/beaver-nest-app-setup-client-runtime/` / `beaver-nest-app-setup-client-runtime` | yes — at Phase 8 end |
 
+### Delivery Deviations (reconciled against git 2026-08-05)
+
+Units 1 and 2 delivered as specified: PR #1 (`beaver-nest-app-setup`, merged 2026-08-03) carried
+Phase 1, PR #2 (`beaver-nest-app-setup-backend`, merged 2026-08-03) carried Phases 2-3. Both merge
+commits are on `main` (`66bfd9ffa`, `be67af9f0`).
+
+**Unit 3 deviated.** Its Phase 4-6 content reached `main` **without a PR** — seven commits from
+`8bfe22fa0 feat(beaver-nest-fe): migrate workspace to vite` through
+`cd2ec0e4d docs(governance): apply model selection disclosure`, landed by pushing the
+`beaver-nest-app-setup-client-runtime` branch directly rather than opening the PR this table
+requires. No PR #3 exists; `gh pr list --state all` returns only #1 and #2. Consequences:
+
+- The mandatory **PR-Review Maker→Fixer Cycles** never ran for unit 3, so no
+  `local-temp/beaver-nest-app-setup-unit-3-cycle-*-review.md` record exists and the PR-Review
+  Workflow Invocation Record below has no unit-3 entry.
+- Phase 8's "Unit 3 PR/Merge" steps are now **unsatisfiable as written** — the content they were to
+  merge is already on `main`. Phase 8 needs rescoping to archive-and-cleanup before it can be
+  executed, or the plan needs an explicit waiver recording the direct-push landing.
+- All three worktrees named in this table are gone (`git worktree list` shows only the primary
+  checkout), and the unit-3 branch has been deleted, so unit 3 cannot be re-delivered through a PR
+  without reconstructing it from `main`.
+
+Checkbox state through Phase 5 was reconciled from the `execution-state.md` ledger, the two merged
+PRs, and the artifacts verified present on `main`; it had drifted to 42/385 while Phases 0-5 were in
+fact complete.
+
 ## Phase 0: Origin Precondition, Environment, and Baseline
 
-- [ ] [AI] Verify this authored plan already exists on `origin/main` with
+- [x] [AI] Verify this authored plan already exists on `origin/main` with
       `git fetch origin && git show origin/main:plans/in-progress/beaver-nest-app-setup/delivery.md >/dev/null`;
       acceptance: the command exits 0 before any origin-based worktree is provisioned. If it fails,
       stop and ask the user for separate authorization to commit and land the plan; this authoring
       request does not authorize staging or committing it.
-- [ ] [AI] Run `npm install` from `/Users/wkf/ose-projects/beaver-nest`; acceptance: npm exits 0 and no
+- [x] [AI] Run `npm install` from `/Users/wkf/ose-projects/beaver-nest`; acceptance: npm exits 0 and no
       unledgered tracked file changes.
-- [ ] [AI] Run `npm run doctor -- --fix` from `/Users/wkf/ose-projects/beaver-nest`; acceptance: the
+- [x] [AI] Run `npm run doctor -- --fix` from `/Users/wkf/ose-projects/beaver-nest`; acceptance: the
       doctor exits 0 without changing git identity.
-- [ ] [AI] Provision the first unit with
+- [x] [AI] Provision the first unit with
       `git fetch origin && git worktree add -b beaver-nest-app-setup worktrees/beaver-nest-app-setup origin/main`
       when it is absent; acceptance: `git -C worktrees/beaver-nest-app-setup status --short` is empty.
-- [ ] [AI] Run `npm install` inside `worktrees/beaver-nest-app-setup/`; acceptance: npm exits 0.
-- [ ] [AI] Run `npm run doctor -- --fix` inside `worktrees/beaver-nest-app-setup/`; acceptance: the
+- [x] [AI] Run `npm install` inside `worktrees/beaver-nest-app-setup/`; acceptance: npm exits 0.
+- [x] [AI] Run `npm run doctor -- --fix` inside `worktrees/beaver-nest-app-setup/`; acceptance: the
       doctor exits 0 without changing git identity.
-- [ ] [AI] Initialize the append-only file-touch ledger in executor task state; acceptance: every
+- [x] [AI] Initialize the append-only file-touch ledger in executor task state; acceptance: every
       later touched path is recorded and no repository file is created for the Phase 0 ledger.
-- [ ] [AI] Create only local temporary scratch-probe inputs
+- [x] [AI] Create only local temporary scratch-probe inputs
       `local-temp/beaver-nest-publication-probe/{main.rs,Dockerfile}`: `main.rs` uses only Rust `std` to
       listen on `0.0.0.0:80` and return a bounded `200` response; `Dockerfile` uses only `FROM scratch`,
       copies the compiled binary, and declares port `80`. Record their hashes, the installed
@@ -138,16 +164,16 @@ flowchart LR
       `local-temp/beaver-nest-publication-probe/executor-state.md`; acceptance: the executor-state record
       proves no registry package, remote image, or manifest change is introduced, so the dependency
       policy's external-package clearance path is not applicable.
-- [ ] [AI] Run a disposable host-address publication capability probe with
+- [x] [AI] Run a disposable host-address publication capability probe with
       `rustc --edition=2024 --target aarch64-unknown-linux-musl -C linker=rust-lld -C target-feature=+crt-static -O local-temp/beaver-nest-publication-probe/main.rs -o local-temp/beaver-nest-publication-probe/publication-probe-server && docker build --pull=false --tag beaver-nest-publication-probe:local -f local-temp/beaver-nest-publication-probe/Dockerfile local-temp/beaver-nest-publication-probe && beaver_nest_probe=beaver-nest-publication-probe-$$; trap 'docker stop "$beaver_nest_probe" >/dev/null 2>&1 || true; docker rm "$beaver_nest_probe" >/dev/null 2>&1 || true' EXIT; docker run --detach --name "$beaver_nest_probe" --publish 127.0.0.1:19391:80 beaver-nest-publication-probe:local >/dev/null && curl --fail --silent --show-error http://127.0.0.1:19391/ >/dev/null && docker port "$beaver_nest_probe" 80 | rg '^127\.0\.0\.1:19391$'`;
       acceptance: the selected Linux Docker Engine or macOS Docker Desktop runtime retains the explicit
       loopback fixture address rather than a wildcard, and records no real VPN address. If it fails,
       stop before Phase 1 and record the unsupported runtime in executor task state; do not relax the
       production address-binding requirement.
-- [ ] [AI] Run
+- [x] [AI] Run
       `npm exec -- nx run-many -t typecheck,lint,test:quick,test:specs -p beaver-nest-contracts,beaver-nest-be,beaver-nest-be-e2e,beaver-nest-fe,beaver-nest-fe-e2e --parallel=3`
       inside the first worktree; acceptance: all targets for the exact five-project baseline exit 0.
-- [ ] [AI] Run `npm run lint:md && npm run validate:sync && npm exec -- nx run rhino-cli:instruction-size:validation`
+- [x] [AI] Run `npm run lint:md && npm run validate:sync && npm exec -- nx run rhino-cli:instruction-size:validation`
       inside the first worktree; acceptance: all three commands exit 0.
 
 ### Phase 0 Gate
@@ -155,11 +181,11 @@ flowchart LR
 > All checks below must pass before Phase 1. Phase 0 pushes nothing, opens no PR, runs no review
 > cycle, and changes no source, spec, documentation, governance, or plan file.
 
-- [ ] [AI] Run
+- [x] [AI] Run
       `git -C worktrees/beaver-nest-app-setup merge-base --is-ancestor origin/main HEAD`;
       acceptance: the command exits 0.
-- [ ] [AI] Run `git -C worktrees/beaver-nest-app-setup status --short`; acceptance: output is empty.
-- [ ] [AI] Re-run
+- [x] [AI] Run `git -C worktrees/beaver-nest-app-setup status --short`; acceptance: output is empty.
+- [x] [AI] Re-run
       `npm exec -- nx run-many -t test:quick,test:specs -p beaver-nest-contracts,beaver-nest-be,beaver-nest-be-e2e,beaver-nest-fe,beaver-nest-fe-e2e --parallel=3`;
       acceptance: all exact five-project baseline targets exit 0.
 
@@ -173,12 +199,12 @@ Run every Phase 1 command from
 `/Users/wkf/ose-projects/beaver-nest/worktrees/beaver-nest-app-setup/` unless the checkbox names a
 different working directory.
 
-- [ ] [AI] Create `plans/in-progress/beaver-nest-app-setup/execution-state.md` with the four required
+- [x] [AI] Create `plans/in-progress/beaver-nest-app-setup/execution-state.md` with the four required
       headings and a `## Phase 1` block before editing governance content; acceptance: the file has
       empty `### Task Status`, `### Files Changed`, `### Commands and Results`, and `### Evidence`
       sections, and its first `Files Changed` row records the file itself as created for durable
       execution-state tracking.
-- [ ] [AI] If Phase 0's local scratch publication probe succeeded and its executor-state record can be
+- [x] [AI] If Phase 0's local scratch publication probe succeeded and its executor-state record can be
       safely retained without host-specific data, create the committed sanitized evidence record
       `plans/in-progress/beaver-nest-app-setup/evidence/phase-0-dependency-adoption.md` before editing
       governance content. Transcribe only the source and Dockerfile hashes, Rust target, `rust-lld` link,
@@ -189,99 +215,99 @@ different working directory.
       safe or appropriate, record that decision in the Phase 1 execution-state ledger and do not create
       the evidence file.
 
-- [ ] [AI] Edit `repo-governance/development/quality/three-level-testing-standard.md` so universal
+- [x] [AI] Edit `repo-governance/development/quality/three-level-testing-standard.md` so universal
       integration gates require each app's real configured production database rather than PostgreSQL;
       acceptance: its generic integration guidance names no specific database product.
-- [ ] [AI] Edit `repo-governance/development/infra/bdd-spec-test-mapping.md` so integration BDD mapping
+- [x] [AI] Edit `repo-governance/development/infra/bdd-spec-test-mapping.md` so integration BDD mapping
       requires the configured real production database; acceptance: its generic mapping makes SQLite
       and PostgreSQL equally valid app-selected examples.
-- [ ] [AI] Edit `repo-governance/development/infra/ci-conventions.md` so CI database guidance is
+- [x] [AI] Edit `repo-governance/development/infra/ci-conventions.md` so CI database guidance is
       application-selected rather than PostgreSQL-only; acceptance: generic CI requirements retain no
       PostgreSQL dependency.
-- [ ] [AI] Edit `repo-governance/development/infra/nx-targets.md` so `test:integration` documentation
+- [x] [AI] Edit `repo-governance/development/infra/nx-targets.md` so `test:integration` documentation
       requires the real configured production database; acceptance: its target definition remains
       database-neutral.
-- [ ] [AI] Edit `repo-governance/development/README.md` to link the generalized real-database rule;
+- [x] [AI] Edit `repo-governance/development/README.md` to link the generalized real-database rule;
       acceptance: its development index describes no PostgreSQL-only integration requirement.
-- [ ] [AI] Edit `repo-governance/development/quality/README.md` to index the generalized testing rule;
+- [x] [AI] Edit `repo-governance/development/quality/README.md` to index the generalized testing rule;
       acceptance: its quality index has no stale PostgreSQL-only description.
-- [ ] [AI] Edit `docs/how-to/add-new-app.md` so a new app declares and tests its own configured
+- [x] [AI] Edit `docs/how-to/add-new-app.md` so a new app declares and tests its own configured
       production database; acceptance: its app-creation guidance does not prescribe PostgreSQL.
-- [ ] [AI] Edit `repo-governance/development/pattern/database-audit-trail.md` so future domain tables
+- [x] [AI] Edit `repo-governance/development/pattern/database-audit-trail.md` so future domain tables
       retain six-column audit, soft-delete, explicit SQL migration, and startup-failure requirements
       while ORM mapping is optional; acceptance:
       `rg -n 'EF Core|ORM|DbUp|SQLite|PostgreSQL' repo-governance/development/pattern/database-audit-trail.md`
       shows direct parameterized SQL as a valid manifestation.
-- [ ] [AI] Run
+- [x] [AI] Run
       `npm exec -- prettier --write repo-governance/development/quality/three-level-testing-standard.md repo-governance/development/infra/bdd-spec-test-mapping.md repo-governance/development/infra/ci-conventions.md repo-governance/development/infra/nx-targets.md repo-governance/development/README.md repo-governance/development/quality/README.md repo-governance/development/pattern/database-audit-trail.md docs/how-to/add-new-app.md`;
       acceptance: Prettier exits 0 and touches no path outside the Phase 1 ledger.
-- [ ] [AI] Run
+- [x] [AI] Run
       `npm exec -- markdownlint-cli2 repo-governance/development/quality/three-level-testing-standard.md repo-governance/development/infra/bdd-spec-test-mapping.md repo-governance/development/infra/ci-conventions.md repo-governance/development/infra/nx-targets.md repo-governance/development/README.md repo-governance/development/quality/README.md repo-governance/development/pattern/database-audit-trail.md docs/how-to/add-new-app.md`;
       acceptance: markdownlint exits 0.
-- [ ] [AI] Reconcile `rtk git status --short` against the ledger; acceptance: every changed path is a
+- [x] [AI] Reconcile `rtk git status --short` against the ledger; acceptance: every changed path is a
       Phase 1 governance/documentation path or this plan's execution-state record, and no spec,
       contract, app, infrastructure, or workflow path changed.
-- [ ] [AI] Export the Phase 1 task-state ledger one repository-relative path per line to
+- [x] [AI] Export the Phase 1 task-state ledger one repository-relative path per line to
       `local-temp/beaver-nest-app-setup-unit-1-ledger.txt`; acceptance:
       `test -s local-temp/beaver-nest-app-setup-unit-1-ledger.txt` exits 0 and inspection confirms only
       the exact Phase 1 governance/documentation paths plus this plan's execution-state path.
-- [ ] [AI] Stage the unit 1 ledger with
+- [x] [AI] Stage the unit 1 ledger with
       `while IFS= read -r beaver_nest_unit_1_stage_path; do case "$beaver_nest_unit_1_stage_path" in */.env.example) :;; /*|*..*|*.env|*.env.*) exit 1;; esac; git add -- "$beaver_nest_unit_1_stage_path" || exit 1; done < local-temp/beaver-nest-app-setup-unit-1-ledger.txt`;
       acceptance:
       `diff -u <(sort local-temp/beaver-nest-app-setup-unit-1-ledger.txt) <(git diff --cached --name-only | sort)`
       exits 0, so no path absent from the ledger is staged.
-- [ ] [AI] Commit with
+- [x] [AI] Commit with
       `git commit -m "docs(governance): support configured production databases"`; acceptance: one
       conventional commit is created without modifying git identity.
-- [ ] [AI] Push with `git push -u origin beaver-nest-app-setup`; acceptance:
+- [x] [AI] Push with `git push -u origin beaver-nest-app-setup`; acceptance:
       `git rev-parse HEAD` equals `git rev-parse origin/beaver-nest-app-setup`.
-- [ ] [AI] Create `local-temp/beaver-nest-app-setup-unit-1-pr.md` with exact unit 1 scope, commands,
+- [x] [AI] Create `local-temp/beaver-nest-app-setup-unit-1-pr.md` with exact unit 1 scope, commands,
       evidence, dependency, and no-private-value sections; acceptance:
       `test -s local-temp/beaver-nest-app-setup-unit-1-pr.md` exits 0 and the body describes
       governance-only changes.
-- [ ] [AI] Open the unit 1 draft PR with
+- [x] [AI] Open the unit 1 draft PR with
       `gh pr create --draft --base main --head beaver-nest-app-setup --title "docs(governance): support configured production databases" --body-file local-temp/beaver-nest-app-setup-unit-1-pr.md`;
       acceptance: `gh pr view beaver-nest-app-setup --json baseRefName,headRefName,isDraft` reports
       `main`, `beaver-nest-app-setup`, and `true`.
-- [ ] [AI] Record the unit 1 PR URL with
+- [x] [AI] Record the unit 1 PR URL with
       `gh pr view beaver-nest-app-setup --json url --jq .url > local-temp/beaver-nest-app-setup-unit-1-pr-url.txt && test -s local-temp/beaver-nest-app-setup-unit-1-pr-url.txt`;
       acceptance: the file has exactly one HTTPS PR URL.
-- [ ] [AI] Send the exact **PR-Review Workflow Invocation Record** request with `N=1`, `C=1`, and
+- [x] [AI] Send the exact **PR-Review Workflow Invocation Record** request with `N=1`, `C=1`, and
       `prior-cycle-record: none`; acceptance:
       `local-temp/beaver-nest-app-setup-unit-1-cycle-1-review.md` says `final-status: done`,
       `cycles-completed: 1`, and `unresolved-threads: 0`, and all reported CRITICAL/HIGH/MEDIUM
       findings are resolved and pushed.
-- [ ] [AI] Resolve the cycle 1 run ID with
+- [x] [AI] Resolve the cycle 1 run ID with
       `gh run list --branch beaver-nest-app-setup --event pull_request --limit 1 --json databaseId --jq '.[0].databaseId' > local-temp/beaver-nest-app-setup-unit-1-cycle-1-run-id.txt && test -s local-temp/beaver-nest-app-setup-unit-1-cycle-1-run-id.txt`;
       acceptance: the file contains one numeric run ID for the pushed cycle 1 HEAD.
-- [ ] [AI] Poll unit 1 CI every two minutes with one
+- [x] [AI] Poll unit 1 CI every two minutes with one
       `gh run view "$(tr -d '\n' < local-temp/beaver-nest-app-setup-unit-1-cycle-1-run-id.txt)" --json status,conclusion`
       call per wakeup; acceptance: status is `completed` and conclusion is `success`.
-- [ ] [AI] Send the exact **PR-Review Workflow Invocation Record** request with `N=1`, `C=2`, and
+- [x] [AI] Send the exact **PR-Review Workflow Invocation Record** request with `N=1`, `C=2`, and
       `prior-cycle-record: local-temp/beaver-nest-app-setup-unit-1-cycle-1-review.md`; acceptance:
       `local-temp/beaver-nest-app-setup-unit-1-cycle-2-review.md` says `final-status: done`,
       `cycles-completed: 1`, and `unresolved-threads: 0`; all blocking findings are resolved and
       pushed.
-- [ ] [AI] Resolve the cycle 2 run ID with
+- [x] [AI] Resolve the cycle 2 run ID with
       `gh run list --branch beaver-nest-app-setup --event pull_request --limit 1 --json databaseId --jq '.[0].databaseId' > local-temp/beaver-nest-app-setup-unit-1-cycle-2-run-id.txt && test -s local-temp/beaver-nest-app-setup-unit-1-cycle-2-run-id.txt`;
       acceptance: the file contains one numeric run ID for the pushed cycle 2 HEAD and differs from
       cycle 1.
-- [ ] [AI] Poll the new unit 1 CI run every two minutes with one
+- [x] [AI] Poll the new unit 1 CI run every two minutes with one
       `gh run view "$(tr -d '\n' < local-temp/beaver-nest-app-setup-unit-1-cycle-2-run-id.txt)" --json status,conclusion`
       call per wakeup; acceptance: status is `completed` and conclusion is `success`.
-- [ ] [AI] Send the exact **PR-Review Workflow Invocation Record** request with `N=1`, `C=3`, and
+- [x] [AI] Send the exact **PR-Review Workflow Invocation Record** request with `N=1`, `C=3`, and
       `prior-cycle-record: local-temp/beaver-nest-app-setup-unit-1-cycle-2-review.md`; acceptance:
       `local-temp/beaver-nest-app-setup-unit-1-cycle-3-review.md` says `final-status: done`,
       `cycles-completed: 1`, and `unresolved-threads: 0`; zero CRITICAL/HIGH/MEDIUM findings remain
       and the branch is forward-updated to latest `origin/main`.
-- [ ] [AI] Resolve the cycle 3 run ID with
+- [x] [AI] Resolve the cycle 3 run ID with
       `gh run list --branch beaver-nest-app-setup --event pull_request --limit 1 --json databaseId --jq '.[0].databaseId' > local-temp/beaver-nest-app-setup-unit-1-cycle-3-run-id.txt && test -s local-temp/beaver-nest-app-setup-unit-1-cycle-3-run-id.txt`;
       acceptance: the file contains one numeric run ID for the pushed cycle 3 HEAD and differs from
       cycles 1 and 2.
-- [ ] [AI] Poll the final unit 1 CI run every two minutes with one
+- [x] [AI] Poll the final unit 1 CI run every two minutes with one
       `gh run view "$(tr -d '\n' < local-temp/beaver-nest-app-setup-unit-1-cycle-3-run-id.txt)" --json status,conclusion`
       call per wakeup; acceptance: status is `completed` and conclusion is `success`.
-- [ ] [AI] Merge unit 1 only after all five hardened preconditions hold using the mechanism required by
+- [x] [AI] Merge unit 1 only after all five hardened preconditions hold using the mechanism required by
       the PR Merge Protocol; acceptance:
       `gh pr view beaver-nest-app-setup --json state,mergedAt,mergeCommit` reports `MERGED`, a non-null
       merge time, and a merge commit.
@@ -290,13 +316,13 @@ different working directory.
 
 > All checks below must pass after unit 1 merges and before provisioning unit 2.
 
-- [ ] [AI] Run
+- [x] [AI] Run
       `git fetch origin && git merge-base --is-ancestor "$(gh pr view beaver-nest-app-setup --json mergeCommit --jq .mergeCommit.oid)" origin/main`;
       acceptance: the command exits 0.
-- [ ] [AI] Run
+- [x] [AI] Run
       `git switch --detach origin/main && npm exec -- nx run-many -t test:quick,test:specs -p beaver-nest-contracts,beaver-nest-be,beaver-nest-be-e2e,beaver-nest-fe,beaver-nest-fe-e2e --parallel=3`;
       acceptance: all exact five-project gates exit 0.
-- [ ] [AI] Inspect the final strict unit 1 review report; acceptance: it records zero
+- [x] [AI] Inspect the final strict unit 1 review report; acceptance: it records zero
       CRITICAL/HIGH/MEDIUM findings and successful required CI.
 
 > **Pause Safety**: Governance-only support for app-selected production databases is merged and all
@@ -309,18 +335,18 @@ After provisioning, run every Phase 2 and Phase 3 command from
 `/Users/wkf/ose-projects/beaver-nest/worktrees/beaver-nest-app-setup-backend/` unless the checkbox
 names a different working directory.
 
-- [ ] [AI] Provision unit 2 with
+- [x] [AI] Provision unit 2 with
       `git fetch origin && git worktree add -b beaver-nest-app-setup-backend worktrees/beaver-nest-app-setup-backend origin/main`;
       acceptance: `git -C worktrees/beaver-nest-app-setup-backend status --short` is empty.
-- [ ] [AI] Run `npm install` inside `worktrees/beaver-nest-app-setup-backend/`; acceptance: npm exits 0.
-- [ ] [AI] Run `npm run doctor -- --fix` inside `worktrees/beaver-nest-app-setup-backend/`; acceptance:
+- [x] [AI] Run `npm install` inside `worktrees/beaver-nest-app-setup-backend/`; acceptance: npm exits 0.
+- [x] [AI] Run `npm run doctor -- --fix` inside `worktrees/beaver-nest-app-setup-backend/`; acceptance:
       the doctor exits 0 without modifying git identity.
-- [ ] [AI] After entering the provisioned unit 2 worktree, append a `## Phase 2` block with the four
+- [x] [AI] After entering the provisioned unit 2 worktree, append a `## Phase 2` block with the four
       required headings to `plans/in-progress/beaver-nest-app-setup/execution-state.md`; acceptance:
       the phase begins with no claimed files or results, every subsequent Phase 2 path is appended when
       touched, and the execution-state record inherited from merged unit 1 remains committed history
       rather than an uncommitted cross-worktree ledger.
-- [ ] [AI] Apply
+- [x] [AI] Apply
       `repo-governance/development/workflow/dependency-bump-policy.md` to exact versions of
       `dbup-sqlite` and `Microsoft.Data.Sqlite`, recording sanitized Path A/B/C evidence in
       `plans/in-progress/beaver-nest-app-setup/evidence/phase-2-dependency-adoption.md`; acceptance: the
@@ -328,23 +354,23 @@ names a different working directory.
       5b results, NVD, GitHub Advisories, Snyk, vendor pages, CISA KEV, and EPSS without secrets; copy
       each final clearance status and exact version into the `tech-docs.md` Security Clearance Status
       table before editing the project file.
-- [ ] [AI] Edit `apps/beaver-nest-be/src/BeaverNestBe/BeaverNestBe.fsproj` to exact-pin only the
+- [x] [AI] Edit `apps/beaver-nest-be/src/BeaverNestBe/BeaverNestBe.fsproj` to exact-pin only the
       approved DbUp SQLite and Microsoft SQLite packages; acceptance:
       `dotnet list apps/beaver-nest-be/src/BeaverNestBe/BeaverNestBe.fsproj package | rg -i 'EntityFramework|Dapper|ORM'`
       exits 1 with no matches.
-- [ ] [AI] Verify the Phase 2 dependency edit with
+- [x] [AI] Verify the Phase 2 dependency edit with
       `rg -n 'Version="[^"]*(\^|~|\*|latest)' apps/beaver-nest-be/src/BeaverNestBe/BeaverNestBe.fsproj`
       and `npm exec -- nx run beaver-nest-be:deps:audit`; acceptance: the exact-pin scan exits 1 with
       no match, the dependency audit exits 0, and their sanitized results are added to the Phase 2
       evidence file and `tech-docs.md` clearance table before continuing.
-- [ ] [AI] **RED** — add listener-configuration tests to
+- [x] [AI] **RED** — add listener-configuration tests to
       `apps/beaver-nest-be/tests/unit/Tests/HttpConfigurationTests.fs` and register the test-only file in
       `apps/beaver-nest-be/tests/unit/BeaverNestBe.UnitTests.fsproj`; run
       `npm exec -- nx run beaver-nest-be:test:unit`; acceptance: tests fail because the app does not yet
       parse `BEAVER_NEST_BE_HTTP_LISTEN_ADDRESS`/`BEAVER_NEST_BE_HTTP_LISTEN_PORT`, host default
       `127.0.0.1:19300`, host-dev override `127.0.0.1:19320`, or container-only explicit
       `0.0.0.0:19300`.
-- [ ] [AI] **GREEN** — add
+- [x] [AI] **GREEN** — add
       `apps/beaver-nest-be/src/BeaverNestBe/Domain/HttpConfiguration.fs`, edit
       `apps/beaver-nest-be/src/BeaverNestBe/Program.fs`, and register source compile order in
       `apps/beaver-nest-be/src/BeaverNestBe/BeaverNestBe.fsproj`; add placeholders/defaults for
@@ -358,27 +384,27 @@ names a different working directory.
       acceptance: host default is loopback port `19300`, Nx `dev` explicitly overrides loopback port
       `19320`, standard `DOTNET_RUNNING_IN_CONTAINER=true` permits explicit container listen
       `0.0.0.0:19300`, and no other host use of `0.0.0.0` is accepted.
-- [ ] [AI] **REFACTOR** — keep listener parsing/validation pure in
+- [x] [AI] **REFACTOR** — keep listener parsing/validation pure in
       `apps/beaver-nest-be/src/BeaverNestBe/Domain/HttpConfiguration.fs`, remove obsolete
       `BEAVER_NEST_BE_PORT` from `apps/beaver-nest-be/{project.json,.env.example,README.md}` and all
       active code/config, and include the backend env example in named inputs; run
       `rg -n 'BEAVER_NEST_BE_PORT' apps/beaver-nest-be infra/dev/beaver-nest-app .github/workflows`;
       acceptance: `rg` exits 1 and `npm exec -- nx run beaver-nest-be:test:quick` exits 0.
-- [ ] [AI] **RED** — add the additive unit-2 ownership assertions to
+- [x] [AI] **RED** — add the additive unit-2 ownership assertions to
       `infra/dev/beaver-nest-app/tests/env-contract.sh`; run
       `bash infra/dev/beaver-nest-app/tests/env-contract.sh`; acceptance: it fails because
       `repo-config.yml` does not register the new backend/Compose keys from
       `apps/beaver-nest-be/.env.example`.
-- [ ] [AI] **GREEN** — edit `repo-config.yml` to register every new backend key and its Compose/local
+- [x] [AI] **GREEN** — edit `repo-config.yml` to register every new backend key and its Compose/local
       injection home while temporarily retaining the current frontend env source until unit 3; run
       `bash infra/dev/beaver-nest-app/tests/env-contract.sh && cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- env validate`;
       acceptance: both commands exit 0 and unit 2 introduces no undeclared key or real value.
-- [ ] [AI] **REFACTOR** — remove the obsolete CORS declaration/allowlist from
+- [x] [AI] **REFACTOR** — remove the obsolete CORS declaration/allowlist from
       `apps/beaver-nest-be/.env.example` and `repo-config.yml`; run
       `bash infra/dev/beaver-nest-app/tests/env-contract.sh && cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- repo-config validate`;
       acceptance: both commands exit 0 while the temporary frontend owner remains unchanged.
 
-- [ ] [AI] **RED** — add
+- [x] [AI] **RED** — add
       `specs/apps/beaver-nest/behavior/beaver-nest-be/gherkin/persistence/fresh-database.feature`, its
       literal TickSpec bindings in `apps/beaver-nest-be/tests/unit/Steps/PersistenceSteps.fs`, and
       fresh-database coverage in `apps/beaver-nest-be/tests/integration/SqliteMigrationTests.fs`;
@@ -398,36 +424,36 @@ names a different working directory.
     And no product or domain table is created
   ```
 
-- [ ] [AI] **GREEN** — add
+- [x] [AI] **GREEN** — add
       `apps/beaver-nest-be/src/BeaverNestBe/Infrastructure/Sqlite/Connection.fs`,
       `apps/beaver-nest-be/src/BeaverNestBe/Infrastructure/Migrations.fs`, and one timestamped
       initialization SQL file under `apps/beaver-nest-be/src/BeaverNestBe/Migrations/`; register exact
       compile/content order in `apps/beaver-nest-be/src/BeaverNestBe/BeaverNestBe.fsproj`; run
       `npm exec -- nx run beaver-nest-be:test:integration`; acceptance: DbUp creates only its journal
       before the host listens.
-- [ ] [AI] **REFACTOR** — extract the fresh-database pre-listen migration orchestration into a focused
+- [x] [AI] **REFACTOR** — extract the fresh-database pre-listen migration orchestration into a focused
       function in `apps/beaver-nest-be/src/BeaverNestBe/Infrastructure/Migrations.fs` while retaining
       the literal bindings in `apps/beaver-nest-be/tests/unit/Steps/PersistenceSteps.fs`; run
       `npm exec -- nx run beaver-nest-be:test:specs && npm exec -- nx run beaver-nest-be:test:integration`;
       acceptance: the `fresh-database.feature` scenario remains bound, DbUp creates its journal before
       listen, and no product or domain table is created.
-- [ ] [AI] **RED** — add `apps/beaver-nest-be/tests/unit/Tests/DatabaseConfigurationTests.fs` and its
+- [x] [AI] **RED** — add `apps/beaver-nest-be/tests/unit/Tests/DatabaseConfigurationTests.fs` and its
       `.fsproj` compile entry; run `npm exec -- nx run beaver-nest-be:test:unit`; acceptance: tests fail
       until configuration derives only `beaver-nest.sqlite3` from a canonical data directory, rejects
       root/home/repository paths, symlink components, directory-as-file values, aliases, and an
       attempted database file outside the data directory.
-- [ ] [AI] **GREEN** — add pure validation to
+- [x] [AI] **GREEN** — add pure validation to
       `apps/beaver-nest-be/src/BeaverNestBe/Domain/DatabaseConfiguration.fs` and wire it through
       `Program.fs`/`Connection.fs`; run `npm exec -- nx run beaver-nest-be:test:unit`; acceptance: the
       production database path is exactly `/var/lib/beaver-nest/beaver-nest.sqlite3`, local tests use
       only their own canonical `mktemp` directory, the development wrapper can supply only its own
       canonical directory, and no arbitrary database-file environment variable remains.
-- [ ] [AI] **REFACTOR** — centralize the fixed-name and canonical-directory predicates in
+- [x] [AI] **REFACTOR** — centralize the fixed-name and canonical-directory predicates in
       `apps/beaver-nest-be/src/BeaverNestBe/Domain/DatabaseConfiguration.fs`; run
       `npm exec -- nx run beaver-nest-be:test:quick`; acceptance: strict F# lint and existing/new tests
       exit 0.
 
-- [ ] [AI] **RED** — add
+- [x] [AI] **RED** — add
       `specs/apps/beaver-nest/behavior/beaver-nest-be/gherkin/persistence/migration-restart.feature`, its
       literal bindings to `apps/beaver-nest-be/tests/unit/Steps/PersistenceSteps.fs`, and
       restart/idempotence coverage to `apps/beaver-nest-be/tests/integration/SqliteMigrationTests.fs`;
@@ -446,16 +472,16 @@ names a different working directory.
     And readiness reports schema "current"
   ```
 
-- [ ] [AI] **GREEN** — implement expected-script/journal comparison in
+- [x] [AI] **GREEN** — implement expected-script/journal comparison in
       `apps/beaver-nest-be/src/BeaverNestBe/Infrastructure/Migrations.fs`; run
       `npm exec -- nx run beaver-nest-be:test:integration`; acceptance: two starts produce one journal
       entry per script and return schema state `current`.
-- [ ] [AI] **REFACTOR** — move migration-state comparison to a pure function in
+- [x] [AI] **REFACTOR** — move migration-state comparison to a pure function in
       `apps/beaver-nest-be/src/BeaverNestBe/Domain/Readiness.fs`; run
       `npm exec -- nx run beaver-nest-be:test:quick`; acceptance: table-driven state tests and strict
       lint exit 0.
 
-- [ ] [AI] **RED** — add
+- [x] [AI] **RED** — add
       `specs/apps/beaver-nest/behavior/beaver-nest-be/gherkin/persistence/broken-migration.feature`, its
       literal bindings to `apps/beaver-nest-be/tests/unit/Steps/PersistenceSteps.fs`, an invalid-SQL
       fixture under `apps/beaver-nest-be/tests/integration/Fixtures/Migrations/`, and startup-failure
@@ -474,15 +500,15 @@ names a different working directory.
     And the migration failure is logged without exposing sensitive configuration
   ```
 
-- [ ] [AI] **GREEN** — edit `apps/beaver-nest-be/src/BeaverNestBe/Infrastructure/Migrations.fs` and
+- [x] [AI] **GREEN** — edit `apps/beaver-nest-be/src/BeaverNestBe/Infrastructure/Migrations.fs` and
       `apps/beaver-nest-be/src/BeaverNestBe/Program.fs` to fail before host listen with sanitized logs;
       run `npm exec -- nx run beaver-nest-be:test:integration`; acceptance: invalid fixture startup is
       non-zero and logs expose no SQL, database path, or connection detail.
-- [ ] [AI] **REFACTOR** — centralize provider error classification in
+- [x] [AI] **REFACTOR** — centralize provider error classification in
       `apps/beaver-nest-be/src/BeaverNestBe/Infrastructure/Sqlite/Errors.fs`; run
       `npm exec -- nx run beaver-nest-be:test:quick`; acceptance: all error mappings remain green.
 
-- [ ] [AI] **RED** — add
+- [x] [AI] **RED** — add
       `specs/apps/beaver-nest/behavior/beaver-nest-be/gherkin/persistence/sqlite-settings.feature`, its
       literal bindings to `apps/beaver-nest-be/tests/unit/Steps/PersistenceSteps.fs`, and SQLite-setting
       coverage to `apps/beaver-nest-be/tests/integration/SqliteSettingsTests.fs`; register the
@@ -502,16 +528,16 @@ names a different working directory.
     And a finite busy timeout is configured
   ```
 
-- [ ] [AI] **GREEN** — edit
+- [x] [AI] **GREEN** — edit
       `apps/beaver-nest-be/src/BeaverNestBe/Infrastructure/Sqlite/Connection.fs` to enable foreign keys,
       WAL, and the configured finite busy timeout without `Cache=Shared`; run
       `npm exec -- nx run beaver-nest-be:test:integration`; acceptance: queried PRAGMA/provider values
       match the configuration.
-- [ ] [AI] **REFACTOR** — represent SQLite settings as an immutable validated F# record and open one
+- [x] [AI] **REFACTOR** — represent SQLite settings as an immutable validated F# record and open one
       connection per operation; run `npm exec -- nx run beaver-nest-be:test:quick`; acceptance: strict
       typecheck/lint/coverage exit 0.
 
-- [ ] [AI] **RED** — add
+- [x] [AI] **RED** — add
       `specs/apps/beaver-nest/behavior/beaver-nest-be/gherkin/persistence/sqlite-contention.feature`, its
       literal bindings to `apps/beaver-nest-be/tests/unit/Steps/PersistenceSteps.fs`, and a
       two-connection contention test that creates its fixture table only in the disposable DB from
@@ -531,16 +557,16 @@ names a different working directory.
     And the result is returned as a controlled database-busy error rather than an unbounded hang
   ```
 
-- [ ] [AI] **GREEN** — implement SQLite busy/locked classification in
+- [x] [AI] **GREEN** — implement SQLite busy/locked classification in
       `apps/beaver-nest-be/src/BeaverNestBe/Infrastructure/Sqlite/Errors.fs`; run
       `npm exec -- nx run beaver-nest-be:test:integration`; acceptance: the second operation returns a
       controlled result within the configured finite timeout without unbounded retry.
-- [ ] [AI] **REFACTOR** — remove duplicated provider-code matching and timing sleeps from
+- [x] [AI] **REFACTOR** — remove duplicated provider-code matching and timing sleeps from
       `apps/beaver-nest-be/tests/integration/SqliteSettingsTests.fs`; run
       `npm exec -- nx run beaver-nest-be:test:quick && npm exec -- nx run beaver-nest-be:test:integration`;
       acceptance: both commands exit 0 deterministically.
 
-- [ ] [AI] **RED** — add
+- [x] [AI] **RED** — add
       `specs/apps/beaver-nest/behavior/beaver-nest-be/gherkin/recovery/online-backup.feature`, its literal
       bindings in `apps/beaver-nest-be/tests/unit/Steps/RecoverySteps.fs`, and online-backup coverage to
       `apps/beaver-nest-be/tests/integration/DatabaseOperationsTests.fs`; register both F# files in
@@ -560,18 +586,18 @@ names a different working directory.
     And foreign_key_check returns no rows for the backup
   ```
 
-- [ ] [AI] **GREEN** — add `apps/beaver-nest-be/src/BeaverNestBe/Operations/Database.fs` and wire
+- [x] [AI] **GREEN** — add `apps/beaver-nest-be/src/BeaverNestBe/Operations/Database.fs` and wire
       `backup --name` in `apps/beaver-nest-be/src/BeaverNestBe/Program.fs` so a validated basename is
       resolved only beneath fixed in-container `/var/backups/beaver-nest`, using
       `SqliteConnection.BackupDatabase`; run `npm exec -- nx run beaver-nest-be:test:integration`;
       acceptance: online backup passes both integrity checks and refuses traversal, symlinks, aliases,
       and an existing name.
-- [ ] [AI] **REFACTOR** — centralize canonical backup-path validation in
+- [x] [AI] **REFACTOR** — centralize canonical backup-path validation in
       `apps/beaver-nest-be/src/BeaverNestBe/Operations/Database.fs`; run
       `npm exec -- nx run beaver-nest-be:test:quick`; acceptance: root/home/repository targets, symlink
       components, source/destination aliasing, and overwrite attempts are rejected without raw `cp`.
 
-- [ ] [AI] **RED** — add
+- [x] [AI] **RED** — add
       `specs/apps/beaver-nest/behavior/beaver-nest-be/gherkin/recovery/verified-restore.feature`, its
       literal bindings to `apps/beaver-nest-be/tests/unit/Steps/RecoverySteps.fs`, and stopped-app
       restore and command-order coverage to
@@ -592,7 +618,7 @@ names a different working directory.
     And the restarted application reports ready
   ```
 
-- [ ] [AI] **GREEN** — wire `restore --name` in
+- [x] [AI] **GREEN** — wire `restore --name` in
       `apps/beaver-nest-be/src/BeaverNestBe/Program.fs` so command-mode dispatch happens before DbUp,
       host construction, or an HTTP listener; a validated basename resolves only beneath fixed
       in-container `/var/backups/beaver-nest`, with a fixed canonical live destination, unique
@@ -600,7 +626,7 @@ names a different working directory.
       `npm exec -- nx run beaver-nest-be:test:integration`; acceptance: a valid backup restores to
       current schema, corrupt/symlink/overwrite cases cannot replace live data, and restore starts no
       listener or migration before replacement.
-- [ ] [AI] **REFACTOR** — share integrity and foreign-key validation between backup and restore in
+- [x] [AI] **REFACTOR** — share integrity and foreign-key validation between backup and restore in
       `apps/beaver-nest-be/src/BeaverNestBe/Operations/Database.fs`; run
       `npm exec -- nx run beaver-nest-be:test:quick`; acceptance: command parsing remains pure and all
       operation tests pass.
@@ -610,15 +636,15 @@ names a different working directory.
 > All checks below must pass before Phase 3. Unit 2 has not opened a PR and the active greeting API
 > and current frontend remain intact.
 
-- [ ] [AI] Run `npm exec -- nx run beaver-nest-be:test:quick`; acceptance: the command exits 0.
-- [ ] [AI] Run `npm exec -- nx run beaver-nest-be:test:integration`; acceptance: the command exits 0
+- [x] [AI] Run `npm exec -- nx run beaver-nest-be:test:quick`; acceptance: the command exits 0.
+- [x] [AI] Run `npm exec -- nx run beaver-nest-be:test:integration`; acceptance: the command exits 0
       using unique disposable real SQLite files.
-- [ ] [AI] Run `npm exec -- nx run beaver-nest-be:test:specs`; acceptance: the command exits 0 with
+- [x] [AI] Run `npm exec -- nx run beaver-nest-be:test:specs`; acceptance: the command exits 0 with
       the additive backend features and retained hello feature.
-- [ ] [AI] Run
+- [x] [AI] Run
       `dotnet list apps/beaver-nest-be/src/BeaverNestBe/BeaverNestBe.fsproj package | rg -i 'EntityFramework|Dapper|ORM'`;
       acceptance: `rg` exits 1 with no matches.
-- [ ] [AI] Run `rtk git status --short` in the backend worktree; acceptance: only Phase 2 ledger paths
+- [x] [AI] Run `rtk git status --short` in the backend worktree; acceptance: only Phase 2 ledger paths
       appear and no database, backup, real env, or disposable-directory content appears.
 
 > **Pause Safety**: Unit 2 contains a tested additive SQLite/migration/backup core while greeting and
@@ -627,28 +653,28 @@ names a different working directory.
 
 ## Phase 3: Additive Readiness Contract and Unit 2 Delivery
 
-- [ ] [AI] Append a `## Phase 3` block with the four required headings to
+- [x] [AI] Append a `## Phase 3` block with the four required headings to
       `plans/in-progress/beaver-nest-app-setup/execution-state.md`; acceptance: the phase begins with
       no claimed files or results, and every subsequent Phase 3 path is appended when touched.
 
-- [ ] [AI] **RED** — add
+- [x] [AI] **RED** — add
       `specs/apps/beaver-nest/containers/contracts/tests/readiness-contract.sh` and replace the
       `beaver-nest-contracts:test:unit` no-op in
       `specs/apps/beaver-nest/containers/contracts/project.json` with that exact script; run
       `npm exec -- nx run beaver-nest-contracts:test:unit`; acceptance: it fails before the contract
       declares readiness `200`/`503`, the exact safe response schemas, `Cache-Control: no-store`, and
       the absence of response validator headers.
-- [ ] [AI] **GREEN** — edit `specs/apps/beaver-nest/containers/contracts/openapi.yaml` to retain
+- [x] [AI] **GREEN** — edit `specs/apps/beaver-nest/containers/contracts/openapi.yaml` to retain
       `getHello` and Greeting while adding `GET /api/v1/readiness` with exact `200` and `503` schemas,
       `Cache-Control: no-store`, and no validator headers for both statuses; run
       `npm exec -- nx run beaver-nest-contracts:lint && npm exec -- nx run beaver-nest-contracts:test:unit && npm exec -- nx run beaver-nest-contracts:bundle && npm exec -- nx run beaver-nest-be:codegen && npm exec -- nx run beaver-nest-fe:codegen`;
       acceptance: lint and contract test pass, the bundled OpenAPI contains health, hello, readiness,
       and JSON Error contracts, and generated clients/types contain both greeting and readiness
       operations so the current frontend still compiles.
-- [ ] [AI] **REFACTOR** — keep the readiness-contract script assertion-only and use no YAML parser
+- [x] [AI] **REFACTOR** — keep the readiness-contract script assertion-only and use no YAML parser
       dependency; run `npm exec -- nx run beaver-nest-contracts:test:quick`; acceptance: all contract
       targets exit 0 and the script has no network or generation side effect.
-- [ ] [AI] Characterize current liveness by replacing the active health scenario with
+- [x] [AI] Characterize current liveness by replacing the active health scenario with
       `specs/apps/beaver-nest/behavior/beaver-nest-be/gherkin/health/liveness.feature`, adding its literal
       binding to `apps/beaver-nest-be/tests/unit/Steps/HealthSteps.fs`, linking it from the backend
       Gherkin README, and extending `apps/beaver-nest-be/tests/unit/Tests/HealthHandlerTests.fs`; run
@@ -667,7 +693,7 @@ names a different working directory.
     And the response reveals no database path or migration detail
   ```
 
-- [ ] [AI] **RED** — add
+- [x] [AI] **RED** — add
       `specs/apps/beaver-nest/behavior/beaver-nest-be/gherkin/health/readiness-ready.feature`, its literal
       binding in `apps/beaver-nest-be/tests/unit/Steps/ReadinessSteps.fs`, and ready-port response
       coverage to `apps/beaver-nest-be/tests/unit/Tests/ReadinessHandlerTests.fs`; register exact F#
@@ -687,17 +713,17 @@ names a different working directory.
     And the response sends "Cache-Control: no-store" without a cache validator
   ```
 
-- [ ] [AI] **GREEN** — add
+- [x] [AI] **GREEN** — add
       `apps/beaver-nest-be/src/BeaverNestBe/Application/ReadinessPort.fs` and
       `apps/beaver-nest-be/src/BeaverNestBe/Api/ReadinessHandlers.fs`, register compile order, and map
       the route in `apps/beaver-nest-be/src/BeaverNestBe/WebApp.fs`; run
       `npm exec -- nx run beaver-nest-be:test:unit`; acceptance: exact readiness `200` JSON passes with
       `Cache-Control: no-store` and without ETag or Last-Modified.
-- [ ] [AI] **REFACTOR** — inject the readiness function explicitly and keep response construction pure;
+- [x] [AI] **REFACTOR** — inject the readiness function explicitly and keep response construction pure;
       run `npm exec -- nx run beaver-nest-be:test:quick`; acceptance: strict lint/typecheck/coverage
       exit 0.
 
-- [ ] [AI] **RED** — add
+- [x] [AI] **RED** — add
       `specs/apps/beaver-nest/behavior/beaver-nest-be/gherkin/health/readiness-unready.feature`, its
       literal binding to `apps/beaver-nest-be/tests/unit/Steps/ReadinessSteps.fs`, unavailable-port unit
       coverage, and real HTTP/SQLite cases in
@@ -720,79 +746,79 @@ names a different working directory.
     And the response sends "Cache-Control: no-store" without a cache validator
   ```
 
-- [ ] [AI] **GREEN** — map unavailable, busy, and corrupt internal readiness results to one safe `503`
+- [x] [AI] **GREEN** — map unavailable, busy, and corrupt internal readiness results to one safe `503`
       contract in `apps/beaver-nest-be/src/BeaverNestBe/Api/ReadinessHandlers.fs`; run
       `npm exec -- nx run beaver-nest-be:test:unit && npm exec -- nx run beaver-nest-be:test:integration`;
       acceptance: fake-port and real HTTP/SQLite lock/fault cases return bounded `503`, exact safe JSON,
       `Cache-Control: no-store`, no ETag/Last-Modified, and no path, SQL, provider code, or exception
       detail.
-- [ ] [AI] **REFACTOR** — expose a closed provider-independent readiness result from
+- [x] [AI] **REFACTOR** — expose a closed provider-independent readiness result from
       `apps/beaver-nest-be/src/BeaverNestBe/Domain/Readiness.fs`; run
       `npm exec -- nx run beaver-nest-be:test:quick && npm exec -- nx run beaver-nest-be:test:integration`;
       acceptance: both commands exit 0; integration manipulates only disposable SQLite state from test
       code, adds no production write route/test seam, and adds no fixture migration to the app.
-- [ ] [AI] Verify the exact unit 2 compile/binding registry in
+- [x] [AI] Verify the exact unit 2 compile/binding registry in
       `apps/beaver-nest-be/tests/unit/BeaverNestBe.UnitTests.fsproj` and
       `apps/beaver-nest-be/tests/integration/BeaverNestBe.IntegrationTests.fsproj`; run
       `npm exec -- nx run beaver-nest-be:test:specs`; acceptance: all ten unit 2 scenario steps have
       executable bindings and every F# test file is compiled once in dependency order.
-- [ ] [AI] Add aggregate Playwright-BDD bindings for unit 2 HTTP/CLI observations in
+- [x] [AI] Add aggregate Playwright-BDD bindings for unit 2 HTTP/CLI observations in
       `apps/beaver-nest-be-e2e/steps/{health,readiness,persistence,recovery}.steps.ts`, update
       `apps/beaver-nest-be-e2e/e2e-coverage-baseline.json`, and retain greeting steps;
       **Gherkin (binds) →** the same ten unit 2 scenario titles (aggregate Playwright-BDD binder
       exception); run `npm exec -- nx run beaver-nest-be-e2e:test:specs`; acceptance: `bddgen`, behavior
       coverage, and E2E coverage all exit 0 without unconditional skip; readiness `200` and `503`
       bindings assert no-store and absence of validator headers.
-- [ ] [AI] Update `apps/beaver-nest-be/docker-compose.integration.yml`,
+- [x] [AI] Update `apps/beaver-nest-be/docker-compose.integration.yml`,
       `apps/beaver-nest-be/Dockerfile.integration`, and `apps/beaver-nest-be/scripts/run-e2e.sh` to pass
       only sanitized explicit unit 2 DB/listen variables and a disposable data directory; acceptance:
       `npm exec -- nx run beaver-nest-be-e2e:test:e2e` exits 0 without reading any real env file.
-- [ ] [AI] Run an additive runtime smoke test from a separate terminal with
+- [x] [AI] Run an additive runtime smoke test from a separate terminal with
       `beaver_nest_phase3_root=$(mktemp -d) && BEAVER_NEST_BE_DATA_DIRECTORY="$beaver_nest_phase3_root" BEAVER_NEST_BE_SQLITE_BUSY_TIMEOUT_MILLISECONDS=1000 BEAVER_NEST_BE_HTTP_LISTEN_ADDRESS=127.0.0.1 BEAVER_NEST_BE_HTTP_LISTEN_PORT=19320 npm exec -- nx run beaver-nest-be:dev`;
       acceptance: startup migrates the disposable database and listens only on CI/local loopback.
-- [ ] [AI] Run
+- [x] [AI] Run
       `curl --fail-with-body --silent --show-error --header 'Accept: application/json' http://127.0.0.1:19320/api/v1/health`;
       acceptance: status is `200`, JSON reports `ok`, and output contains no database path or migration
       detail.
-- [ ] [AI] Run
+- [x] [AI] Run
       `curl --fail-with-body --silent --show-error --header 'Accept: application/json' http://127.0.0.1:19320/api/v1/readiness`;
       acceptance: status is `200` and JSON reports ready/database ready/schema current.
-- [ ] [AI] Run
+- [x] [AI] Run
       `curl --fail-with-body --silent --show-error --header 'Accept: application/json' http://127.0.0.1:19320/api/v1/hello`;
       acceptance: status remains `200` in unit 2.
-- [ ] [AI] Update `apps/beaver-nest-be/README.md` with additive SQLite, migration, readiness, backup,
+- [x] [AI] Update `apps/beaver-nest-be/README.md` with additive SQLite, migration, readiness, backup,
       restore, explicit-env, and local loopback-test procedures; acceptance:
       `npm exec -- markdownlint-cli2 apps/beaver-nest-be/README.md` exits 0.
-- [ ] [AI] Reconcile the unit 2 ledger against `rtk git status --short`; acceptance: every changed path
+- [x] [AI] Reconcile the unit 2 ledger against `rtk git status --short`; acceptance: every changed path
       is ledgered and no current frontend source, combined-runtime infrastructure, real env, database,
       or backup file appears.
-- [ ] [AI] Run
+- [x] [AI] Run
       `npm exec -- nx run-many -t build,typecheck,lint,test:quick,test:specs -p beaver-nest-contracts,beaver-nest-be,beaver-nest-be-e2e,beaver-nest-fe,beaver-nest-fe-e2e --parallel=3`;
       acceptance: all exact five-project gates exit 0 while hello/current FE remain active.
-- [ ] [AI] Run `npm exec -- nx run beaver-nest-be:test:integration`; acceptance: real SQLite integration
+- [x] [AI] Run `npm exec -- nx run beaver-nest-be:test:integration`; acceptance: real SQLite integration
       exits 0.
-- [ ] [AI] Run `npm exec -- nx run beaver-nest-be-e2e:test:e2e`; acceptance: the full backend E2E spec
+- [x] [AI] Run `npm exec -- nx run beaver-nest-be-e2e:test:e2e`; acceptance: the full backend E2E spec
       suite exits 0 with a disposable DB directory.
-- [ ] [AI] Export the unit 2 task-state ledger one repository-relative path per line to
+- [x] [AI] Export the unit 2 task-state ledger one repository-relative path per line to
       `local-temp/beaver-nest-app-setup-unit-2-ledger.txt`; acceptance:
       `test -s local-temp/beaver-nest-app-setup-unit-2-ledger.txt` exits 0 and inspection excludes real
       env/database/backup/disposable paths and every unowned actor path.
-- [ ] [AI] Stage the unit 2 ledger with
+- [x] [AI] Stage the unit 2 ledger with
       `while IFS= read -r beaver_nest_unit_2_stage_path; do case "$beaver_nest_unit_2_stage_path" in */.env.example) :;; /*|*..*|*.env|*.env.*) exit 1;; esac; git add -- "$beaver_nest_unit_2_stage_path" || exit 1; done < local-temp/beaver-nest-app-setup-unit-2-ledger.txt`;
       acceptance:
       `diff -u <(sort local-temp/beaver-nest-app-setup-unit-2-ledger.txt) <(git diff --cached --name-only | sort)`
       exits 0, so no path absent from the ledger is staged.
-- [ ] [AI] Commit with `git commit -m "feat(beaver-nest-be): add sqlite readiness foundation"`;
+- [x] [AI] Commit with `git commit -m "feat(beaver-nest-be): add sqlite readiness foundation"`;
       acceptance: one conventional commit is created without changing git identity.
-- [ ] [AI] Push with `git push -u origin beaver-nest-app-setup-backend`; acceptance: remote and local
+- [x] [AI] Push with `git push -u origin beaver-nest-app-setup-backend`; acceptance: remote and local
       branch SHAs match.
-- [ ] [AI] Identify the unit 2 post-push CI blast radius with
+- [x] [AI] Identify the unit 2 post-push CI blast radius with
       `git diff origin/main...HEAD --name-only && npm exec -- nx show projects --affected --base=origin/main --head=HEAD`;
       acceptance: the executor records every changed app, contract, library, and configuration surface
       and maps the BeaverNest backend/frontend/contract blast radius to
       `beaver-nest-app-test-local-deploy-stag.yml` under
       `repo-governance/development/workflow/ci-post-push-verification.md`.
-- [ ] [AI] Before dispatching, inspect the newest
+- [x] [AI] Before dispatching, inspect the newest
       `beaver-nest-app-test-local-deploy-stag.yml` run for the unit 2 branch with
       `gh run list --workflow=beaver-nest-app-test-local-deploy-stag.yml --branch=beaver-nest-app-setup-backend --limit=1 --json databaseId,headSha,status`;
       trigger it exactly once with
@@ -800,64 +826,64 @@ names a different working directory.
       only when no run for the current `git rev-parse HEAD` is `queued` or `in_progress`; acceptance: the
       required app-group heavy workflow is either already running for the current head or is dispatched
       once, never duplicated.
-- [ ] [AI] Record the current-head heavy-workflow run ID in
+- [x] [AI] Record the current-head heavy-workflow run ID in
       `local-temp/beaver-nest-app-setup-unit-2-post-push-app-ci-run-id.txt` using
       `gh run list --workflow=beaver-nest-app-test-local-deploy-stag.yml --branch=beaver-nest-app-setup-backend --event=workflow_dispatch --limit=3 --json databaseId,headSha,status`;
       acceptance: the recorded run has `headSha` equal to `git rev-parse HEAD` and one numeric
       `databaseId`.
-- [ ] [AI] Monitor the recorded unit 2 heavy-workflow run every two minutes using exactly one
+- [x] [AI] Monitor the recorded unit 2 heavy-workflow run every two minutes using exactly one
       `gh run view "$(tr -d '\n' < local-temp/beaver-nest-app-setup-unit-2-post-push-app-ci-run-id.txt)" --json status,conclusion,jobs`
       call per wakeup; acceptance: it reaches `completed` with conclusion `success`; on failure, inspect
       `gh run view <run-id> --log-failed`, fix the root cause, push, and repeat this post-push sequence.
-- [ ] [AI] Create `local-temp/beaver-nest-app-setup-unit-2-pr.md` with exact additive scope, retained
+- [x] [AI] Create `local-temp/beaver-nest-app-setup-unit-2-pr.md` with exact additive scope, retained
       hello/current-FE compatibility, commands, SQLite evidence, dependency evidence, and no-private-
       value sections; acceptance: `test -s local-temp/beaver-nest-app-setup-unit-2-pr.md` exits 0.
-- [ ] [AI] Open the unit 2 draft PR with
+- [x] [AI] Open the unit 2 draft PR with
       `gh pr create --draft --base main --head beaver-nest-app-setup-backend --title "feat(beaver-nest-be): add sqlite readiness foundation" --body-file local-temp/beaver-nest-app-setup-unit-2-pr.md`;
       acceptance: the PR targets `main` from only the backend worktree branch.
-- [ ] [AI] Identify and monitor the PR-triggered workflows `pr-quality-gate.yml` and `validate-env.yml`
+- [x] [AI] Identify and monitor the PR-triggered workflows `pr-quality-gate.yml` and `validate-env.yml`
       in addition to the completed heavy workflow: run
       `gh run list --branch=beaver-nest-app-setup-backend --event=pull_request --limit=20 --json databaseId,headSha,status,workflowName`;
       acceptance: each named workflow has a run for the current PR head, and each run is checked every
       two minutes with one `gh run view <run-id> --json status,conclusion,jobs` call per wakeup until
       `completed/success`; fixes that change the head restart this full three-workflow verification.
-- [ ] [AI] Record the unit 2 PR URL with
+- [x] [AI] Record the unit 2 PR URL with
       `gh pr view beaver-nest-app-setup-backend --json url --jq .url > local-temp/beaver-nest-app-setup-unit-2-pr-url.txt && test -s local-temp/beaver-nest-app-setup-unit-2-pr-url.txt`;
       acceptance: the file has exactly one HTTPS PR URL.
-- [ ] [AI] Send the exact **PR-Review Workflow Invocation Record** request with `N=2`, `C=1`, and
+- [x] [AI] Send the exact **PR-Review Workflow Invocation Record** request with `N=2`, `C=1`, and
       `prior-cycle-record: none`; acceptance:
       `local-temp/beaver-nest-app-setup-unit-2-cycle-1-review.md` says `final-status: done`,
       `cycles-completed: 1`, and `unresolved-threads: 0`; all CRITICAL/HIGH/MEDIUM findings are
       resolved and pushed.
-- [ ] [AI] Resolve the unit 2 cycle 1 run ID with
+- [x] [AI] Resolve the unit 2 cycle 1 run ID with
       `gh run list --branch beaver-nest-app-setup-backend --event pull_request --limit 1 --json databaseId --jq '.[0].databaseId' > local-temp/beaver-nest-app-setup-unit-2-cycle-1-run-id.txt && test -s local-temp/beaver-nest-app-setup-unit-2-cycle-1-run-id.txt`;
       acceptance: the file contains one numeric run ID for cycle 1 HEAD.
-- [ ] [AI] Poll unit 2 cycle 1 CI every two minutes with one
+- [x] [AI] Poll unit 2 cycle 1 CI every two minutes with one
       `gh run view "$(tr -d '\n' < local-temp/beaver-nest-app-setup-unit-2-cycle-1-run-id.txt)" --json status,conclusion`
       per wakeup; acceptance: completed/success.
-- [ ] [AI] Send the exact **PR-Review Workflow Invocation Record** request with `N=2`, `C=2`, and
+- [x] [AI] Send the exact **PR-Review Workflow Invocation Record** request with `N=2`, `C=2`, and
       `prior-cycle-record: local-temp/beaver-nest-app-setup-unit-2-cycle-1-review.md`; acceptance:
       `local-temp/beaver-nest-app-setup-unit-2-cycle-2-review.md` says `final-status: done`,
       `cycles-completed: 1`, and `unresolved-threads: 0`; all blocking findings are resolved and
       pushed.
-- [ ] [AI] Resolve the unit 2 cycle 2 run ID with
+- [x] [AI] Resolve the unit 2 cycle 2 run ID with
       `gh run list --branch beaver-nest-app-setup-backend --event pull_request --limit 1 --json databaseId --jq '.[0].databaseId' > local-temp/beaver-nest-app-setup-unit-2-cycle-2-run-id.txt && test -s local-temp/beaver-nest-app-setup-unit-2-cycle-2-run-id.txt`;
       acceptance: the numeric run ID is for cycle 2 HEAD and differs from cycle 1.
-- [ ] [AI] Poll unit 2 cycle 2 CI every two minutes with one
+- [x] [AI] Poll unit 2 cycle 2 CI every two minutes with one
       `gh run view "$(tr -d '\n' < local-temp/beaver-nest-app-setup-unit-2-cycle-2-run-id.txt)" --json status,conclusion`
       per wakeup; acceptance: completed/success.
-- [ ] [AI] Send the exact **PR-Review Workflow Invocation Record** request with `N=2`, `C=3`, and
+- [x] [AI] Send the exact **PR-Review Workflow Invocation Record** request with `N=2`, `C=3`, and
       `prior-cycle-record: local-temp/beaver-nest-app-setup-unit-2-cycle-2-review.md`; acceptance:
       `local-temp/beaver-nest-app-setup-unit-2-cycle-3-review.md` says `final-status: done`,
       `cycles-completed: 1`, and `unresolved-threads: 0`; zero CRITICAL/HIGH/MEDIUM findings remain
       and the branch is forward-updated to latest `origin/main`.
-- [ ] [AI] Resolve the unit 2 cycle 3 run ID with
+- [x] [AI] Resolve the unit 2 cycle 3 run ID with
       `gh run list --branch beaver-nest-app-setup-backend --event pull_request --limit 1 --json databaseId --jq '.[0].databaseId' > local-temp/beaver-nest-app-setup-unit-2-cycle-3-run-id.txt && test -s local-temp/beaver-nest-app-setup-unit-2-cycle-3-run-id.txt`;
       acceptance: the numeric run ID is for cycle 3 HEAD and differs from cycles 1 and 2.
-- [ ] [AI] Poll unit 2 cycle 3 CI every two minutes with one
+- [x] [AI] Poll unit 2 cycle 3 CI every two minutes with one
       `gh run view "$(tr -d '\n' < local-temp/beaver-nest-app-setup-unit-2-cycle-3-run-id.txt)" --json status,conclusion`
       per wakeup; acceptance: completed/success.
-- [ ] [AI] Merge unit 2 only after all five hardened preconditions hold; acceptance:
+- [x] [AI] Merge unit 2 only after all five hardened preconditions hold; acceptance:
       `gh pr view beaver-nest-app-setup-backend --json state,mergedAt,mergeCommit` reports `MERGED`, a
       non-null merge time, and a merge commit.
 
@@ -865,17 +891,17 @@ names a different working directory.
 
 > All checks below must pass after unit 2 merges and before provisioning unit 3.
 
-- [ ] [AI] Run
+- [x] [AI] Run
       `git fetch origin && git merge-base --is-ancestor "$(gh pr view beaver-nest-app-setup-backend --json mergeCommit --jq .mergeCommit.oid)" origin/main`;
       acceptance: the command exits 0.
-- [ ] [AI] Run
+- [x] [AI] Run
       `git switch --detach origin/main && npm exec -- nx run-many -t build,test:quick,test:specs -p beaver-nest-contracts,beaver-nest-be,beaver-nest-be-e2e,beaver-nest-fe,beaver-nest-fe-e2e --parallel=3`;
       acceptance: all exact five-project gates exit 0.
-- [ ] [AI] Run `npm exec -- nx run beaver-nest-be:test:integration`; acceptance: the full backend
+- [x] [AI] Run `npm exec -- nx run beaver-nest-be:test:integration`; acceptance: the full backend
       integration suite exits 0 against disposable real SQLite.
-- [ ] [AI] Run `npm exec -- nx run beaver-nest-be-e2e:test:e2e`; acceptance: the full backend E2E spec
+- [x] [AI] Run `npm exec -- nx run beaver-nest-be-e2e:test:e2e`; acceptance: the full backend E2E spec
       suite exits 0.
-- [ ] [AI] Inspect the final strict unit 2 review report; acceptance: it records zero
+- [x] [AI] Inspect the final strict unit 2 review report; acceptance: it records zero
       CRITICAL/HIGH/MEDIUM findings and successful required CI.
 
 > **Pause Safety**: Additive SQLite, migration, backup/restore, and readiness are merged; hello and the
@@ -1099,20 +1125,20 @@ exact`, the audit exits 0, and their sanitized results are added to the Phase 4 
       palette; run
       `npm exec -- nx run beaver-nest-fe:build && npm exec -- nx run beaver-nest-fe:test:quick && npm exec -- nx run beaver-nest-fe:test:integration`;
       acceptance: static build, system light/dark tests, and WCAG component checks exit 0.
-- [ ] [AI] **RED** — add `apps/beaver-nest-fe-e2e/tests/workspace-viewport.spec.ts` and
+- [x] [AI] **RED** — add `apps/beaver-nest-fe-e2e/tests/workspace-viewport.spec.ts` and
       `apps/beaver-nest-fe-e2e/playwright.viewport.config.ts` with a Vite `webServer` command and
       `testDir: "./tests"` so direct Playwright specs are discoverable; run
       `npm exec -- playwright test --config apps/beaver-nest-fe-e2e/playwright.viewport.config.ts` from
       the unit 3 worktree root; acceptance: assertions fail on clipped/overflowing or incorrectly
       composed foundation status at mobile `320x568` and `375x812`, tablet `768x1024`, or desktop
       `1280x800`.
-- [ ] [AI] **GREEN** — update `apps/beaver-nest-fe/src/App.tsx`,
+- [x] [AI] **GREEN** — update `apps/beaver-nest-fe/src/App.tsx`,
       `apps/beaver-nest-fe/src/components/ReadinessPanel.tsx`, and client CSS for the selected responsive
       layout; run
       `npm exec -- playwright test --config apps/beaver-nest-fe-e2e/playwright.viewport.config.ts`
       from the unit 3 worktree root; acceptance: all four named viewports show AppHeader, Card, status
       rows, and Refresh button without clipping, overlap, or hidden keyboard focus.
-- [ ] [AI] **REFACTOR** — share viewport expectations and deterministic reduced-motion/theme setup in
+- [x] [AI] **REFACTOR** — share viewport expectations and deterministic reduced-motion/theme setup in
       `apps/beaver-nest-fe-e2e/tests/workspace-viewport.spec.ts`; run
       `npm exec -- playwright test --config apps/beaver-nest-fe-e2e/playwright.viewport.config.ts`
       from the unit 3 worktree root; acceptance: mobile/tablet/desktop remain green without pixel sleeps
@@ -1170,11 +1196,11 @@ exact`, the audit exits 0, and their sanitized results are added to the Phase 4 
 
 ## Phase 5: Combined Same-Origin Runtime, Persistence, Security, and CI
 
-- [ ] [AI] Append a `## Phase 5` block with the four required headings to
+- [x] [AI] Append a `## Phase 5` block with the four required headings to
       `plans/in-progress/beaver-nest-app-setup/execution-state.md`; acceptance: the phase begins with
       no claimed files or results, and every subsequent Phase 5 path is appended when touched.
 
-- [ ] [AI] Apply `repo-governance/development/workflow/dependency-bump-policy.md` before rewriting any
+- [x] [AI] Apply `repo-governance/development/workflow/dependency-bump-policy.md` before rewriting any
       Phase 5 Dockerfile: `docker.io/library/node` for the
       `apps/beaver-nest-be/Dockerfile` build stage and
       `infra/dev/beaver-nest-app/Dockerfile.fe.dev`; `mcr.microsoft.com/dotnet/sdk` for the
@@ -1189,20 +1215,20 @@ exact`, the audit exits 0, and their sanitized results are added to the Phase 4 
       Dockerfile edit. A Path C result also creates the required waiver in both `tech-docs.md` and
       `docs/reference/security-waivers.md` before merge.
 
-- [ ] [AI] **RED** — add `infra/dev/beaver-nest-app/tests/clean-image-build.sh`, which rsyncs the
+- [x] [AI] **RED** — add `infra/dev/beaver-nest-app/tests/clean-image-build.sh`, which rsyncs the
       current unit-3 source into a task-specific `mktemp` tree while excluding `.git`, `node_modules`,
       `dist`, and generated-contract trees, then runs the root-context image build; run
       `bash infra/dev/beaver-nest-app/tests/clean-image-build.sh`; acceptance: it fails because the
       current root `.dockerignore` withholds the BeaverNest contract inputs and the current Dockerfile
       does not build/copy the Vite output.
-- [ ] [AI] **GREEN** — edit root `.dockerignore` to re-include only required
+- [x] [AI] **GREEN** — edit root `.dockerignore` to re-include only required
       `specs/apps/beaver-nest/` contract inputs, then rewrite `apps/beaver-nest-be/Dockerfile` as a
       root-context multi-stage build that runs contract bundle/codegen, builds
       `apps/beaver-nest-fe/dist`, publishes F#, copies only static output into ASP.NET, runs as stable
       `UID:GID 10001:10001`, and exposes only production container port `19300`; run
       `bash infra/dev/beaver-nest-app/tests/clean-image-build.sh`; acceptance: a source-only image builds
       with no reliance on host-generated/untracked clients or frontend output.
-- [ ] [AI] Verify every rewritten `FROM` reference in
+- [x] [AI] Verify every rewritten `FROM` reference in
       `apps/beaver-nest-fe/Dockerfile`, `apps/beaver-nest-be/Dockerfile`,
       `apps/beaver-nest-be/Dockerfile.integration`, `infra/dev/beaver-nest-app/Dockerfile.be.dev`, and
       `infra/dev/beaver-nest-app/Dockerfile.fe.dev` with
@@ -1213,40 +1239,40 @@ exact`, the audit exits 0, and their sanitized results are added to the Phase 4 
       version tag plus immutable digest; each unique digest is inspectable; no floating image reference
       remains; and the sanitized per-occurrence inspection output is recorded in the Phase 4/5 evidence
       files and clearance table.
-- [ ] [AI] **REFACTOR** — minimize copied build inputs/layers in root `.dockerignore` and
+- [x] [AI] **REFACTOR** — minimize copied build inputs/layers in root `.dockerignore` and
       `apps/beaver-nest-be/Dockerfile`; run
       `docker build -f apps/beaver-nest-be/Dockerfile -t beaver-nest-app:local .` followed by
       `docker run --rm --entrypoint sh beaver-nest-app:local -c 'test ! -x /usr/bin/node && test "$(id -u):$(id -g)" = "10001:10001"'`;
       acceptance: the final image contains no Node/Next runtime and starts as `10001:10001`.
-- [ ] [AI] **RED** — add unsafe-owner/mode and safe-start cases to
+- [x] [AI] **RED** — add unsafe-owner/mode and safe-start cases to
       `infra/dev/beaver-nest-app/tests/container-permissions.sh`; run
       `bash infra/dev/beaver-nest-app/tests/container-permissions.sh`; acceptance: the unsafe cases do
       not fail closed before an entrypoint exists.
-- [ ] [AI] **GREEN** — add `apps/beaver-nest-be/scripts/container-entrypoint.sh` with `umask 0077` and
+- [x] [AI] **GREEN** — add `apps/beaver-nest-be/scripts/container-entrypoint.sh` with `umask 0077` and
       exact mode checks; run `bash infra/dev/beaver-nest-app/tests/container-permissions.sh` and
       `shellcheck --severity=warning apps/beaver-nest-be/scripts/container-entrypoint.sh`;
       acceptance: long-running data directory is `0700`, SQLite/WAL/SHM/backup files are `0600`, and
       unsafe ownership for UID/GID `10001` fails before startup.
-- [ ] [AI] **REFACTOR** — extract readonly validation helpers inside
+- [x] [AI] **REFACTOR** — extract readonly validation helpers inside
       `apps/beaver-nest-be/scripts/container-entrypoint.sh`; rerun
       `bash infra/dev/beaver-nest-app/tests/container-permissions.sh`; acceptance: all safe/unsafe
       cases remain green and no validation changes data before all checks pass.
-- [ ] [AI] **RED** — add global ASP.NET security-header tests covering API success/error, static asset,
+- [x] [AI] **RED** — add global ASP.NET security-header tests covering API success/error, static asset,
       `index.html`, and SPA fallback in
       `apps/beaver-nest-be/tests/unit/Tests/SecurityHeaderTests.fs`; register them in
       `apps/beaver-nest-be/tests/unit/BeaverNestBe.UnitTests.fsproj`; run
       `npm exec -- nx run beaver-nest-be:test:unit`; acceptance: tests RED because the Next header layer
       no longer protects the combined endpoint; assertions also require the `Server` header to be
       absent.
-- [ ] [AI] **GREEN** — add global security-header middleware before API/static/fallback routing in
+- [x] [AI] **GREEN** — add global security-header middleware before API/static/fallback routing in
       `apps/beaver-nest-be/src/BeaverNestBe/WebApp.fs`; run
       `npm exec -- nx run beaver-nest-be:test:unit`; acceptance: CSP, nosniff, referrer, frame,
       permissions, absent-`Server`, and other existing policy assertions pass for every response
       class while `Program.fs` retains `AddServerHeader <- false`.
-- [ ] [AI] **REFACTOR** — move the security policy into one immutable header map in a new F# sibling under
+- [x] [AI] **REFACTOR** — move the security policy into one immutable header map in a new F# sibling under
       `apps/beaver-nest-be/src/BeaverNestBe/Api/`; run
       `npm exec -- nx run beaver-nest-be:test:quick`; acceptance: no policy is duplicated by route.
-- [ ] [AI] Characterize the current unknown-API JSON boundary by adding
+- [x] [AI] Characterize the current unknown-API JSON boundary by adding
       `specs/apps/beaver-nest/behavior/beaver-nest-be/gherkin/routing/unknown-api.feature`, its literal
       binding in `apps/beaver-nest-be/tests/unit/Steps/RoutingSteps.fs`, its Gherkin README link, and
       coverage in `apps/beaver-nest-be/tests/unit/Tests/NotFoundHandlerTests.fs`; register exact F#
@@ -1264,7 +1290,7 @@ exact`, the audit exits 0, and their sanitized results are added to the Phase 4 
     And the response body contains a non-empty error message
   ```
 
-- [ ] [AI] Characterize missing-asset 404 behavior by adding
+- [x] [AI] Characterize missing-asset 404 behavior by adding
       `specs/apps/beaver-nest/behavior/beaver-nest-be/gherkin/routing/missing-asset.feature`, its literal
       binding to `apps/beaver-nest-be/tests/unit/Steps/RoutingSteps.fs`, its README link, and coverage in
       `apps/beaver-nest-be/tests/unit/Tests/StaticRoutingTests.fs`; run
@@ -1282,7 +1308,7 @@ exact`, the audit exits 0, and their sanitized results are added to the Phase 4 
     And the response is not the Vite application shell
   ```
 
-- [ ] [AI] **RED** — add
+- [x] [AI] **RED** — add
       `specs/apps/beaver-nest/behavior/beaver-nest-be/gherkin/routing/spa-fallback.feature`, its literal
       binding to `apps/beaver-nest-be/tests/unit/Steps/RoutingSteps.fs`, its README link, and
       unknown-client-route coverage to `apps/beaver-nest-be/tests/unit/Tests/StaticRoutingTests.fs`;
@@ -1300,18 +1326,18 @@ exact`, the audit exits 0, and their sanitized results are added to the Phase 4 
     And the returned document is the Vite application shell
   ```
 
-- [ ] [AI] **GREEN** — configure `UseStaticFiles` for the dedicated Vite directory in
+- [x] [AI] **GREEN** — configure `UseStaticFiles` for the dedicated Vite directory in
       `apps/beaver-nest-be/src/BeaverNestBe/Program.fs`; then configure known APIs, the
       `/api/{**path}` JSON catch-all, protected `/assets` 404, and a final Giraffe
       `spaFallbackHandler` in `apps/beaver-nest-be/src/BeaverNestBe/WebApp.fs`. The fallback permits
       only GET/HEAD dotless non-API/non-asset paths and returns `index.html`; run
       `npm exec -- nx run beaver-nest-be:test:unit`; acceptance: all three route-boundary scenarios and
       security headers pass, and source inspection finds no `MapFallbackToFile` call.
-- [ ] [AI] **REFACTOR** — centralize route predicates/cache policies so fingerprinted assets are
+- [x] [AI] **REFACTOR** — centralize route predicates/cache policies so fingerprinted assets are
       immutable-cacheable while `index.html` is no-cache; run
       `npm exec -- nx run beaver-nest-be:test:quick`; acceptance: no directory browsing or API HTML
       fallback.
-- [ ] [AI] **RED** — add
+- [x] [AI] **RED** — add
       `specs/apps/beaver-nest/behavior/beaver-nest-be/gherkin/routing/greeting-retirement.feature`, its
       literal binding to `apps/beaver-nest-be/tests/unit/Steps/RoutingSteps.fs`, its README link, and
       retired-greeting coverage to `apps/beaver-nest-be/tests/unit/Tests/NotFoundHandlerTests.fs`; run
@@ -1329,7 +1355,7 @@ exact`, the audit exits 0, and their sanitized results are added to the Phase 4 
     And the content type is "application/json"
   ```
 
-- [ ] [AI] **GREEN** — remove
+- [x] [AI] **GREEN** — remove
       `apps/beaver-nest-be/src/BeaverNestBe/Domain/Greeting.fs`,
       `apps/beaver-nest-be/src/BeaverNestBe/Api/GreetingHandlers.fs`,
       `apps/beaver-nest-be/tests/unit/Steps/GreetingSteps.fs`,
@@ -1338,23 +1364,23 @@ exact`, the audit exits 0, and their sanitized results are added to the Phase 4 
       `npm exec -- nx run beaver-nest-be:test:unit`; acceptance: hello is JSON `404` and generated code
       contains no greeting operation; the backend Gherkin README removes the obsolete hello feature
       only in this GREEN step.
-- [ ] [AI] **REFACTOR** — remove greeting E2E steps/features and stale README references; run
+- [x] [AI] **REFACTOR** — remove greeting E2E steps/features and stale README references; run
       `rg -n 'getHello|GreetingHandlers|greeting-client|/api/v1/hello.*200' apps specs/apps/beaver-nest docs README.md`;
       acceptance: `rg` exits 1 outside archived plan/evidence history.
-- [ ] [AI] **RED** — add path/IP/ownership/mode/alias/overwrite cases to
+- [x] [AI] **RED** — add path/IP/ownership/mode/alias/overwrite cases to
       `infra/dev/beaver-nest-app/tests/preflight.sh`; run
       `bash infra/dev/beaver-nest-app/tests/preflight.sh`; acceptance: unsafe canonical paths, root/home/
       repository targets, symlink components, missing exact host IP, wrong UID/GID/modes, aliases, and
       overwrites are not yet rejected because no preflight exists.
-- [ ] [AI] **GREEN** — add `infra/dev/beaver-nest-app/scripts/preflight.sh`; run
+- [x] [AI] **GREEN** — add `infra/dev/beaver-nest-app/scripts/preflight.sh`; run
       `bash infra/dev/beaver-nest-app/tests/preflight.sh` and
       `shellcheck --severity=warning infra/dev/beaver-nest-app/scripts/preflight.sh`;
       acceptance: every unsafe case fails closed before Compose and safe sanitized fixture paths pass.
-- [ ] [AI] **REFACTOR** — extract readonly canonical-path helpers into
+- [x] [AI] **REFACTOR** — extract readonly canonical-path helpers into
       `infra/dev/beaver-nest-app/scripts/lib.sh`; run
       `bash infra/dev/beaver-nest-app/tests/preflight.sh && shellcheck --severity=warning infra/dev/beaver-nest-app/scripts/preflight.sh infra/dev/beaver-nest-app/scripts/lib.sh`;
       acceptance: validation changes nothing before all checks pass and prints no supplied private value.
-- [ ] [AI] **RED** — add combined-Compose service-recreate coverage under
+- [x] [AI] **RED** — add combined-Compose service-recreate coverage under
       `infra/dev/beaver-nest-app/tests/persistence.sh`, add
       `specs/apps/beaver-nest/behavior/beaver-nest-be/gherkin/persistence/container-restart.feature`, its
       literal binding to `apps/beaver-nest-be/tests/unit/Steps/PersistenceSteps.fs`, and its backend
@@ -1373,18 +1399,18 @@ exact`, the audit exits 0, and their sanitized results are added to the Phase 4 
     And the application returns to ready state
   ```
 
-- [ ] [AI] **GREEN** — replace `infra/dev/beaver-nest-app/docker-compose.yml` with one long-running
+- [x] [AI] **GREEN** — replace `infra/dev/beaver-nest-app/docker-compose.yml` with one long-running
       `beaver-nest-app` service using one external data bind at `/var/lib/beaver-nest` with
       `bind.create_host_path: false`, internal listen `0.0.0.0:19300`, no host backend port, and no
       `down -v`; implement service-only recreate in the persistence test and run
       `bash infra/dev/beaver-nest-app/tests/persistence.sh`; acceptance: its unique task-owned mktemp
       data directory preserves journal identity/count and readiness returns.
-- [ ] [AI] **REFACTOR** — centralize exact disposable-directory cleanup in
+- [x] [AI] **REFACTOR** — centralize exact disposable-directory cleanup in
       `infra/dev/beaver-nest-app/tests/lib.sh`; run
       `bash infra/dev/beaver-nest-app/tests/persistence.sh && bash infra/dev/beaver-nest-app/tests/persistence.sh`;
       acceptance: tests are isolated and
       never resolve to an operator path.
-- [ ] [AI] **RED** — add exact-host-address/single-port Compose assertions under
+- [x] [AI] **RED** — add exact-host-address/single-port Compose assertions under
       `infra/dev/beaver-nest-app/tests/publication.sh`, add
       `specs/apps/beaver-nest/behavior/beaver-nest-be/gherkin/network/vpn-publication.feature`, its
       literal binding in `apps/beaver-nest-be/tests/unit/Steps/NetworkSteps.fs`, its `.fsproj` compile
@@ -1405,19 +1431,19 @@ exact`, the audit exits 0, and their sanitized results are added to the Phase 4 
     And no separate backend port is reachable
   ```
 
-- [ ] [AI] **GREEN** — enforce exact host-address publication and one same-origin port in
+- [x] [AI] **GREEN** — enforce exact host-address publication and one same-origin port in
       `infra/dev/beaver-nest-app/docker-compose.yml` with fail-closed
       `${BEAVER_NEST_BE_VPN_HOST_IP:?BEAVER_NEST_BE_VPN_HOST_IP is required}` and production default
       `${BEAVER_NEST_BE_PUBLIC_PORT:-19300}`; run
       `bash infra/dev/beaver-nest-app/tests/publication.sh`; acceptance: rendered
       Compose contains the supplied address, no wildcard, and no second port. This proves destination-
       address publication only, not VPN peer identity or source-network isolation.
-- [ ] [AI] **REFACTOR** — make Linux/macOS socket inspection adapters consume supplied sanitized
+- [x] [AI] **REFACTOR** — make Linux/macOS socket inspection adapters consume supplied sanitized
       addresses in `infra/dev/beaver-nest-app/tests/publication.sh`; run
       `shellcheck --severity=warning infra/dev/beaver-nest-app/tests/publication.sh && bash infra/dev/beaver-nest-app/tests/publication.sh`;
       acceptance: no
       real private address is written to output or evidence.
-- [ ] [AI] **RED** — add non-selected-host-address refusal and no-wildcard assertions to
+- [x] [AI] **RED** — add non-selected-host-address refusal and no-wildcard assertions to
       `infra/dev/beaver-nest-app/tests/publication.sh`, add
       `specs/apps/beaver-nest/behavior/beaver-nest-be/gherkin/network/other-host-addresses.feature`, its
       literal binding to `apps/beaver-nest-be/tests/unit/Steps/NetworkSteps.fs`, and its backend Gherkin
@@ -1436,19 +1462,19 @@ exact`, the audit exits 0, and their sanitized results are added to the Phase 4 
     And socket inspection shows no wildcard host publication
   ```
 
-- [ ] [AI] **GREEN** — keep publication bound to the exact supplied host address and add sanitized
+- [x] [AI] **GREEN** — keep publication bound to the exact supplied host address and add sanitized
       refusal/socket checks for known alternate fixture addresses; run
       `bash infra/dev/beaver-nest-app/tests/publication.sh`; acceptance: CI loopback fixture is
       green without claiming firewall-level source isolation.
-- [ ] [AI] **REFACTOR** — document the publication boundary in
+- [x] [AI] **REFACTOR** — document the publication boundary in
       `infra/dev/beaver-nest-app/README.md`; acceptance: documentation says exact host-address binding is
       the app guarantee and VPN admission/routing/firewall policy remains operator-owned.
-- [ ] [AI] **RED** — add `infra/dev/beaver-nest-app/tests/operations-profile.sh` asserting separate
+- [x] [AI] **RED** — add `infra/dev/beaver-nest-app/tests/operations-profile.sh` asserting separate
       live-data and backup binds, one long-running writer, online backup/integrity scope, stopped-app
       restore, operation-lock serialization, active-service restore refusal, and basename-only commands; run
       `bash infra/dev/beaver-nest-app/tests/operations-profile.sh`; acceptance: it fails because one-shot profiles
       do not exist.
-- [ ] [AI] **GREEN** — add one-shot backup/integrity and stopped-app restore profiles to
+- [x] [AI] **GREEN** — add one-shot backup/integrity and stopped-app restore profiles to
       `infra/dev/beaver-nest-app/docker-compose.yml` and an operations wrapper at
       `infra/dev/beaver-nest-app/scripts/operations.sh`; run
       `bash infra/dev/beaver-nest-app/tests/operations-profile.sh`; acceptance: only
@@ -1456,56 +1482,56 @@ exact`, the audit exits 0, and their sanitized results are added to the Phase 4 
       app mounts only `/var/lib/beaver-nest`, backup uses `backup --name`, restore uses `restore --name`
       only while the app is stopped, an atomic operation lock serializes one-shots, and no arbitrary
       host path reaches the CLI.
-- [ ] [AI] **REFACTOR** — share immutable service/build/env anchors without sharing mutable lifecycle
+- [x] [AI] **REFACTOR** — share immutable service/build/env anchors without sharing mutable lifecycle
       state in `infra/dev/beaver-nest-app/{docker-compose.yml,scripts/operations.sh}`; run
       `bash infra/dev/beaver-nest-app/tests/operations-profile.sh && bash infra/dev/beaver-nest-app/tests/persistence.sh`;
       acceptance: the app is the sole long-running SQLite writer, with narrowly
       scoped online backup/integrity DB access, serialized one-shots, and stopped-app restore as the
       only one-shot exceptions.
-- [ ] [AI] **RED** — add canonical-production-start cases to
+- [x] [AI] **RED** — add canonical-production-start cases to
       `infra/dev/beaver-nest-app/tests/start.sh`; run `bash infra/dev/beaver-nest-app/tests/start.sh`;
       acceptance: missing/blank host IP, unsafe host bind, real-env auto-load, or direct Compose bypass
       is not yet stopped by one supported preflight-before-Compose path.
-- [ ] [AI] **GREEN** — add `infra/dev/beaver-nest-app/scripts/start.sh` as the sole documented
+- [x] [AI] **GREEN** — add `infra/dev/beaver-nest-app/scripts/start.sh` as the sole documented
       production entrypoint; run
       `bash infra/dev/beaver-nest-app/tests/start.sh && shellcheck --severity=warning infra/dev/beaver-nest-app/scripts/start.sh`;
       acceptance: it requires
       one explicit env-file argument, runs preflight, and invokes exact Compose files/service without
       exposing values or permitting wildcard/unsafe sources.
-- [ ] [AI] **REFACTOR** — centralize readonly Compose/service arguments in the start wrapper and remove
+- [x] [AI] **REFACTOR** — centralize readonly Compose/service arguments in the start wrapper and remove
       every direct production `docker compose up` instruction from active docs/package scripts; run
       `bash infra/dev/beaver-nest-app/tests/start.sh`; acceptance: only the wrapper can start the production profile and it remains fail
       closed.
-- [ ] [AI] **RED** — add runner-ownership cases to
+- [x] [AI] **RED** — add runner-ownership cases to
       `infra/dev/beaver-nest-app/tests/e2e-runner-ownership.sh`; run
       `bash infra/dev/beaver-nest-app/tests/e2e-runner-ownership.sh`; acceptance: it fails because
       the backend runner still nests stack lifecycle and no pure FE runner exists.
-- [ ] [AI] **GREEN** — add pure runners
+- [x] [AI] **GREEN** — add pure runners
       `apps/beaver-nest-{be,fe}-e2e/scripts/run-playwright.sh`, retain sole local lifecycle ownership in
       `apps/beaver-nest-be/scripts/run-e2e.sh`, and edit both E2E `project.json` files with pure
       `test:e2e:runner` plus lifecycle `test:e2e`; run
       `bash infra/dev/beaver-nest-app/tests/e2e-runner-ownership.sh`; acceptance: CI can run both
       suites against its existing stack and local targets each own exactly one disposable stack.
-- [ ] [AI] **REFACTOR** — centralize wait/cleanup with canonical mktemp validation in
+- [x] [AI] **REFACTOR** — centralize wait/cleanup with canonical mktemp validation in
       `apps/beaver-nest-be/scripts/run-e2e.sh`; run
       `bash infra/dev/beaver-nest-app/tests/e2e-runner-ownership.sh && bash infra/dev/beaver-nest-app/tests/e2e-runner-ownership.sh`;
       acceptance: no nested
       `down/up`, `down -v`, operator path, or fixed sleep remains.
-- [ ] [AI] **RED** — add `infra/dev/beaver-nest-app/tests/final-topology.sh` covering the dev, CI,
+- [x] [AI] **RED** — add `infra/dev/beaver-nest-app/tests/final-topology.sh` covering the dev, CI,
       integration, and documentation surfaces; run
       `bash infra/dev/beaver-nest-app/tests/final-topology.sh`; acceptance: it fails while any obsolete
       two-service/two-port file remains.
-- [ ] [AI] **GREEN** — replace/update
+- [x] [AI] **GREEN** — replace/update
       `infra/dev/beaver-nest-app/{Dockerfile.be.dev,Dockerfile.fe.dev,docker-compose.ci.yml,README.md,.gitignore}`
       and `apps/beaver-nest-be/{Dockerfile.integration,docker-compose.integration.yml}` for the final
       one-service model; run `bash infra/dev/beaver-nest-app/tests/final-topology.sh`; acceptance:
       explicit safe variables plus `--env-file /dev/null` render CI and integration Compose, with no
       old two-service/two-port topology.
-- [ ] [AI] **REFACTOR** — remove duplicated service/port declarations from the final infrastructure
+- [x] [AI] **REFACTOR** — remove duplicated service/port declarations from the final infrastructure
       files without adding a generic abstraction; run
       `bash infra/dev/beaver-nest-app/tests/final-topology.sh && shellcheck --severity=warning infra/dev/beaver-nest-app/tests/final-topology.sh`;
       acceptance: the topology remains green and explicit.
-- [ ] [AI] Add/update aggregate backend Playwright-BDD bindings in
+- [x] [AI] Add/update aggregate backend Playwright-BDD bindings in
       `apps/beaver-nest-be-e2e/steps/{routing,persistence,network}.steps.ts` and update
       `apps/beaver-nest-be-e2e/{playwright.config.ts,e2e-coverage-baseline.json,README.md}`;
       **Gherkin (binds) →** "Unknown API path returns JSON not SPA HTML"; "Unknown client route receives
@@ -1514,24 +1540,24 @@ exact`, the audit exits 0, and their sanitized results are added to the Phase 4 
       the shared workspace"; "Other host addresses do not publish BeaverNest" (aggregate Playwright-BDD
       binder exception); run `npm exec -- nx run beaver-nest-be-e2e:test:specs`; acceptance: the full
       backend spec gate exits 0 with no duplicate scenario body or unconditional skip.
-- [ ] [AI] Document backup failure-domain limits in `infra/dev/beaver-nest-app/README.md` and
+- [x] [AI] Document backup failure-domain limits in `infra/dev/beaver-nest-app/README.md` and
       `apps/beaver-nest-be/README.md`; acceptance: both say the writable backup bind is not guaranteed to
       be a second failure domain, same-host backup does not cover host/disk loss, and the operator must
       copy/place a validated backup onto designated independent or off-host storage.
-- [ ] [AI] **RED** — add `infra/dev/beaver-nest-app/tests/development-ports.sh`; run
+- [x] [AI] **RED** — add `infra/dev/beaver-nest-app/tests/development-ports.sh`; run
       `bash infra/dev/beaver-nest-app/tests/development-ports.sh`; acceptance: it fails until the
       canonical local command fixes Vite/API to `19310`/`19320` independently of production `19300`.
-- [ ] [AI] **GREEN** — add `apps/beaver-nest-be/scripts/start-development.sh` and edit root
+- [x] [AI] **GREEN** — add `apps/beaver-nest-be/scripts/start-development.sh` and edit root
       `package.json` so real local development uses that wrapper to require
       `BEAVER_NEST_BE_DEVELOPMENT_DATA_DIRECTORY`, then run
       `npm exec -- nx run-many -t dev -p beaver-nest-be,beaver-nest-fe --parallel=2`, with Vite on
       loopback `19310` proxying the backend on loopback `19320`; run
       `bash infra/dev/beaver-nest-app/tests/development-ports.sh`; acceptance: split development does not
       require the combined image and no durable-data reset command uses `down -v`.
-- [ ] [AI] **REFACTOR** — keep local port overrides in the two Nx `dev` targets rather than production
+- [x] [AI] **REFACTOR** — keep local port overrides in the two Nx `dev` targets rather than production
       Compose; rerun `bash infra/dev/beaver-nest-app/tests/development-ports.sh`; acceptance: changing
       the production public-port default cannot change either local development port.
-- [ ] [AI] **RED** — add
+- [x] [AI] **RED** — add
       `specs/apps/beaver-nest/behavior/beaver-nest-be/gherkin/development/development-data-isolation.feature`,
       its literal TickSpec bindings in `apps/beaver-nest-be/tests/unit/Steps/DevelopmentSteps.fs`, the
       exact unit-test project compile entry, and its backend Gherkin README link; extend
@@ -1552,7 +1578,7 @@ exact`, the audit exits 0, and their sanitized results are added to the Phase 4 
     And the command neither reads nor inherits the production host data-bind source
   ```
 
-- [ ] [AI] **GREEN** — implement the explicit development-data handoff in
+- [x] [AI] **GREEN** — implement the explicit development-data handoff in
       `apps/beaver-nest-be/scripts/start-development.sh`, update root `package.json`,
       `apps/beaver-nest-be/.env.example`, `repo-config.yml`, and the app/runtime READMEs; run
       `npm exec -- nx run beaver-nest-be:test:specs && bash infra/dev/beaver-nest-app/tests/development-data-isolation.sh`;
@@ -1560,111 +1586,111 @@ exact`, the audit exits 0, and their sanitized results are added to the Phase 4 
       backend receives only the canonical development directory, Compose never references
       `BEAVER_NEST_BE_DEVELOPMENT_DATA_DIRECTORY`, and the bound `Development uses a separate SQLite
 directory` scenario passes.
-- [ ] [AI] **REFACTOR** — keep the development wrapper's environment handoff explicit and limited to
+- [x] [AI] **REFACTOR** — keep the development wrapper's environment handoff explicit and limited to
       its development directory, loopback ports, and `nx run-many` invocation; rerun
       `npm exec -- nx run beaver-nest-be:test:specs && bash infra/dev/beaver-nest-app/tests/development-data-isolation.sh && bash infra/dev/beaver-nest-app/tests/development-ports.sh`;
       acceptance: changing a production host data-bind source or public port cannot change local
       SQLite access or either local development port, and the named development-data feature remains
       fully bound.
-- [ ] [AI] **RED** — extend `infra/dev/beaver-nest-app/tests/env-contract.sh` with final unit-3 owner
+- [x] [AI] **RED** — extend `infra/dev/beaver-nest-app/tests/env-contract.sh` with final unit-3 owner
       assertions; run `bash infra/dev/beaver-nest-app/tests/env-contract.sh`; acceptance: it fails while
       the obsolete frontend env source/injection remains.
-- [ ] [AI] **GREEN** — edit `repo-config.yml` and
+- [x] [AI] **GREEN** — edit `repo-config.yml` and
       `repo-governance/conventions/security/secrets-and-env-standards.md` so the combined runtime's env
       contract/injection keys are owned only by `apps/beaver-nest-be/.env.example`, remove obsolete
       FE/CORS/Vercel injection entries, and delete `apps/beaver-nest-fe/.env.example`; run
       `bash infra/dev/beaver-nest-app/tests/env-contract.sh && npm exec -- nx run rhino-cli:env:validation`;
       acceptance: env validation exits 0, browser E2E
       base URLs remain explicitly test-harness-only, and no real value is introduced.
-- [ ] [AI] **REFACTOR** — keep test-harness URLs in the `ci-harness` registry rather than an app env
+- [x] [AI] **REFACTOR** — keep test-harness URLs in the `ci-harness` registry rather than an app env
       source; run
       `bash infra/dev/beaver-nest-app/tests/env-contract.sh && cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- repo-config validate`;
       acceptance: both commands exit 0 without a blanket allowlist.
-- [ ] [AI] **RED** — add `infra/dev/beaver-nest-app/tests/token-entry.sh` asserting that BeaverNest
+- [x] [AI] **RED** — add `infra/dev/beaver-nest-app/tests/token-entry.sh` asserting that BeaverNest
       tokens target the Vite client stylesheet and external pre-render theme bootstrap; run
       `bash infra/dev/beaver-nest-app/tests/token-entry.sh`; acceptance: it fails while active token
       guidance still names `src/app/globals.css`, `next/font`, or an inline theme script.
-- [ ] [AI] **GREEN** — update `libs/web-ui-token/src/beaver-nest.css`, `libs/web-ui-token/README.md`, and
+- [x] [AI] **GREEN** — update `libs/web-ui-token/src/beaver-nest.css`, `libs/web-ui-token/README.md`, and
       `repo-governance/development/frontend/design-tokens.md` from the obsolete
       `src/app/globals.css`/inline-theme vocabulary to the Vite client CSS plus external
       `apps/beaver-nest-fe/src/theme.ts`; run
       `bash infra/dev/beaver-nest-app/tests/token-entry.sh && npm exec -- nx run web-ui-token:test:quick`;
       acceptance: token checks exit 0 and preserve BeaverNest system light/dark semantics.
-- [ ] [AI] **REFACTOR** — remove duplicated framework-specific token instructions; run
+- [x] [AI] **REFACTOR** — remove duplicated framework-specific token instructions; run
       `bash infra/dev/beaver-nest-app/tests/token-entry.sh && shellcheck --severity=warning infra/dev/beaver-nest-app/tests/token-entry.sh && npm exec -- markdownlint-cli2 libs/web-ui-token/README.md repo-governance/development/frontend/design-tokens.md`;
       acceptance: the contract remains explicit and all shell/Markdown checks exit 0.
-- [ ] [AI] **RED** — add `infra/dev/beaver-nest-app/tests/vocabulary-contract.sh` for canonical FE
+- [x] [AI] **RED** — add `infra/dev/beaver-nest-app/tests/vocabulary-contract.sh` for canonical FE
       tier, Vite platform tag, and `dist` output vocabulary; run
       `bash infra/dev/beaver-nest-app/tests/vocabulary-contract.sh`; acceptance: it fails while active
       project/config surfaces still identify this no-marketing-site client as Next.js or `.next`.
-- [ ] [AI] **GREEN** — reconcile canonical naming/Nx vocabulary in `AGENTS.md`,
+- [x] [AI] **GREEN** — reconcile canonical naming/Nx vocabulary in `AGENTS.md`,
       `docs/reference/monorepo-structure.md`, `repo-governance/development/infra/nx-targets.md`,
       `apps/beaver-nest-fe/project.json`, and `repo-config.yml`; run
       `bash infra/dev/beaver-nest-app/tests/vocabulary-contract.sh`; acceptance:
       `npm exec -- nx show project beaver-nest-fe --json` reports `platform:vite`, `beaver-nest-fe`
       remains the canonical FE tier because no promotional site exists, and active docs use `dist`
       rather than `.next` without inventing Nx target names.
-- [ ] [AI] **REFACTOR** — centralize exact vocabulary assertions without changing Nx target names; run
+- [x] [AI] **REFACTOR** — centralize exact vocabulary assertions without changing Nx target names; run
       `bash infra/dev/beaver-nest-app/tests/vocabulary-contract.sh && shellcheck --severity=warning infra/dev/beaver-nest-app/tests/vocabulary-contract.sh && npm exec -- nx show project beaver-nest-fe --json`;
       acceptance: all checks exit 0 and the project reports `platform:vite`.
-- [ ] [AI] **RED** — add `infra/dev/beaver-nest-app/tests/affected-propagation.sh`; run
+- [x] [AI] **RED** — add `infra/dev/beaver-nest-app/tests/affected-propagation.sh`; run
       `bash infra/dev/beaver-nest-app/tests/affected-propagation.sh`; acceptance: it fails because the
       backend combined-image target does not depend on frontend output.
-- [ ] [AI] **GREEN** — edit `apps/beaver-nest-be/project.json` so build/implicit dependencies include
+- [x] [AI] **GREEN** — edit `apps/beaver-nest-be/project.json` so build/implicit dependencies include
       `beaver-nest-fe`; run `bash infra/dev/beaver-nest-app/tests/affected-propagation.sh`; acceptance:
       an isolated committed FE fixture selected by the test marks both `beaver-nest-fe` and
       `beaver-nest-be` affected, and the test removes only its own fixture/temporary commit worktree.
-- [ ] [AI] **REFACTOR** — express the dependency once through canonical Nx target/implicit dependency
+- [x] [AI] **REFACTOR** — express the dependency once through canonical Nx target/implicit dependency
       fields; rerun `bash infra/dev/beaver-nest-app/tests/affected-propagation.sh`; acceptance: affected
       propagation remains green without app-to-app source imports.
-- [ ] [AI] **RED** — add `infra/dev/beaver-nest-app/tests/workflow-contract.sh` asserting one combined
+- [x] [AI] **RED** — add `infra/dev/beaver-nest-app/tests/workflow-contract.sh` asserting one combined
       image/service/origin, FE affected propagation, disposable CI data, and honest unprovisioned
       staging; run `bash infra/dev/beaver-nest-app/tests/workflow-contract.sh`; acceptance: it fails on
       the current split runtime and standalone-FE staging assumptions.
-- [ ] [AI] **GREEN** — update `.github/workflows/publish-images.yml` so FE-only affected propagation publishes the
+- [x] [AI] **GREEN** — update `.github/workflows/publish-images.yml` so FE-only affected propagation publishes the
       combined backend image; acceptance: actionlint exits 0 and affected verification selects the
       combined image job.
-- [ ] [AI] **GREEN** — update `.github/workflows/beaver-nest-app-test-local-deploy-stag.yml` inputs for one app
+- [x] [AI] **GREEN** — update `.github/workflows/beaver-nest-app-test-local-deploy-stag.yml` inputs for one app
       service/port and no standalone FE staging publication; acceptance: the caller passes one combined
       runtime contract to the reusable workflow.
-- [ ] [AI] **GREEN** — update `.github/workflows/_reusable-app-test-local-deploy-stag.yml` to create one mktemp data
+- [x] [AI] **GREEN** — update `.github/workflows/_reusable-app-test-local-deploy-stag.yml` to create one mktemp data
       directory, export explicit CI-only
       `BEAVER_NEST_BE_VPN_HOST_IP=127.0.0.1`, set app/data/backup variables, start one combined service,
       curl one origin, and call pure BE plus FE E2E runners; acceptance: no nested lifecycle wrapper,
       separate `19320` host curl, real env auto-load, or two-service log command remains.
-- [ ] [AI] **GREEN** — update `.github/workflows/beaver-nest-be-build-deploy-stag.yml` to build the combined image
+- [x] [AI] **GREEN** — update `.github/workflows/beaver-nest-be-build-deploy-stag.yml` to build the combined image
       containing FE output, or retire it honestly if no combined staging target exists; acceptance: it
       never describes the image as backend-only and actionlint exits 0.
-- [ ] [AI] **GREEN** — delete/retire `.github/workflows/beaver-nest-app-test-stag.yml` until an actual combined
+- [x] [AI] **GREEN** — delete/retire `.github/workflows/beaver-nest-app-test-stag.yml` until an actual combined
       same-origin staging endpoint exists; acceptance: no active workflow claims FE E2E against a
       standalone Vercel deployment verifies this architecture.
-- [ ] [AI] **GREEN** — update `.github/workflows/README.md` for combined local CI, image publication,
+- [x] [AI] **GREEN** — update `.github/workflows/README.md` for combined local CI, image publication,
       and honest staging status; run `bash infra/dev/beaver-nest-app/tests/workflow-contract.sh`;
       acceptance: the workflow contract exits 0.
-- [ ] [AI] **REFACTOR** — remove duplicated split-runtime workflow branches and retain explicit
+- [x] [AI] **REFACTOR** — remove duplicated split-runtime workflow branches and retain explicit
       lifecycle ownership; run
       `bash infra/dev/beaver-nest-app/tests/workflow-contract.sh && shellcheck --severity=warning infra/dev/beaver-nest-app/tests/workflow-contract.sh && actionlint && npm exec -- markdownlint-cli2 .github/workflows/README.md`;
       acceptance: all contract, shell, workflow, and Markdown checks exit 0.
-- [ ] [AI] Update `.claude/agents/apps-beaver-nest-be-deployer.md` and
+- [x] [AI] Update `.claude/agents/apps-beaver-nest-be-deployer.md` and
       `.claude/agents/apps-beaver-nest-fe-deployer.md` so the deployers describe one combined image and
       honestly state that no production or combined staging deploy target is provisioned; acceptance:
       no agent promises standalone FE/Vercel delivery.
-- [ ] [AI] Rewrite `.claude/agents/apps-beaver-nest-fe-content-{maker,checker,fixer}.md`,
+- [x] [AI] Rewrite `.claude/agents/apps-beaver-nest-fe-content-{maker,checker,fixer}.md`,
       `.claude/skills/apps-beaver-nest-fe-developing-content/SKILL.md`,
       `.claude/skills/swe-developing-frontend-ui/reference/brand-context.md`, and
       `.claude/agents/README.md` so active guidance names Vite CSR and the foundation-status screen,
       not Next.js, a landing page, promotional copy, or greeting content; acceptance:
       `rg -n 'Next\.js|landing page|promotional|getHello|greeting' .claude/agents/apps-beaver-nest-fe-content-{maker,checker,fixer}.md .claude/skills/apps-beaver-nest-fe-developing-content/SKILL.md .claude/skills/swe-developing-frontend-ui/reference/brand-context.md .claude/agents/README.md`
       leaves only explicitly historical/retired statements.
-- [ ] [AI] Run `npm run generate:bindings` after `.claude/` edits; acceptance: generated
+- [x] [AI] Run `npm run generate:bindings` after `.claude/` edits; acceptance: generated
       `.opencode/`, `.cursor/`, and `.amazonq/` mirrors are ledgered and remain in the same unit as their
       `.claude/` sources.
-- [ ] [AI] Run `npm run validate:sync`; acceptance: all generated bindings match `.claude/` sources.
-- [ ] [AI] Update `plans/ideas/beaver-nest-first-deploy.md` so future deployment requires a combined
+- [x] [AI] Run `npm run validate:sync`; acceptance: all generated bindings match `.claude/` sources.
+- [x] [AI] Update `plans/ideas/beaver-nest-first-deploy.md` so future deployment requires a combined
       same-origin target and does not claim a standalone FE target already exists; acceptance:
       `rg -n 'Vercel|standalone frontend|separate backend' plans/ideas/beaver-nest-first-deploy.md`
       contains only explicit retired/non-goal context.
-- [ ] [AI] Update the architecture/docs surface
+- [x] [AI] Update the architecture/docs surface
       `specs/apps/beaver-nest/{README.md,product/README.md,product/overview.md,system-context/README.md,system-context/context.md,containers/README.md,containers/container.md,components/README.md,components/overview.md}`,
       `AGENTS.md`, `README.md`, `ROADMAP.md`,
       `docs/reference/{code-coverage,monorepo-structure,nx-configuration,project-dependency-graph,sdlc-gate-standard}.md`,
@@ -1675,7 +1701,7 @@ directory` scenario passes.
       (correct because there is no separate promotional site), one ASP.NET origin, SQLite, and one exact
       host-address publication; the BeaverNest current-state section no longer prescribes Vercel or
       `vercel.json`, while generic Vercel guidance remains available to other apps.
-- [ ] [AI] Run
+- [x] [AI] Run
       `rg -n 'src/app/(page|layout|error|not-found|icon)|\.next|next start|stag-beaver-nest-fe|Vercel preview|localhost:19320.*browser|beaver-nest-fe service|beaver-nest-be service' README.md docs specs/apps/beaver-nest apps infra .github .claude plans/ideas`;
       acceptance: each match is either removed, updated, or explicitly documented as historical/
       retired; no stale active path or topology remains.
@@ -1685,38 +1711,38 @@ directory` scenario passes.
 > All checks below must pass before full-story verification. AI commands use only sanitized explicit
 > process variables and `--env-file /dev/null`; they never read or auto-load an operator env file.
 
-- [ ] [AI] Run
+- [x] [AI] Run
       `beaver_nest_ci_root=$(mktemp -d) && install -d -m 0700 "$beaver_nest_ci_root/data" "$beaver_nest_ci_root/backups" && BEAVER_NEST_BE_VPN_HOST_IP=127.0.0.1 BEAVER_NEST_BE_PUBLIC_PORT=19300 BEAVER_NEST_BE_HOST_DATA_DIRECTORY="$beaver_nest_ci_root/data" BEAVER_NEST_BE_BACKUP_DIRECTORY="$beaver_nest_ci_root/backups" docker compose --env-file /dev/null -f infra/dev/beaver-nest-app/docker-compose.yml -f infra/dev/beaver-nest-app/docker-compose.ci.yml config --quiet`;
       acceptance: Compose exits 0 with the documented loopback/mktemp CI exception.
-- [ ] [AI] Run `npm exec -- nx run beaver-nest-be:test:quick`; acceptance: the full backend quick suite,
+- [x] [AI] Run `npm exec -- nx run beaver-nest-be:test:quick`; acceptance: the full backend quick suite,
       including global security headers, exits 0.
-- [ ] [AI] Run `npm exec -- nx run beaver-nest-be:test:integration`; acceptance: the full backend real
+- [x] [AI] Run `npm exec -- nx run beaver-nest-be:test:integration`; acceptance: the full backend real
       SQLite integration suite exits 0.
-- [ ] [AI] Run `npm exec -- nx run beaver-nest-be:test:specs`; acceptance: the full backend spec gate
+- [x] [AI] Run `npm exec -- nx run beaver-nest-be:test:specs`; acceptance: the full backend spec gate
       exits 0.
-- [ ] [AI] Run `npm exec -- nx run beaver-nest-be-e2e:test:specs`; acceptance: the full backend E2E
+- [x] [AI] Run `npm exec -- nx run beaver-nest-be-e2e:test:specs`; acceptance: the full backend E2E
       spec gate exits 0.
-- [ ] [AI] Run `npm exec -- nx run beaver-nest-be-e2e:test:e2e`; acceptance: the lifecycle wrapper owns
+- [x] [AI] Run `npm exec -- nx run beaver-nest-be-e2e:test:e2e`; acceptance: the lifecycle wrapper owns
       one disposable combined stack and the full backend E2E suite exits 0.
-- [ ] [AI] Run `npm exec -- nx run beaver-nest-fe:test:quick`; acceptance: the full frontend quick suite
+- [x] [AI] Run `npm exec -- nx run beaver-nest-fe:test:quick`; acceptance: the full frontend quick suite
       exits 0.
-- [ ] [AI] Run `npm exec -- nx run beaver-nest-fe:test:integration`; acceptance: the full frontend MSW
+- [x] [AI] Run `npm exec -- nx run beaver-nest-fe:test:integration`; acceptance: the full frontend MSW
       integration suite exits 0.
-- [ ] [AI] Run `npm exec -- nx run beaver-nest-fe:test:specs`; acceptance: the full frontend spec gate
+- [x] [AI] Run `npm exec -- nx run beaver-nest-fe:test:specs`; acceptance: the full frontend spec gate
       exits 0.
-- [ ] [AI] Run `npm exec -- nx run beaver-nest-fe-e2e:test:specs`; acceptance: the full frontend E2E
+- [x] [AI] Run `npm exec -- nx run beaver-nest-fe-e2e:test:specs`; acceptance: the full frontend E2E
       spec gate exits 0.
-- [ ] [AI] Run `npm exec -- nx run beaver-nest-fe-e2e:test:e2e`; acceptance: the frontend lifecycle
+- [x] [AI] Run `npm exec -- nx run beaver-nest-fe-e2e:test:e2e`; acceptance: the frontend lifecycle
       target owns one disposable combined stack and the full frontend browser E2E suite exits 0.
-- [ ] [AI] Run `actionlint`; acceptance: every active workflow exits warning-free.
-- [ ] [AI] Run `npm run validate:sync`; acceptance: generated harness mirrors are synchronized.
-- [ ] [AI] Export only paths touched since the Phase 4 commit to
+- [x] [AI] Run `actionlint`; acceptance: every active workflow exits warning-free.
+- [x] [AI] Run `npm run validate:sync`; acceptance: generated harness mirrors are synchronized.
+- [x] [AI] Export only paths touched since the Phase 4 commit to
       `local-temp/beaver-nest-app-setup-phase-5-ledger.txt`; acceptance: the file is non-empty and
       every path also appears in the Phase 5 `execution-state.md` ledger block.
-- [ ] [AI] Stage the Phase 5 ledger with
+- [x] [AI] Stage the Phase 5 ledger with
       `while IFS= read -r beaver_nest_phase_5_stage_path; do case "$beaver_nest_phase_5_stage_path" in */.env.example) :;; /*|*..*|*.env|*.env.*) exit 1;; esac; git add -- "$beaver_nest_phase_5_stage_path" || exit 1; done < local-temp/beaver-nest-app-setup-phase-5-ledger.txt`;
       acceptance: sorted staged names exactly equal sorted Phase 5 ledger names.
-- [ ] [AI] Commit the Phase 5 theme with
+- [x] [AI] Commit the Phase 5 theme with
       `git commit -m "feat(beaver-nest): serve combined sqlite runtime"`; acceptance: one local
       Conventional Commit is created on the same unit 3 branch and no PR/push occurs yet.
 
