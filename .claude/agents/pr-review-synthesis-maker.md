@@ -134,7 +134,8 @@ directly from the GitHub review itself — not just from an internal log:
 ```markdown
 **Cycle**: N of {total}
 **Risk tier**: trivial | lite | full
-**Specialists fanned out**: none (coordinator-only pass) | governance, logic, security, integrity | all nine specialists
+**Specialists fanned out**: none (coordinator-only pass) | governance, logic, security, integrity | all nine specialists | seven/eight specialists (see the **Per-specialist raw findings** field below for the DD-10 skip and its reason)
+**Per-specialist raw findings**: architecture: N, logic: N, governance: N, security: N, integrity: N (or "skipped — DD-10: no test/CI files in diff"), performance: N, docs: N, instruction: N, types: N (or "skipped — DD-10: no typed-language files in diff") — one entry per fanned-out specialist, including zero-finding specialists and any DD-10 skip with its reason
 **Security-sensitive-path override applied**: yes | no
 **Diff coverage**: full diff reviewed in one pass | reviewed in N slices (see note)
 **Prior-cycle human dismissals respected**: N threads / none this cycle
@@ -144,7 +145,15 @@ Populate every field for every cycle, even a `trivial`-tier coordinator-only pas
 omitted field is itself a finding-worthy gap in this agent's own output. Every field after `**Cycle**`
 carries forward the exact tier, specialist-set, and slicing decision `pr-review-scout-maker` recorded
 in its shared-context brief for this cycle — this agent transcribes that decision into the header, it
-does not re-derive it.
+does not re-derive it. **Per-specialist raw findings (DD-11)** is this agent's own durable capture of
+per-discipline acceptance-rate data — the
+[Post-Cutover Monitoring Plan](../../repo-governance/development/quality/pr-review-disciplines.md#post-cutover-monitoring-plan)
+names "per-discipline acceptance rate" as a goal but had no mechanism to record it before DD-11; this
+field makes every posted review, on its own, sufficient raw data for that future read, with no side
+log and no re-deriving from agent transcripts. Record a raw count (pre-dedup, pre-filter) for every
+specialist that actually fanned out this cycle, and record a DD-10 skip with its reason for any
+specialist the [Content-Type Applicability Filter](./pr-review-scout-maker.md#risk-tier-classification--specialist-set-selection-d12)
+excluded — never silently omit a specialist from this field.
 
 ## Finding Requirements (Hard Rules)
 
@@ -167,6 +176,15 @@ missing any element does not survive the reasonableness-filter function above.
 4. **Anti-sycophantic framing** — state what is wrong plainly in the consolidated review. Do not
    soften, hedge, or drop a real finding merely to keep the review short; the reasonableness-filter
    drops noise, not substance.
+5. **`**Raised by**: <specialist(s)>` byline (DD-11)** — every posted finding names the discipline
+   specialist(s) that originated it, e.g. `**Raised by**: pr-review-architecture-maker`. When the
+   Deduplicate function (function 1 of the [Four Coordination Functions](#the-four-coordination-functions))
+   merges the same `file:line` defect independently raised by more than one specialist, this byline
+   keeps **every** contributing specialist's name (e.g.
+   `**Raised by**: pr-review-logic-maker, pr-review-docs-maker`) rather than collapsing to one — a
+   multiply-corroborated finding must visibly show its corroboration count, not read as a single
+   specialist's opinion. For a `trivial`-tier coordinator-only pass, this byline names this agent
+   itself (`**Raised by**: pr-review-synthesis-maker (trivial-tier generalist pass)`).
 
 **CRITICAL-requires-reproduction**: a `CRITICAL` finding surviving to the consolidated review must
 carry a reproduction/verification step from the tool-verify function, not mere multi-specialist
