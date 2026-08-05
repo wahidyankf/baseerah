@@ -44,6 +44,11 @@ against an imagined ideal implementation.
 
 Concretely, before writing a single finding:
 
+0. Check for `pr-review-scout-maker`'s `context_brief` for this cycle — it already carries the pinned
+   head SHA, the full diff (or its recorded slicing), and the originating plan/issue context in one
+   pass, extracted once per cycle rather than once per specialist. If a brief was supplied, use it and
+   skip steps 1-3 below. Only fall back to independent re-derivation (steps 1-3) when no brief was
+   supplied for this cycle — e.g. a standalone/manual invocation outside the orchestrated loop.
 1. Pin the PR's head commit: `gh pr view <PR> --json headRefOid`. Every finding you post in this
    pass anchors to this one SHA — never a moving target.
 2. Read the full diff: `gh pr diff <PR>` (or `gh pr view <PR> --json files,body`).

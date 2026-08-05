@@ -793,7 +793,7 @@ archival additionally requires the
 against the plan's PR before any archival step below. This gate does not apply to the direct-push
 modes (`worktree-to-origin-main`, `main-to-origin-main`), which carry no PR and no review cycle.
 
-- Run the workflow's strictly sequential N-cycle loop (default **N = 3**): each cycle, the eight
+- Run the workflow's strictly sequential N-cycle loop (default **N = 3**): each cycle, the nine
   discipline specialists fan out and `pr-review-synthesis-maker` posts one consolidated set of
   line-anchored findings against the PR's current head commit via the GitHub Reviews API, a
   `pr-review-fixer` triages and resolves every unresolved thread, and CI on the PR must be GREEN

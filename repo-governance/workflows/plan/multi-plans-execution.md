@@ -350,7 +350,7 @@ when every plan reached its clean terminal state **and** cross-plan learnings we
 
 ## Iron Rules (Non-Negotiable)
 
-All ten [`plan-execution.md` Iron Rules](./plan-execution.md#iron-rules-non-negotiable) apply per
+All eleven [`plan-execution.md` Iron Rules](./plan-execution.md#iron-rules-non-negotiable) apply per
 plan, unchanged. The multi-plan additions:
 
 1. **Resolve scope once, then freeze it.** The caller states scope explicitly — an explicit plan list

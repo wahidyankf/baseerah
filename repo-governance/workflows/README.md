@@ -201,7 +201,7 @@ Workflows that test a live running website and turn findings into a fix plan:
 
 Workflows for reviewing and finishing off pull requests before the merge:
 
-- **pr-review-quality-gate**: Strictly sequential N-cycle (default 3) reviewer pipeline (eight
+- **pr-review-quality-gate**: Strictly sequential N-cycle (default 3) reviewer pipeline (nine
   specialists → `pr-review-synthesis-maker`) → `pr-review-fixer` loop against a PR — line-anchored
   findings via the GitHub Reviews API, per-thread triage and resolution, CI-green gate between
   cycles — mandatory before archival and the merge for the `worktree-to-pr` and `main-to-pr` delivery

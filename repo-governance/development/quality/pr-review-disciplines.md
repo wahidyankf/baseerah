@@ -348,11 +348,12 @@ subtle, high-consequence defects:
   defeats the purpose of a second, independent pass.
 
 This high-risk scope is deliberately narrower than the
-[risk-tier fan-out's security-sensitive path list](#risk-tier-fan-out-d12) that forces all nine
-specialists into a review — a diff can be `full`-tier without touching auth, payments, migrations,
-or a public API, in which case this adversarial pass does not apply. The two mechanics are related
-but distinct: one controls how many specialists review a diff, the other controls whether a
-second, independent pass re-checks a specific finding before it is posted.
+[risk-tier fan-out's security-sensitive path list](#risk-tier-fan-out-d12) that forces the full
+specialist set into a review, minus any DD-10 content-type skip — a diff can be `full`-tier without
+touching auth, payments, migrations, or a public API, in which case this adversarial pass does not
+apply. The two mechanics are related but distinct: one controls how many specialists review a diff,
+the other controls whether a second, independent pass re-checks a specific finding before it is
+posted.
 
 ### CRITICAL-Requires-Reproduction
 
