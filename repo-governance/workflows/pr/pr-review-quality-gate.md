@@ -88,7 +88,7 @@ specialist's full charter, owned scope, and routing rules.
 %% Color palette: Gold #ECE133 (scout), Blue #0173B2 (specialists), Purple #CC78BC (coordinator), Orange #DE8F05 (fixer), Teal #029E73 (CI gate)
 flowchart LR
   SC["pr-review-scout-maker"]:::gold
-  subgraph FANOUT["9 concurrent specialists"]
+  subgraph FANOUT["up to 9 concurrent specialists<br/>(DD-10 may skip up to 2)"]
     A["pr-review-architecture-maker"]:::blue
     L["pr-review-logic-maker"]:::blue
     G["pr-review-governance-maker"]:::blue
@@ -129,7 +129,8 @@ run_pr_review_cycle(PR, N = 3):            # N configurable, default 3, STRICTLY
         head = gh pr view <PR> --json headRefOid   # pin ONE head SHA for this pass
         scout = fresh pr-review-scout-maker(pr = PR, head = head, cycle = cycle, total_cycles = N, prior = prior)
                        # output: tier, specialists, context_brief, dismissals
-        synthesis_maker = fresh pr-review-synthesis-maker(context = scout.context_brief, fed = prior)
+        synthesis_maker = fresh pr-review-synthesis-maker(context = scout.context_brief, cycle = cycle, total_cycles = N, fed = prior)
+                       # cycle/total_cycles populate the mandatory `**Cycle**: N of {total}` header field
         if scout.specialists is empty:                       # trivial tier (DD-7): coordinator-only path
             raw = synthesis_maker.generalist_pass(context = scout.context_brief, fed = prior)
         else:
@@ -165,7 +166,7 @@ run_pr_review_cycle(PR, N = 3):            # N configurable, default 3, STRICTLY
 sequenceDiagram
   participant O as Orchestrator (this workflow)
   participant SC as pr-review-scout-maker
-  participant SP as 9 specialist-makers
+  participant SP as up to 9 specialist-makers<br/>(DD-10 may skip up to 2)
   participant SY as pr-review-synthesis-maker
   participant GH as GitHub PR Reviews API
   participant F as pr-review-fixer
@@ -174,6 +175,7 @@ sequenceDiagram
   O->>SC: pin head SHA, cycle number N of {total}
   SC->>SC: classify risk tier, select specialist set, assemble shared-context brief, read prior dismissals
   SC->>SP: fan out tier-selected specialists (fed context brief)
+  Note over SC,SP: DD-10 content-type filter: up to 2 specialists (types, integrity)<br/>skipped when no typed-source/test-CI files are in the diff
   SP-->>SY: raw findings per discipline
   Note over SY: trivial tier (DD-7): SY itself performs the<br/>single generalist pass instead of a fan-out
   SY->>SY: dedup + re-categorize + reasonableness-filter + tool-verify

@@ -138,7 +138,7 @@ directly from the GitHub review itself — not just from an internal log:
 ```markdown
 **Cycle**: N of {total}
 **Risk tier**: trivial | lite | full
-**Specialists fanned out**: none (coordinator-only pass) | governance, logic, security, integrity | all nine specialists | seven/eight specialists (see the **Per-specialist raw findings** field below for the DD-10 skip and its reason)
+**Specialists fanned out**: none (coordinator-only pass) | governance, logic, security, integrity | all nine specialists | seven-of-nine or eight-of-nine, per DD-10 (see the **Per-specialist raw findings** field below for the skip and its reason)
 **Per-specialist raw findings**: architecture: N, logic: N, governance: N, security: N, integrity: N (or "skipped — DD-10: no test/CI files in diff"), performance: N, docs: N, instruction: N, types: N (or "skipped — DD-10: no typed-language files in diff") — one entry per fanned-out specialist, including zero-finding specialists and any DD-10 skip with its reason
 **Security-sensitive-path override applied**: yes | no
 **Diff coverage**: full diff reviewed in one pass | reviewed in N slices (see note)
