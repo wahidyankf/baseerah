@@ -37,7 +37,7 @@ tutorials/how-to/reference/explanation), `repo-governance/`
 (conventions/development/principles/workflows/vision), `plans/` (backlog/in-progress/done), `.claude/`
 (primary binding: agents + skills), `.opencode/` (auto-synced from `.claude/`).
 
-**See**: [docs/reference/monorepo-structure.md](./docs/reference/monorepo-structure.md)
+**See**: [monorepo-structure.md](./docs/reference/monorepo-structure.md)
 
 ## Build, Test, Lint Commands
 
@@ -57,7 +57,7 @@ npm run lint:md:fix                   # Fix markdown violations
 **Worktree setup**: After `git worktree add`, run `npm install` AND `npm run doctor -- --fix`. See
 [Worktree Toolchain Initialization](./repo-governance/development/workflow/worktree-setup.md).
 
-**See**: [repo-governance/development/infra/nx-targets.md](./repo-governance/development/infra/nx-targets.md)
+**See**: [nx-targets.md](./repo-governance/development/infra/nx-targets.md)
 for canonical target names, coverage thresholds, caching rules, and the three-level testing standard.
 
 ## Markdown Quality
@@ -67,8 +67,8 @@ All markdown auto-linted via Prettier (pre-commit), markdownlint-cli2 (pre-push)
 into pre-commit/pre-push hooks and CI as raw `cargo run` invocations — not Nx targets). Quick fix:
 `npm run lint:md:fix`.
 
-**See**: [repo-governance/development/quality/markdown.md](./repo-governance/development/quality/markdown.md),
-[repo-governance/development/quality/repository-validation.md](./repo-governance/development/quality/repository-validation.md)
+**See**: [markdown.md](./repo-governance/development/quality/markdown.md),
+[repository-validation.md](./repo-governance/development/quality/repository-validation.md)
 
 ## Cross-Language Lint Gates
 
@@ -81,7 +81,7 @@ All installed by `npm run doctor -- --fix`.
 thresholds on auto-loaded instruction files; sole remediation is progressive disclosure.
 See [Instruction-File Size Budget Convention](./repo-governance/conventions/structure/instruction-file-size-budget.md).
 
-**See**: [repo-governance/development/quality/cross-language-lint-strictness.md](./repo-governance/development/quality/cross-language-lint-strictness.md)
+**See**: [cross-language-lint-strictness.md](./repo-governance/development/quality/cross-language-lint-strictness.md)
 
 ## Monorepo Architecture
 
@@ -89,9 +89,9 @@ See [Instruction-File Size Budget Convention](./repo-governance/conventions/stru
 `libs/` — flat, naming `ts-[name]`/`rust-[name]`/`fsharp-[name]`, import via
 `@open-sharia-enterprise/ts-[lib-name]`, no circular deps.
 
-**See**: [docs/reference/monorepo-structure.md](./docs/reference/monorepo-structure.md),
-[docs/how-to/add-new-app.md](./docs/how-to/add-new-app.md),
-[repo-governance/development/infra/nx-targets.md](./repo-governance/development/infra/nx-targets.md)
+**See**: [monorepo-structure.md](./docs/reference/monorepo-structure.md),
+[add-new-app.md](./docs/how-to/add-new-app.md),
+[nx-targets.md](./repo-governance/development/infra/nx-targets.md)
 
 ## Git Workflow
 
@@ -101,14 +101,14 @@ lib/backend targets (`prod-web-ui`, `stag-ose-be`) absent from the Web Sites tab
 **Commit format**: Conventional Commits `<type>(<scope>): <description>` — imperative mood, no
 period. Split by domain/concern.
 
-**See**: [repo-governance/development/workflow/commit-messages.md](./repo-governance/development/workflow/commit-messages.md)
+**See**: [commit-messages.md](./repo-governance/development/workflow/commit-messages.md)
 
 ### Worktree Path
 
 Worktrees land at **`worktrees/<name>/`** in the repo root (gitignored). Routing handled by a
 repo-local `WorktreeCreate` hook.
 
-**See**: [repo-governance/conventions/structure/worktree-path.md](./repo-governance/conventions/structure/worktree-path.md)
+**See**: [worktree-path.md](./repo-governance/conventions/structure/worktree-path.md)
 
 ### Delivery Mode
 
@@ -141,7 +141,7 @@ shell/Dockerfiles/workflows, auto-sync platform bindings, auto-stage. Commit-msg
 Pre-push: `typecheck`, `lint`, `test:quick`, `specs:coverage` for affected projects (parallelism:
 cores-1); markdown linting. All four Nx targets cacheable — warm cache before push if timeout occurs.
 
-**See**: [repo-governance/development/quality/code.md](./repo-governance/development/quality/code.md)
+**See**: [code.md](./repo-governance/development/quality/code.md)
 
 ## Documentation Organization
 
@@ -149,8 +149,8 @@ cores-1); markdown linting. All four Nx targets cacheable — warm cache before 
 `docs/reference/` (specs), `docs/explanation/` (concepts). File naming: lowercase kebab-case;
 exception: `README.md`.
 
-**See**: [repo-governance/conventions/structure/file-naming.md](./repo-governance/conventions/structure/file-naming.md),
-[repo-governance/conventions/structure/diataxis-framework.md](./repo-governance/conventions/structure/diataxis-framework.md)
+**See**: [file-naming.md](./repo-governance/conventions/structure/file-naming.md),
+[diataxis-framework.md](./repo-governance/conventions/structure/diataxis-framework.md)
 
 ## Conventions
 
@@ -167,45 +167,45 @@ Core principles (see [Principles Index](./repo-governance/principles/README.md) 
 
 Lowercase kebab-case (`[a-z0-9-]+`). Exception: `README.md`, `docs/metadata/` files.
 
-**See**: [repo-governance/conventions/structure/file-naming.md](./repo-governance/conventions/structure/file-naming.md)
+**See**: [file-naming.md](./repo-governance/conventions/structure/file-naming.md)
 
 ### Linking
 
 GitHub-compatible markdown with `.md` extension.
 
-**See**: [repo-governance/conventions/formatting/linking.md](./repo-governance/conventions/formatting/linking.md)
+**See**: [linking.md](./repo-governance/conventions/formatting/linking.md)
 
 ### Indentation
 
 Markdown nested bullets: 2 spaces. YAML frontmatter: 2 spaces. Code: language-specific.
 
-**See**: [repo-governance/conventions/formatting/indentation.md](./repo-governance/conventions/formatting/indentation.md)
+**See**: [indentation.md](./repo-governance/conventions/formatting/indentation.md)
 
 ### Emoji Usage
 
 Allowed: `docs/`, README, `plans/`, `repo-governance/`, `AGENTS.md`, `CLAUDE.md`, agent definition
 files, Agent Skill files. Forbidden: config files (`*.json`, `*.yaml`, `*.toml`), source code.
 
-**See**: [repo-governance/conventions/formatting/emoji.md](./repo-governance/conventions/formatting/emoji.md)
+**See**: [emoji.md](./repo-governance/conventions/formatting/emoji.md)
 
 ### Diagrams
 
 Mermaid diagrams with color-blind friendly palette, proper accessibility.
 
-**See**: [repo-governance/conventions/formatting/diagrams.md](./repo-governance/conventions/formatting/diagrams.md)
+**See**: [diagrams.md](./repo-governance/conventions/formatting/diagrams.md)
 
 ### Content Quality
 
 Active voice, single H1, proper heading nesting, alt text for images, WCAG AA color contrast.
 
-**See**: [repo-governance/conventions/writing/quality.md](./repo-governance/conventions/writing/quality.md)
+**See**: [quality.md](./repo-governance/conventions/writing/quality.md)
 
 ### Dynamic Collection References
 
 Never hardcode counts of dynamic collections (agents, skills, conventions, practices, principles,
 workflows) in docs. Reference collection by name and link.
 
-**See**: [repo-governance/conventions/writing/dynamic-collection-references.md](./repo-governance/conventions/writing/dynamic-collection-references.md)
+**See**: [dynamic-collection-references.md](./repo-governance/conventions/writing/dynamic-collection-references.md)
 
 ## Development Practices
 
@@ -213,13 +213,13 @@ workflows) in docs. Reference collection by name and link.
 
 Prefer immutability, pure functions, functional core/imperative shell.
 
-**See**: [repo-governance/development/pattern/functional-programming.md](./repo-governance/development/pattern/functional-programming.md)
+**See**: [functional-programming.md](./repo-governance/development/pattern/functional-programming.md)
 
 ### Implementation Workflow
 
 Make it work → Make it right → Make it fast.
 
-**See**: [repo-governance/development/workflow/implementation.md](./repo-governance/development/workflow/implementation.md)
+**See**: [implementation.md](./repo-governance/development/workflow/implementation.md)
 
 ### Test-Driven Development
 
@@ -227,7 +227,7 @@ Red → Green → Refactor. Required for all code changes. Every code delivery s
 three-substep template (RED/GREEN/REFACTOR), each naming a file path, verbatim command, and acceptance
 criterion.
 
-**See**: [repo-governance/development/workflow/test-driven-development.md](./repo-governance/development/workflow/test-driven-development.md)
+**See**: [test-driven-development.md](./repo-governance/development/workflow/test-driven-development.md)
 
 ### Specs & Gherkin Completeness (Both Paths)
 
@@ -236,14 +236,14 @@ Code under `apps/`/`libs/` never lands without companion `specs/` Gherkin — **
 Gherkin steps; `plan-maker` emits them, `plan-checker` flags absence). Pure refactors and docs-only
 changes are exempt.
 
-**See**: [repo-governance/development/quality/feature-change-completeness.md](./repo-governance/development/quality/feature-change-completeness.md)
+**See**: [feature-change-completeness.md](./repo-governance/development/quality/feature-change-completeness.md)
 
 ### Regression Test Mandate (Every Bug Fix)
 
 Every bug fix lands with a reproducing test (failing before fix, passing after) in the same commit/PR —
 blocking, no exemptions. Enforced by `swe-code-checker` (Step 6.7) and `plan-checker` (Step 16b).
 
-**See**: [repo-governance/development/quality/regression-test-mandate.md](./repo-governance/development/quality/regression-test-mandate.md)
+**See**: [regression-test-mandate.md](./repo-governance/development/quality/regression-test-mandate.md)
 
 ### Knowledge Capture
 
@@ -263,7 +263,7 @@ identity at **any** scope — `git config user.*` bare/`--local`/`--global`/`--s
 `.git/config [user]` edits. Identity comes from the developer's `~/.gitconfig` (`includeIf` for
 per-tree overrides). CI service-account identity in workflow YAML is exempt.
 
-**See**: [repo-governance/development/workflow/reproducible-environments.md](./repo-governance/development/workflow/reproducible-environments.md),
+**See**: [reproducible-environments.md](./repo-governance/development/workflow/reproducible-environments.md),
 [Secrets and Env Standards](./repo-governance/conventions/security/secrets-and-env-standards.md)
 
 ### Dependency Bump Stability & Safety Policy
@@ -272,7 +272,7 @@ Three-path tree: A (LTS latest patch), B (60-day soak + CVE-clean), C (security-
 Exact pins only, CVE-clean across NVD, GitHub Advisories, Snyk, vendor pages, CISA KEV. CISA-KEV
 fast-track and EPSS ≥ 0.5 escalate to Path C.
 
-**See**: [repo-governance/development/workflow/dependency-bump-policy.md](./repo-governance/development/workflow/dependency-bump-policy.md)
+**See**: [dependency-bump-policy.md](./repo-governance/development/workflow/dependency-bump-policy.md)
 
 ### Agent Workflow Orchestration
 
@@ -300,7 +300,7 @@ independent nodes fan out up to N, dependent nodes serialize, cleanup is the ter
 orchestrator, never splitting dependent work to fill a slot. Report every 5 min generic, 3 min CI;
 maintain a live task list, marking in-progress/completed and adding discovered tasks immediately.
 
-**See**: [repo-governance/development/agents/agent-workflow-orchestration.md](./repo-governance/development/agents/agent-workflow-orchestration.md),
+**See**: [agent-workflow-orchestration.md](./repo-governance/development/agents/agent-workflow-orchestration.md),
 [Subagent Orchestration Convention](./repo-governance/development/agents/subagent-orchestration.md),
 [Parallel-by-Default Practice](./repo-governance/development/practice/parallel-by-default.md),
 [Task List Discipline](./repo-governance/development/practice/task-list-discipline.md),
@@ -359,8 +359,8 @@ See [Web Research Delegation Convention](./repo-governance/conventions/writing/w
 at `.claude/agents/<name>.md`; skill files at `.claude/skills/<name>/SKILL.md`. Agent skills serve agents
 (service relationship, not governance).
 
-**See**: [repo-governance/development/agents/ai-agents.md](./repo-governance/development/agents/ai-agents.md),
-[repo-governance/development/pattern/maker-checker-fixer.md](./repo-governance/development/pattern/maker-checker-fixer.md),
+**See**: [ai-agents.md](./repo-governance/development/agents/ai-agents.md),
+[maker-checker-fixer.md](./repo-governance/development/pattern/maker-checker-fixer.md),
 [Agent Naming Convention](./repo-governance/conventions/structure/agent-naming.md),
 [Workflow Naming Convention](./repo-governance/conventions/structure/workflow-naming.md)
 
@@ -372,7 +372,7 @@ rules), Layer 3 (Development — HOW we develop), Layer 4 (AI Agents — WHO enf
 (Workflows — WHEN we compose agents/procedures). **agent skills**: delivery infrastructure (inline + fork
 modes) serving agents — not a governance layer.
 
-**See**: [repo-governance/repository-governance-architecture.md](./repo-governance/repository-governance-architecture.md)
+**See**: [repository-governance-architecture.md](./repo-governance/repository-governance-architecture.md)
 
 ## Web Sites
 
@@ -390,14 +390,25 @@ details.
   `{agent-family}__{uuid-chain}__{YYYY-MM-DD--HH-MM}__audit.md`. Checkers MUST write progressive reports.
 - **`local-temp/`**: Misc temporary files.
 
-**See**: [repo-governance/development/infra/temporary-files.md](./repo-governance/development/infra/temporary-files.md)
+**See**: [temporary-files.md](./repo-governance/development/infra/temporary-files.md)
+
+### Build-Artifact Sweeper
+
+An ambient scheduled sweeper on the host machine deletes gitignored build output (`target/`, `dist/`,
+`.next/`), tool caches (`.nx/cache`), and the shared cargo `target/` at any time, mid-session and
+mid-plan. A missing artifact is expected — regenerate (`nx build` / `npm install` / `npm run doctor --
+--fix`) and continue. Never file a finding, commit build output, edit `.gitignore` to protect it, or
+blame a concurrent agent. It never touches tracked files, `.env*`, `generated-reports/`, `local-temp/`,
+worktrees, or git refs — anything else missing is not the sweeper.
+
+**See**: [build-artifact-sweeper.md](./repo-governance/development/infra/build-artifact-sweeper.md)
 
 ## Plans
 
 `plans/` folder: `ideas/` (two-pager briefs), `backlog/` (future; `[id]/`),
 `in-progress/` (active; `[id]/`), `done/` (completed; `YYYY-MM-DD__[id]/`).
 
-**See**: [repo-governance/conventions/structure/plans.md](./repo-governance/conventions/structure/plans.md)
+**See**: [plans.md](./repo-governance/conventions/structure/plans.md)
 
 ## Important Notes
 
@@ -411,12 +422,12 @@ details.
 
 ## Related Documentation
 
-- **Conventions Index**: [repo-governance/conventions/README.md](./repo-governance/conventions/README.md) — Documentation writing and org standards
-- **Development Index**: [repo-governance/development/README.md](./repo-governance/development/README.md) — Software dev practices and workflows
-- **Principles Index**: [repo-governance/principles/README.md](./repo-governance/principles/README.md) — Foundational values governing all layers
+- **Conventions Index**: [README.md](./repo-governance/conventions/README.md) — Documentation writing and org standards
+- **Development Index**: [README.md](./repo-governance/development/README.md) — Software dev practices and workflows
+- **Principles Index**: [README.md](./repo-governance/principles/README.md) — Foundational values governing all layers
 - **Primary Binding Agents Index**: [agent catalog](./.claude/agents/README.md) — Specialized agents organized by role
-- **Workflows Index**: [repo-governance/workflows/README.md](./repo-governance/workflows/README.md) — Orchestrated processes
-- **Repository Architecture**: [repo-governance/repository-governance-architecture.md](./repo-governance/repository-governance-architecture.md) — Six-layer governance hierarchy
+- **Workflows Index**: [README.md](./repo-governance/workflows/README.md) — Orchestrated processes
+- **Repository Architecture**: [repository-governance-architecture.md](./repo-governance/repository-governance-architecture.md) — Six-layer governance hierarchy
 
 ## Related Repositories
 
@@ -495,10 +506,10 @@ The exceptions:
 
 Every generated directory above is emitted by `rhino-cli harness bindings generate` — never hand-edited.
 
-See [docs/reference/platform-bindings.md](./docs/reference/platform-bindings.md) for the full catalog
+See [platform-bindings.md](./docs/reference/platform-bindings.md) for the full catalog
 of binding directories, root instruction files, and mechanical translation artifacts. The two-tier
 binding model and no-shadowing rule are defined in
-[repo-governance/conventions/structure/multi-harness-binding.md](./repo-governance/conventions/structure/multi-harness-binding.md).
+[multi-harness-binding.md](./repo-governance/conventions/structure/multi-harness-binding.md).
 
 ### Concrete Vendor Model IDs
 

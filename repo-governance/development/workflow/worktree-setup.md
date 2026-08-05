@@ -239,6 +239,12 @@ Agents that create or enter worktrees via `git worktree add`, the `EnterWorktree
 
 The root worktree path is available from the environment context or can be confirmed with `git worktree list`. See the [Git Worktree Awareness](../agents/ai-agents.md#git-worktree-awareness) section of the AI Agents Convention for the full set of rules governing agent behavior in worktrees.
 
+If a worktree's dependencies or build output turn out to be missing **mid-session** — not just at
+initial entry — re-run this same two-step init (plus `nx build <project>` as needed for build output).
+The [Build-Artifact Sweeper Convention](../infra/build-artifact-sweeper.md) makes that an expected,
+routine occurrence: the response is re-running provisioning, never re-creating the worktree from
+scratch or investigating it as a defect.
+
 ## Related Documentation
 
 - [Worktree Path Convention](../../conventions/structure/worktree-path.md) - Repo-root `worktrees/<name>/` override and the WorktreeCreate hook that enforces it

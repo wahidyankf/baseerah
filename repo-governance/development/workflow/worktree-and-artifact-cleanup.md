@@ -85,7 +85,11 @@ These bound every action the gate takes.
   [`rust-cargo-target-dir-sharing`](../../../plans/done/2026-07-19__rust-cargo-target-dir-sharing/)
   plan — is depended on by concurrent builds in every other worktree. Removing it breaks them. The
   same reasoning applies to any shared cache: if another session can be relying on it, it is out of
-  scope for a plan-scoped cleanup.
+  scope for a plan-scoped cleanup. This rule binds **agents**: it does not contradict the
+  [Build-Artifact Sweeper Convention](../infra/build-artifact-sweeper.md), an ambient host-machine
+  process (not an agent) that may remove the same shared cache on its own schedule. A cache an agent
+  must never delete can still disappear — that is the environment, not a rule violation by another
+  actor.
 - **Cleanup is itself non-destructive to others.** The gate may not use any operation that a
   concurrent actor could be harmed by. It removes; it never force-removes, rewrites, or prunes shared
   state.
@@ -187,8 +191,17 @@ Explicitly **skip** the shared cargo `target/` and every other shared cache, and
 or `git prune` on the object store. History maintenance is a serialization point on a shared machine
 and stays out of the cleanup gate entirely.
 
+If build output is already gone when this gate runs, that is the ambient
+[Build-Artifact Sweeper](../infra/build-artifact-sweeper.md) — not a missed cleanup step. Record it as
+already swept and move on; do not rebuild an artifact solely to then delete it.
+
 ## Related Documentation
 
+- [Build-Artifact Sweeper Convention](../infra/build-artifact-sweeper.md) — the ambient host-machine
+  process that may remove the same build output and shared caches this gate governs, on its own
+  schedule. The two reconcile: this convention binds what **agents** may delete; the sweeper
+  convention covers what the **environment** deletes unprompted, and a swept artifact found already
+  missing is expected, not a rule violation.
 - [Worktree Toolchain Initialization](./worktree-setup.md) — the **setup** half of the same lifecycle.
   That convention provisions a worktree and converges its toolchain; this one tears it down. A plan
   touches both, at opposite ends.
