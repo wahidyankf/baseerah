@@ -6,34 +6,10 @@ that genuinely need a full plan's depth to answer.
 
 ## Planned Projects
 
-- [audit-e2e-reuse-existing-server-config](./audit-e2e-reuse-existing-server-config/README.md)
-  — Audits whether `reuseExistingServer: true` (hardcoded unconditionally in
-  `libs/web-ui/e2e/playwright.config.ts`, the sole surviving offender after the BeaverNest repo reset
-  deleted the plan's six originally-cited apps) risks silently reusing a stale, unrelated server,
-  and applies a CI-conditional gate, doc caveat, or automated check depending on runner persistence.
-- [coverage-artifact-relative-paths](./coverage-artifact-relative-paths/README.md)
-  — Fixes a git-tracked .NET coverage artifact (`libs/fsharp-crane-core/tests/unit/coverage.json`)
-  that bakes in checkout-local absolute paths, dirtying the tree on every `test:quick` run from a
-  different checkout.
-- [cross-repo-governance-link-parity](./cross-repo-governance-link-parity/README.md)
-  — Validates shared governance doc anchors across `ose-public`, `ose-primer`, and `ose-private`
-  during multi-repo landings.
-- [cross-repo-port-registry](./cross-repo-port-registry/README.md)
-  — Designs a shared, machine-checkable port registry across the four sibling repos under
-  `/Users/wkf/ose-projects/`, replacing manual per-repo prose-table port allocation.
-- [merge-queue-adoption](./merge-queue-adoption/README.md)
-  — Hardens merge-precondition (c) under concurrent integration; owns the merge-queue work deferred
-  from `worktree-to-pr-hardening`.
-- [ose-private-opencode-ci-monitor-orphan](./ose-private-opencode-ci-monitor-orphan/README.md)
-  — Removes or restores the source mirror for a stale `.opencode/agents/ci-monitor-subagent.md` in
-  the sibling `ose-private` repo.
-- [vitest-glob-coverage-guard](./vitest-glob-coverage-guard/README.md)
-  — Designs a durable, automated guard against test files landing outside every configured Vitest
-  project's `include` glob, after a regression test silently executed zero times due to exactly this
-  gap.
+**The backlog is currently empty** — no plan is promoted and waiting to start.
 
-Other candidate work lives as two-pager idea briefs in [`../ideas/`](../ideas/README.md); promote one
-here when it is ripe.
+All candidate work lives as two-pager idea briefs in [`../ideas/`](../ideas/README.md). Promote one
+here when it is ripe, following the steps below.
 
 ## Instructions
 

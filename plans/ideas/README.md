@@ -12,6 +12,7 @@ ideas/ (two-pagers) → backlog/ (full 5-doc plans) → in-progress/ → done/
 
 - [acceptance-clause-vacuity](./acceptance-clause-vacuity.md) — acceptance clauses that cannot fail certify nothing; require falsifiability in both directions.
 - [agents-md-progressive-disclosure](./agents-md-progressive-disclosure.md) — `AGENTS.md` sits under 20 B beneath its 30,000 B ceiling; restore headroom via progressive disclosure.
+- [audit-e2e-reuse-existing-server-config](./audit-e2e-reuse-existing-server-config.md) — only 1 of 3 Playwright configs reuses an unverified server, and CI never runs it, so the proposed gate would be a no-op.
 - [bare-repo-landing-method-step-count-drift](./bare-repo-landing-method-step-count-drift.md) — the landing method numbers eight steps but is summarized as "seven-step" in nine sites across three repos.
 - [beaver-nest-first-deploy](./beaver-nest-first-deploy.md) — provision the first real `prod-beaver-nest-fe`/`stag-beaver-nest-be` deploy targets; the deployer agents and CI callers ship wired but dormant.
 - [beaver-nest-first-llm-integration](./beaver-nest-first-llm-integration.md) — give `beaver-nest-be` its first real LLM-backed route; today there is no capture, no notes, no prompt plumbing at all.
@@ -21,13 +22,18 @@ ideas/ (two-pagers) → backlog/ (full 5-doc plans) → in-progress/ → done/
 - [ci-setup-rust-toolchain-retry](./ci-setup-rust-toolchain-retry.md) — `setup-rust` flaked 7× in one phase on the toolchain download; add a retry in all three repos.
 - [class-sweep-completeness](./class-sweep-completeness.md) — class sweeps miss producer surfaces, root instruction files, and the block around a cited substring.
 - [contributing-md-trunk-guidance-and-naming-exemption](./contributing-md-trunk-guidance-and-naming-exemption.md) — fix stale "work on main" guidance blocked by the filename-naming gate.
+- [coverage-artifact-relative-paths](./coverage-artifact-relative-paths.md) — generated coverage files bake in the last runner's absolute path; both live instances are already gitignored, leaving only a root-level guard and an index check.
+- [cross-repo-governance-link-parity](./cross-repo-governance-link-parity.md) — cross-repo citations and inherited anchors are invisible to every link gate, which stops at the repo root and skips inline code.
+- [cross-repo-port-registry](./cross-repo-port-registry.md) — port allocation across the four sibling repos lives in four separate prose tables, so a collision is caught only when two apps fail to bind at once.
 - [demo-apps-standards-recheck](./demo-apps-standards-recheck.md) — re-verify the ose-primer demo apps still meet current repo standards.
 - [doc-command-existence-validation](./doc-command-existence-validation.md) — a rhino-cli validator catching doc-cited commands that don't exist.
 - [harness-binding-catalog-drift](./harness-binding-catalog-drift.md) — triage the 2026-07-20 harness-compatibility external-drift findings.
 - [iam-service-module](./iam-service-module.md) — a shared IAM (authn/authz) capability; early placeholder, mostly open questions.
+- [merge-queue-adoption](./merge-queue-adoption.md) — a merge queue would make merge-precondition (c) hold under concurrent merges, but GitHub gates it on organization ownership and this repo's owner type was never probed.
 - [mermaid-validator-does-not-check-syntax](./mermaid-validator-does-not-check-syntax.md) — `md mermaid validate` is cited as the Mermaid-correctness gate but never parses syntax; broken diagrams pass clean.
 - [mermaid-state-label-render-clipping-warn](./mermaid-state-label-render-clipping-warn.md) — a WARN rule for `stateDiagram-v2` edge labels that clip in GitHub's renderer.
 - [nx-affected-cross-worktree-contamination](./nx-affected-cross-worktree-contamination.md) — `nx affected` includes uncommitted working-directory changes, so a concurrent plan's stray WIP blocked an unrelated docs-only push.
+- [ose-private-opencode-ci-monitor-orphan](./ose-private-opencode-ci-monitor-orphan.md) — a stale OpenCode agent mirror with no `.claude/` source, and the guard gap that lets source-less binding artifacts pass clean.
 - [plan-archival-in-pr-multi-repo-gap](./plan-archival-in-pr-multi-repo-gap.md) — `plan-execution.md` §8's Archival-in-PR rule has no provision for a plan whose delivery spans multiple repositories.
 - [plan-quality-gate-convergence](./plan-quality-gate-convergence.md) — make the plan-quality-gate loop converge in a bounded number of iterations without relaxing checks.
 - [post-cutoff-dependency-migrations](./post-cutoff-dependency-migrations.md) — track and promote the deferred dependency bumps as their soak windows clear.
@@ -46,6 +52,7 @@ ideas/ (two-pagers) → backlog/ (full 5-doc plans) → in-progress/ → done/
 - [syllabus-conformance-validator](./syllabus-conformance-validator.md) — a deterministic `rhino-cli md syllabus validate` for course-file section conformance, deferred until the format settles.
 - [tri-repo-rhino-cli-byte-identity-gate](./tri-repo-rhino-cli-byte-identity-gate.md) — a standing diff gate over the `apps/rhino-cli` byte-identity boundary across all three repos.
 - [vendor-audit-kiro-term](./vendor-audit-kiro-term.md) — add `Kiro` to the vendor-audit denylist before it leaks into governance prose.
+- [vitest-glob-coverage-guard](./vitest-glob-coverage-guard.md) — a test file outside every Vitest include glob runs zero times and still reports green.
 
 ## What a Two-Pager Is
 
