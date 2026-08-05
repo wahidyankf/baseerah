@@ -91,7 +91,7 @@ agent via the Agent tool, using the **identical Agent Selection rules** defined 
 annotation → project/app → file extension → content type → framework → direct execution).
 
 The orchestrator invokes `plan-execution-checker` as a delegated agent for each plan's independent
-validation, and runs the PR-review cycle (eight specialists → `pr-review-synthesis-maker` →
+validation, and runs the PR-review cycle (nine specialists → `pr-review-synthesis-maker` →
 `pr-review-fixer`) for each `*-to-pr` plan — again, unchanged from the single-plan workflow. The only thing this workflow adds is the **scheduling of
 those per-plan steps across plans**.
 
@@ -350,7 +350,7 @@ when every plan reached its clean terminal state **and** cross-plan learnings we
 
 ## Iron Rules (Non-Negotiable)
 
-All ten [`plan-execution.md` Iron Rules](./plan-execution.md#iron-rules-non-negotiable) apply per
+All eleven [`plan-execution.md` Iron Rules](./plan-execution.md#iron-rules-non-negotiable) apply per
 plan, unchanged. The multi-plan additions:
 
 1. **Resolve scope once, then freeze it.** The caller states scope explicitly — an explicit plan list
