@@ -13,6 +13,11 @@ Use three sequential worktree-to-PR delivery units. Each PR targets `main`, foll
 [PR Merge Protocol](../../../repo-governance/development/workflow/pr-merge-protocol.md), and runs the
 default three-cycle PR-Review Maker→Fixer quality gate. Phase 0 is setup only and never opens a PR.
 
+**CI scope note**: every CI-verification step below is scoped to a named/branch/PR-event workflow
+(`pr-quality-gate.yml`, `beaver-nest-app-test-local-deploy-stag.yml`, etc.) — never
+`.github/workflows/main-ci.yml`, which is deprecated, schedule-only, and must not be monitored or
+gated on.
+
 ## Worktree
 
 Worktree path: `worktrees/beaver-nest-app-setup/`
