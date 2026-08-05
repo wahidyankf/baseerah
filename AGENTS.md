@@ -345,7 +345,7 @@ role. Do not maintain a second roster here. Names follow `<domain>-<role>`:
   Phase 0 first, `[AI]`/`[HUMAN]` tags, gated phases. See the
   [plan-execution](./repo-governance/workflows/plan/plan-execution.md) and
   [plan-planning](./repo-governance/workflows/plan/plan-planning.md) workflows.
-- **PR Review Cycle** — eight discipline `pr-review-*-maker` specialists fan out to
+- **PR Review Cycle** — nine discipline `pr-review-*-maker` specialists fan out to
   `pr-review-synthesis-maker` (coordinator) to `pr-review-fixer`, for `*-to-pr` Delivery Mode plans.
   See [Delivery Mode](./repo-governance/conventions/structure/plans.md#delivery-mode),
   [PR Review Quality Gate](./repo-governance/workflows/pr/pr-review-quality-gate.md),
