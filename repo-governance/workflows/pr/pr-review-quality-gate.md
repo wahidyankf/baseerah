@@ -99,7 +99,8 @@ flowchart LR
     N["pr-review-instruction-maker"]:::blue
     T["pr-review-types-maker"]:::blue
   end
-  SC --> FANOUT
+  SC -->|"lite / full tier"| FANOUT
+  SC -->|"trivial tier (DD-7): zero specialists,<br/>SY performs the single generalist pass itself"| SY
   A --> SY
   L --> SY
   G --> SY
@@ -128,8 +129,11 @@ run_pr_review_cycle(PR, N = 3):            # N configurable, default 3, STRICTLY
         head = gh pr view <PR> --json headRefOid   # pin ONE head SHA for this pass
         scout = fresh pr-review-scout-maker(pr = PR, head = head, cycle = cycle, total_cycles = N, prior = prior)
                        # output: tier, specialists, context_brief, dismissals
-        synthesis_maker = fresh pr-review-synthesis-maker(context = clean, fed = prior)
-        raw = fan_out(scout.specialists, context = scout.context_brief, fed = prior)   # CONCURRENT within this cycle
+        synthesis_maker = fresh pr-review-synthesis-maker(context = scout.context_brief, fed = prior)
+        if scout.specialists is empty:                       # trivial tier (DD-7): coordinator-only path
+            raw = synthesis_maker.generalist_pass(context = scout.context_brief, fed = prior)
+        else:
+            raw = fan_out(scout.specialists, context = scout.context_brief, fed = prior)   # CONCURRENT within this cycle
         consolidated = synthesis_maker.synthesize(raw, dedup_against = prior)
                        # dedup + re-categorize + reasonableness-filter + tool-verify
         post consolidated as ONE line-anchored review (Reviews API)
@@ -171,6 +175,7 @@ sequenceDiagram
   SC->>SC: classify risk tier, select specialist set, assemble shared-context brief, read prior dismissals
   SC->>SP: fan out tier-selected specialists (fed context brief)
   SP-->>SY: raw findings per discipline
+  Note over SY: trivial tier (DD-7): SY itself performs the<br/>single generalist pass instead of a fan-out
   SY->>SY: dedup + re-categorize + reasonableness-filter + tool-verify
   SY->>GH: post ONE consolidated review (line-anchored)
   GH->>F: unresolved review threads
@@ -224,7 +229,11 @@ sequenceDiagram
   cited evidence (blob URL + SHA + line range), and a CRITICAL/HIGH/MEDIUM/LOW severity mapping; the
   review's header records the risk tier, the specialist set fanned out, any diff-slicing applied, and
   the cycle number (N of {input.cycles}) (see the
-  [PR Reviewer-Discipline Convention](../../development/quality/pr-review-disciplines.md))
+  [PR Reviewer-Discipline Convention](../../development/quality/pr-review-disciplines.md)). When
+  Step 1 resolves the tier to `trivial` (empty specialist set), this step's fan-out is a no-op and
+  `pr-review-synthesis-maker` performs the single generalist pass itself, per
+  [`pr-review-scout-maker.md`'s Trivial-Tier Handoff (DD-7)](../../../.claude/agents/pr-review-scout-maker.md#trivial-tier-handoff-dd-7);
+  the same success criteria still apply to that solo pass's output.
 - **On failure**: If a specialist or the coordinator cannot access the PR or an API call fails, retry
   once; if it fails again, escalate to the user
 
