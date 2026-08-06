@@ -56,7 +56,7 @@ already works and is real; only the receiving end is missing.
 - Is a Vercel project for `beaver-nest-fe` provisioned manually (human `[HUMAN]` step) or can it be
   automated? Account/billing implications likely make this a human step.
 - Does hello-world content warrant a real deploy yet, or should this wait for the first real
-  feature (see [beaver-nest-persistence-layer](./beaver-nest-persistence-layer.md))?
+  feature (see [beaver-nest-persistence-layer](../q4-not-urgent-not-important/beaver-nest-persistence-layer.md))?
 
 ## What success looks like + promotion signal
 

@@ -57,7 +57,7 @@ The first draft of `baseerah.css` failed 3 of the 16 pairs:
 
 All three used white (`#ffffff`) foreground text over a hue whose lightness (`L`) was too high for
 sufficient contrast — a variant of the same failure mode recorded in the
-[`web-ui-alert-destructive-dark-contrast`](../../../ideas/web-ui-alert-destructive-dark-contrast.md)
+[`web-ui-alert-destructive-dark-contrast`](https://github.com/wahidyankf/ose-public/blob/main/plans/ideas/q2-not-urgent-important/web-ui-alert-destructive-dark-contrast.md)
 two-pager for other brands' tokens. Fixed by lowering each hue's `L` value (keeping chroma and hue
 angle unchanged) until the ratio cleared 4.5:1 with a safety margin, then re-verified against the
 full pair set above and against `npx nx run web-ui-token:test:quick --skip-nx-cache` (still passing).

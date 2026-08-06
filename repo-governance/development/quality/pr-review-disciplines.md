@@ -479,7 +479,7 @@ CRITICAL finding — therefore lands with review STATE `COMMENT` instead of `REQ
 consumer that gates on STATE alone reads a blocked PR as unblocked while a CRITICAL finding sits open
 on it. This convention does not own closing that gap: provisioning a scope-minimal GitHub App or
 CI-scoped bot identity and rewiring the coordinator to authenticate as it is tracked in the
-[PR-review bot identity idea](../../../plans/ideas/pr-review-bot-identity.md), which owns the
+[PR-review bot identity idea](https://github.com/wahidyankf/ose-public/blob/main/plans/ideas/q2-not-urgent-important/pr-review-bot-identity.md), which owns the
 AI-attribution and formal `REQUEST_CHANGES` question until an org-level identity becomes available.
 
 ### Cost and Latency Budgeting
@@ -507,7 +507,7 @@ settings expose no merge-queue toggle to enable, because GitHub merge queue requ
 ownership and the repos in scope are personal-account-owned. Precondition (c) therefore remains the
 manual branch-up-to-date check, unchanged. The deferred investigation, availability matrix, and
 adoption path are owned by the standalone
-[merge-queue-adoption idea brief](../../../plans/ideas/merge-queue-adoption.md), not by
+[merge-queue-adoption idea brief](https://github.com/wahidyankf/ose-public/blob/main/plans/ideas/q2-not-urgent-important/merge-queue-adoption.md), not by
 this convention.
 
 ## Examples

@@ -71,19 +71,19 @@ adopted against a tractable surface before the app count grows and the glob dive
 
 ## Prior art / precedents
 
-- [acceptance-clause-vacuity](./acceptance-clause-vacuity.md) — the direct sibling in the
+- [acceptance-clause-vacuity](https://github.com/wahidyankf/ose-public/blob/main/plans/ideas/q1-urgent-important/acceptance-clause-vacuity.md) — the direct sibling in the
   silent-false-pass family: clauses that pass no matter what the world looks like. Its central rule,
   "verify the check could have failed", is the same rule this guard mechanizes for test discovery.
-- [mermaid-validator-does-not-check-syntax](./mermaid-validator-does-not-check-syntax.md) — another
+- [mermaid-validator-does-not-check-syntax](https://github.com/wahidyankf/ose-public/blob/main/plans/ideas/q1-urgent-important/mermaid-validator-does-not-check-syntax.md) — another
   same-class instance: a validator wired into pre-commit, pre-push, and CI, routinely cited as the
   correctness gate, that never actually parses what it claims to check.
-- [Regression Test Mandate](../../repo-governance/development/quality/regression-test-mandate.md) —
+- [Regression Test Mandate](../../../repo-governance/development/quality/regression-test-mandate.md) —
   requires every bug fix to land with a reproducing test. That mandate is only as strong as the
   guarantee the test actually runs, which is exactly what this guard supplies.
-- [Feature-Change Completeness](../../repo-governance/development/quality/feature-change-completeness.md)
+- [Feature-Change Completeness](../../../repo-governance/development/quality/feature-change-completeness.md)
   — the existing `specs:coverage` machinery already reasons about which files satisfy which
   requirement; it is the closest structural precedent for a path-to-glob reconciliation check.
-- [Maker-Checker-Fixer pattern](../../repo-governance/development/pattern/maker-checker-fixer.md) —
+- [Maker-Checker-Fixer pattern](../../../repo-governance/development/pattern/maker-checker-fixer.md) —
   the natural home if the guard lands as a checker enhancement rather than a standalone script.
 
 ## Proposed direction (sketch)
@@ -92,8 +92,8 @@ Enumerate every project carrying a Vitest config, read its `include` globs, then
 test-shaped file (`*.test.*`, `*.spec.*`, `*.steps.*`) under that project's root and report any file
 matching no glob. Two design questions dominate and were left open by the original plan: where the
 guard lives — a lightweight script wired into an Nx target, or an enhancement to the existing
-[`ci-checker`](../../.claude/agents/ci-checker.md) or
-[`swe-code-checker`](../../.claude/agents/swe-code-checker.md) agent — and whether it blocks CI or
+[`ci-checker`](../../../.claude/agents/ci-checker.md) or
+[`swe-code-checker`](../../../.claude/agents/swe-code-checker.md) agent — and whether it blocks CI or
 merely reports. A deliberate-exemption mechanism is mandatory from the start, because
 `landing.steps.ts` is a legitimate unmatched file. The guard must be proven both ways: zero findings
 against the repo as it stands today, and exactly one finding against a synthetic reintroduction of

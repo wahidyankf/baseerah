@@ -65,7 +65,7 @@ this input).
 - Is there a lower-cost mitigation neither option above captures (e.g. a reverse proxy in front of
   Kestrel in production that normalizes malformed requests before they reach the app)? (open — no
   production deploy target exists yet for `beaver-nest-be`, see
-  [beaver-nest-first-deploy](./beaver-nest-first-deploy.md))
+  [beaver-nest-first-deploy](../q2-not-urgent-important/beaver-nest-first-deploy.md))
 - Does this matter at all before `beaver-nest-be` has a real production deploy target and real
   clients? (open — leans toward "no")
 

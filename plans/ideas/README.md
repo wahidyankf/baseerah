@@ -10,49 +10,25 @@ ideas/ (two-pagers) → backlog/ (full 5-doc plans) → in-progress/ → done/
 
 ## Two-Pagers
 
-- [acceptance-clause-vacuity](./acceptance-clause-vacuity.md) — acceptance clauses that cannot fail certify nothing; require falsifiability in both directions.
-- [agents-md-progressive-disclosure](./agents-md-progressive-disclosure.md) — `AGENTS.md` sits under 20 B beneath its 30,000 B ceiling; restore headroom via progressive disclosure.
-- [audit-e2e-reuse-existing-server-config](./audit-e2e-reuse-existing-server-config.md) — only 1 of 3 Playwright configs reuses an unverified server, and CI never runs it, so the proposed gate would be a no-op.
-- [bare-repo-landing-method-step-count-drift](./bare-repo-landing-method-step-count-drift.md) — the landing method numbers eight steps but is summarized as "seven-step" in nine sites across three repos.
-- [beaver-nest-first-deploy](./beaver-nest-first-deploy.md) — provision the first real `prod-beaver-nest-fe`/`stag-beaver-nest-be` deploy targets; the deployer agents and CI callers ship wired but dormant.
-- [beaver-nest-first-llm-integration](./beaver-nest-first-llm-integration.md) — give `beaver-nest-be` its first real LLM-backed route; today there is no capture, no notes, no prompt plumbing at all.
-- [beaver-nest-be-nullbyte-path-error-envelope](./beaver-nest-be-nullbyte-path-error-envelope.md) — a null-byte path request gets a bodyless Kestrel 400 instead of `beaver-nest-be`'s usual `Error` envelope; fixing it means replacing the server.
-- [beaver-nest-persistence-layer](./beaver-nest-persistence-layer.md) — add the first concrete feature that durably stores and retrieves product data on the SQLite foundation; no product schema exists yet.
-- [behavior-coverage-json-report-wiring](./behavior-coverage-json-report-wiring.md) — wire rhino-cli's JSON-run-report cross-check into project targets + CI.
-- [ci-setup-rust-toolchain-retry](./ci-setup-rust-toolchain-retry.md) — `setup-rust` flaked 7× in one phase on the toolchain download; add a retry in all three repos.
-- [class-sweep-completeness](./class-sweep-completeness.md) — class sweeps miss producer surfaces, root instruction files, and the block around a cited substring.
-- [contributing-md-trunk-guidance-and-naming-exemption](./contributing-md-trunk-guidance-and-naming-exemption.md) — fix stale "work on main" guidance blocked by the filename-naming gate.
-- [coverage-artifact-relative-paths](./coverage-artifact-relative-paths.md) — generated coverage files bake in the last runner's absolute path; both live instances are already gitignored, leaving only a root-level guard and an index check.
-- [cross-repo-governance-link-parity](./cross-repo-governance-link-parity.md) — cross-repo citations and inherited anchors are invisible to every link gate, which stops at the repo root and skips inline code.
-- [cross-repo-port-registry](./cross-repo-port-registry.md) — port allocation across the four sibling repos lives in four separate prose tables, so a collision is caught only when two apps fail to bind at once.
-- [demo-apps-standards-recheck](./demo-apps-standards-recheck.md) — re-verify the ose-primer demo apps still meet current repo standards.
-- [doc-command-existence-validation](./doc-command-existence-validation.md) — a rhino-cli validator catching doc-cited commands that don't exist.
-- [harness-binding-catalog-drift](./harness-binding-catalog-drift.md) — triage the 2026-07-20 harness-compatibility external-drift findings.
-- [iam-service-module](./iam-service-module.md) — a shared IAM (authn/authz) capability; early placeholder, mostly open questions.
-- [merge-queue-adoption](./merge-queue-adoption.md) — a merge queue would make merge-precondition (c) hold under concurrent merges, but GitHub gates it on organization ownership and this repo's owner type was never probed.
-- [mermaid-validator-does-not-check-syntax](./mermaid-validator-does-not-check-syntax.md) — `md mermaid validate` is cited as the Mermaid-correctness gate but never parses syntax; broken diagrams pass clean.
-- [mermaid-state-label-render-clipping-warn](./mermaid-state-label-render-clipping-warn.md) — a WARN rule for `stateDiagram-v2` edge labels that clip in GitHub's renderer.
-- [nx-affected-cross-worktree-contamination](./nx-affected-cross-worktree-contamination.md) — `nx affected` includes uncommitted working-directory changes, so a concurrent plan's stray WIP blocked an unrelated docs-only push.
-- [ose-private-opencode-ci-monitor-orphan](./ose-private-opencode-ci-monitor-orphan.md) — a stale OpenCode agent mirror with no `.claude/` source, and the guard gap that lets source-less binding artifacts pass clean.
-- [plan-archival-in-pr-multi-repo-gap](./plan-archival-in-pr-multi-repo-gap.md) — `plan-execution.md` §8's Archival-in-PR rule has no provision for a plan whose delivery spans multiple repositories.
-- [plan-quality-gate-convergence](./plan-quality-gate-convergence.md) — make the plan-quality-gate loop converge in a bounded number of iterations without relaxing checks.
-- [post-cutoff-dependency-migrations](./post-cutoff-dependency-migrations.md) — track and promote the deferred dependency bumps as their soak windows clear.
-- [pr-review-bot-identity](./pr-review-bot-identity.md) — a dedicated bot identity so blocking reviews post as `REQUEST_CHANGES`.
-- [propagation-checklist-under-coverage](./propagation-checklist-under-coverage.md) — propagation checklists enumerated by change ID under-cover the merged changeset; derive the file list from the PR diff.
-- [refresh-agent-illustrative-example-paths](./refresh-agent-illustrative-example-paths.md) — 4 generic agent definitions still illustrate usage with example paths naming apps this repo deleted.
-- [repo-rules-quality-gate-convergence](./repo-rules-quality-gate-convergence.md) — turn the repo-rules sweep into a bounded, count-diff convergence loop.
-- [rhino-cli-env-backup-scripts](./rhino-cli-env-backup-scripts.md) — scripted backup/restore of the gitignored rhino-cli `.env*` files.
-- [rust-crate-structural-checklist-promotion](./rust-crate-structural-checklist-promotion.md) — promote the Rust crate structural checklist to governance once a 2nd crate exists.
-- [web-ui-alert-destructive-dark-contrast](./web-ui-alert-destructive-dark-contrast.md) — shared `Alert variant="destructive"` renders at 1.99:1 in dark mode; the obvious token fix is unsafe.
-- [sdlc-gate-standard-property-bound-lag](./sdlc-gate-standard-property-bound-lag.md) — `ose-public`'s SDLC gate standard trails both siblings on two name-bound bareness claims; adopt their wording.
-- [sibling-main-ci-never-runs-on-merge](./sibling-main-ci-never-runs-on-merge.md) — `main-ci` is schedule-triggered in both siblings, so a merge to their `main` gets no post-merge CI signal.
-- [source-code-credential-scanning](./source-code-credential-scanning.md) — evaluate Betterleaks (gitleaks successor) for pre-commit + CI credential detection in source.
-- [specs-checker-phantom-nx-targets](./specs-checker-phantom-nx-targets.md) — `specs-checker.md`'s Drift Detection section names Nx targets that don't exist.
-- [standardize-cis](./standardize-cis.md) — audit for any CI-standardization residual left by the toolchain-parity work.
-- [syllabus-conformance-validator](./syllabus-conformance-validator.md) — a deterministic `rhino-cli md syllabus validate` for course-file section conformance, deferred until the format settles.
-- [tri-repo-rhino-cli-byte-identity-gate](./tri-repo-rhino-cli-byte-identity-gate.md) — a standing diff gate over the `apps/rhino-cli` byte-identity boundary across all three repos.
-- [vendor-audit-kiro-term](./vendor-audit-kiro-term.md) — add `Kiro` to the vendor-audit denylist before it leaks into governance prose.
-- [vitest-glob-coverage-guard](./vitest-glob-coverage-guard.md) — a test file outside every Vitest include glob runs zero times and still reports green.
+Grouped into Eisenhower quadrants by [`plan-ideas-grooming`](../../repo-governance/workflows/plan/plan-ideas-grooming.md).
+
+### Q2 — Important, Not Urgent
+
+No active plan waits on these and no live defect is running, but each carries a real stake. This is the plan-from-here quadrant.
+
+- [audit-e2e-reuse-existing-server-config](./q2-not-urgent-important/audit-e2e-reuse-existing-server-config.md) — a stale dev server on the target port silently absorbs e2e runs via unconditional `reuseExistingServer: true`.
+- [beaver-nest-first-deploy](./q2-not-urgent-important/beaver-nest-first-deploy.md) — provision the first real `prod-beaver-nest-fe`/`stag-beaver-nest-be` deploy targets; the deployer agents and CI callers ship wired but dormant.
+- [cross-repo-governance-link-parity](./q2-not-urgent-important/cross-repo-governance-link-parity.md) — governance docs copied to a sibling repo carry anchors that break there; check link parity before the copy, not at the destination's push gate.
+- [orphaned-harness-binding-artifacts](./q2-not-urgent-important/orphaned-harness-binding-artifacts.md) — an unsourced `.opencode/agents/ci-monitor-subagent.md` mirror survives only via a hardcoded filename skip all three repos inherit.
+- [vitest-glob-coverage-guard](./q2-not-urgent-important/vitest-glob-coverage-guard.md) — a regression test that matched no Vitest project's include glob ran zero times and passed green; guard the class.
+
+### Q4 — Neither Urgent nor Important
+
+Parked deliberately. Kept because the need may become real, not because it is real now.
+
+- [beaver-nest-be-nullbyte-path-error-envelope](./q4-not-urgent-not-important/beaver-nest-be-nullbyte-path-error-envelope.md) — a null-byte path request gets a bodyless Kestrel 400 instead of `beaver-nest-be`'s usual `Error` envelope; fixing it means replacing the server.
+- [beaver-nest-first-llm-integration](./q4-not-urgent-not-important/beaver-nest-first-llm-integration.md) — give `beaver-nest-be` its first real LLM-backed route; today there is no capture, no notes, no prompt plumbing at all.
+- [beaver-nest-persistence-layer](./q4-not-urgent-not-important/beaver-nest-persistence-layer.md) — add the first concrete feature that durably stores and retrieves product data on the SQLite foundation; no product schema exists yet.
 
 ## What a Two-Pager Is
 
@@ -93,3 +69,47 @@ promoted yet" is a legitimate state, distinct from "rejected".
   — the authoritative convention, template, and discipline.
 - [Knowledge Capture Convention](../../repo-governance/development/quality/knowledge-capture.md) —
   routes future-work learnings from plan execution here as two-pagers.
+
+## Grooming Log
+
+### 2026-08-06 — plan-ideas-grooming (all four OSE repos in one run)
+
+Swept 120 two-pagers across `ose-public`, `ose-primer`, `ose-private`, and `beaver-nest`; 79 survive. Every surviving idea carries a residency verdict (R1 secrets-bearing, R2 single-repo-only, R3 generalizable) and an Eisenhower quadrant.
+
+- **Classified**: 8 idea(s) resident here, filed into quadrant folders.
+- **Renamed**: `ose-private-opencode-ci-monitor-orphan.md` → `orphaned-harness-binding-artifacts.md` (filename no longer matched content).
+- **Deduplicated out** (31) — the surviving copy is named for each:
+  - `acceptance-clause-vacuity.md` → `ose-public/plans/ideas/q1-urgent-important/acceptance-clause-vacuity.md`
+  - `agents-md-progressive-disclosure.md` → `ose-public/plans/ideas/q1-urgent-important/agents-md-progressive-disclosure.md`
+  - `bare-repo-landing-method-step-count-drift.md` → `ose-public/plans/ideas/q2-not-urgent-important/bare-repo-landing-method-step-count-drift.md`
+  - `behavior-coverage-json-report-wiring.md` → `ose-public/plans/ideas/q2-not-urgent-important/behavior-coverage-json-report-wiring.md`
+  - `ci-setup-rust-toolchain-retry.md` → `ose-public/plans/ideas/q2-not-urgent-important/ci-setup-rust-toolchain-retry.md`
+  - `class-sweep-completeness.md` → `ose-public/plans/ideas/q2-not-urgent-important/class-sweep-completeness.md`
+  - `contributing-md-trunk-guidance-and-naming-exemption.md` → `ose-public/plans/ideas/q2-not-urgent-important/contributing-md-trunk-guidance-and-naming-exemption.md`
+  - `demo-apps-standards-recheck.md` → `ose-primer/plans/ideas/q2-not-urgent-important/demo-apps-standards-recheck.md`
+  - `doc-command-existence-validation.md` → `ose-public/plans/ideas/q2-not-urgent-important/doc-command-existence-validation.md`
+  - `harness-binding-catalog-drift.md` → `ose-public/plans/ideas/q2-not-urgent-important/harness-binding-catalog-drift.md`
+  - `iam-service-module.md` → `ose-public/plans/ideas/q2-not-urgent-important/iam-service-module.md`
+  - `merge-queue-adoption.md` → `ose-public/plans/ideas/q2-not-urgent-important/merge-queue-adoption.md`
+  - `mermaid-state-label-render-clipping-warn.md` → `ose-public/plans/ideas/q2-not-urgent-important/mermaid-state-label-render-clipping-warn.md`
+  - `mermaid-validator-does-not-check-syntax.md` → `ose-public/plans/ideas/q1-urgent-important/mermaid-validator-does-not-check-syntax.md`
+  - `nx-affected-cross-worktree-contamination.md` → `ose-public/plans/ideas/q2-not-urgent-important/nx-affected-cross-worktree-contamination.md`
+  - `plan-archival-in-pr-multi-repo-gap.md` → `ose-public/plans/ideas/q2-not-urgent-important/plan-archival-in-pr-multi-repo-gap.md`
+  - `plan-quality-gate-convergence.md` → `ose-public/plans/ideas/q2-not-urgent-important/plan-quality-gate-convergence.md`
+  - `post-cutoff-dependency-migrations.md` → `ose-public/plans/ideas/q2-not-urgent-important/post-cutoff-dependency-migrations.md`
+  - `pr-review-bot-identity.md` → `ose-public/plans/ideas/q2-not-urgent-important/pr-review-bot-identity.md`
+  - `propagation-checklist-under-coverage.md` → `ose-public/plans/ideas/q2-not-urgent-important/propagation-checklist-under-coverage.md`
+  - `repo-rules-quality-gate-convergence.md` → `ose-public/plans/ideas/q2-not-urgent-important/repo-rules-quality-gate-convergence.md`
+  - `rhino-cli-env-backup-scripts.md` → `ose-public/plans/ideas/q2-not-urgent-important/rhino-cli-env-backup-scripts.md`
+  - `rust-crate-structural-checklist-promotion.md` → `ose-public/plans/ideas/q2-not-urgent-important/rust-crate-structural-checklist-promotion.md`
+  - `sdlc-gate-standard-property-bound-lag.md` → `ose-public/plans/ideas/q2-not-urgent-important/sdlc-gate-standard-property-bound-lag.md`
+  - `sibling-main-ci-never-runs-on-merge.md` → `ose-public/plans/ideas/q2-not-urgent-important/sibling-main-ci-never-runs-on-merge.md`
+  - `source-code-credential-scanning.md` → `ose-public/plans/ideas/q2-not-urgent-important/source-code-credential-scanning.md`
+  - `standardize-cis.md` → `ose-public/plans/ideas/q2-not-urgent-important/standardize-cis.md`
+  - `syllabus-conformance-validator.md` → `ose-public/plans/ideas/q2-not-urgent-important/syllabus-conformance-validator.md`
+  - `tri-repo-rhino-cli-byte-identity-gate.md` → `ose-public/plans/ideas/q1-urgent-important/tri-repo-rhino-cli-byte-identity-gate.md`
+  - `vendor-audit-kiro-term.md` → `ose-public/plans/ideas/q2-not-urgent-important/vendor-audit-kiro-term.md`
+  - `web-ui-alert-destructive-dark-contrast.md` → `ose-public/plans/ideas/q2-not-urgent-important/web-ui-alert-destructive-dark-contrast.md`
+- **Unresolved follow-ups**: none. No relocation was interrupted and no filename collision was deferred.
+
+> Last groomed: 2026-08-06

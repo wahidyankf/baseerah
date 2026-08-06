@@ -14,7 +14,7 @@ The link validator is repo-bounded and deliberately blind to inline code. In
 `apps/rhino-cli/src/application/docs/links.rs`, the scan options carry a single `repo_root`, and
 `extract_links` runs `strip_inline_code_spans` on every line before matching link syntax. A reference
 written as `` `some/path.md#anchor` `` is therefore invisible to the gate, on purpose. Meanwhile the
-[Documentation Linking Convention](../../repo-governance/conventions/formatting/linking.md) requires
+[Documentation Linking Convention](../../../repo-governance/conventions/formatting/linking.md) requires
 relative paths for real links — which a cross-repo reference cannot be. So the entire class of
 cross-repo citation is unverifiable with today's tooling, and the repository has quietly accumulated
 a lot of it.
@@ -22,19 +22,19 @@ a lot of it.
 Measured on the current tree: 16 distinct `plans/done/<date>__<slug>` folder citations appear as
 inline code across `docs/`, `repo-governance/`, `plans/`, and `.claude/`; 14 of them name folders
 that do not exist in this repository. A representative case is
-[the SDLC Gate Standard's byte-identity section](../../docs/reference/sdlc-gate-standard.md#rhino-cli-byte-identity-boundary),
+[the SDLC Gate Standard's byte-identity section](../../../docs/reference/sdlc-gate-standard.md#rhino-cli-byte-identity-boundary),
 which cites `plans/done/2026-07-03__unify-rhino-cli-sdlc-parity/tech-docs.md#4-rhino-cli-source-identity-standard`
 — a path _and_ an anchor fragment, neither of which resolves here, and no gate reports it.
 
 **This repository's version of the problem is not the upstream one.** `beaver-nest` stands outside
 the `ose-public` ↔ `ose-primer` content-parity loop, and its `apps/rhino-cli` is an explicit fork
 rather than a member of the three-repo byte-identity boundary — see
-[Related Repositories](../../docs/reference/related-repositories.md#consequences-of-standing-outside-the-parity-loop).
+[Related Repositories](../../../docs/reference/related-repositories.md#consequences-of-standing-outside-the-parity-loop).
 The original stub framed this as validating shared anchors _during multi-repo landings_, which
 describes the loop, not this repo. Here the failure mode is one-directional **adoption drift**:
 governance text adopted from upstream arrives carrying upstream's claims, paths, and anchors, and
 nothing re-checks them locally. That is observable today —
-[the SDLC Gate Standard](../../docs/reference/sdlc-gate-standard.md) states in its Divergence Policy
+[the SDLC Gate Standard](../../../docs/reference/sdlc-gate-standard.md) states in its Divergence Policy
 that "the standardization layer is identical across all 3 repos" and records a Parity Status verified
 across `ose-public`, `ose-primer`, and `ose-private`: a live assertion, inside a `beaver-nest`
 document, about a set `beaver-nest` is not part of.
@@ -48,24 +48,24 @@ unchecked string. That remedy was correct and is not being second-guessed here; 
 scaled the unchecked-citation surface in a single pass, and nothing measures it. The rebrand then
 demonstrated the failure mode inside a single repo: two links broke purely through anchor-fragment
 drift while still pointing at the right file, and only the pre-push hook caught them
-([rebrand learnings](../done/2026-08-01__beaver-nest-rebrand/learnings.md), Phase 11 addendum).
+([rebrand learnings](../../done/2026-08-01__beaver-nest-rebrand/learnings.md), Phase 11 addendum).
 Across repos there is no equivalent catch at all. Compounding it, all three wirings of the validator
 (`.husky/pre-push`, `main-ci.yml`, `pr-quality-gate.yml`) pass `--exclude plans/done`, so archived
 plans' own outbound links are not scanned either.
 
 ## Prior art / precedents
 
-- [Documentation Linking Convention](../../repo-governance/conventions/formatting/linking.md) — its
+- [Documentation Linking Convention](../../../repo-governance/conventions/formatting/linking.md) — its
   Anchor Links section documents the `broken-anchor` finding and the GitHub slug algorithm the
   validator implements; the same slug logic is what a cross-repo anchor check would need.
-- [Large-Scale Rename Plan Link Management](../../repo-governance/development/workflow/large-scale-rename-plan-link-management.md)
+- [Large-Scale Rename Plan Link Management](../../../repo-governance/development/workflow/large-scale-rename-plan-link-management.md)
   — the in-repo precedent, written after anchor fragments drifted away from the headings they encode.
-- [Repository Validation](../../repo-governance/development/quality/repository-validation.md) —
+- [Repository Validation](../../../repo-governance/development/quality/repository-validation.md) —
   describes `md links validate` as a full-repo scan, making the repo boundary explicit.
-- [Tri-repo rhino-cli byte-identity drift gate](./tri-repo-rhino-cli-byte-identity-gate.md) — a
+- [Tri-repo rhino-cli byte-identity drift gate](https://github.com/wahidyankf/ose-public/blob/main/plans/ideas/q1-urgent-important/tri-repo-rhino-cli-byte-identity-gate.md) — a
   sibling idea for a standing cross-repo diff gate; it carries the same unresolved run-location and
   cross-repo-access questions, so the two should be designed together or not at all.
-- [Related Repositories](../../docs/reference/related-repositories.md) — defines the four-repo family
+- [Related Repositories](../../../docs/reference/related-repositories.md) — defines the four-repo family
   and states plainly that `beaver-nest` does not participate in parity syncs in either direction.
 
 ## Proposed direction (sketch)

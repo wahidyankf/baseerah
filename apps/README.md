@@ -137,7 +137,7 @@ nx run beaver-nest-be-e2e:test:e2e
 `prod-beaver-nest-fe`/`stag-beaver-nest-be` deploy target is provisioned yet. See
 [apps-beaver-nest-fe-deployer](../.claude/agents/apps-beaver-nest-fe-deployer.md),
 [apps-beaver-nest-be-deployer](../.claude/agents/apps-beaver-nest-be-deployer.md), and the
-[beaver-nest-first-deploy](../plans/ideas/beaver-nest-first-deploy.md) idea brief for the deferred
+[beaver-nest-first-deploy](../plans/ideas/q2-not-urgent-important/beaver-nest-first-deploy.md) idea brief for the deferred
 provisioning work.
 
 ## Language Support

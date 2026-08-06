@@ -2,7 +2,7 @@
 
 One-line summary: introduce the first concrete BeaverNest feature that durably stores and retrieves
 product data on the explicit SQLite foundation planned in
-[`beaver-nest-app-setup`](../in-progress/beaver-nest-app-setup/README.md).
+[`beaver-nest-app-setup`](../../in-progress/beaver-nest-app-setup/README.md).
 
 > Idea, added 2026-07-31 from `baseerah-repo-reset`; narrowed 2026-08-02 when the infrastructure-only
 > SQLite foundation became its own active plan.
@@ -22,13 +22,13 @@ soft-delete behavior.
 
 ## Prior art / precedents
 
-- [`beaver-nest-app-setup`](../in-progress/beaver-nest-app-setup/README.md) — fixes SQLite, DbUp,
+- [`beaver-nest-app-setup`](../../in-progress/beaver-nest-app-setup/README.md) — fixes SQLite, DbUp,
   single-host, no-ORM, backup, and real-database test boundaries.
-- [BeaverNest Vision](../../repo-governance/vision/beaver-nest.md) — names assistant, content,
+- [BeaverNest Vision](../../../repo-governance/vision/beaver-nest.md) — names assistant, content,
   posting, and workflow capabilities that may supply the first stateful slice.
-- [Functional Programming](../../repo-governance/development/pattern/functional-programming.md) —
+- [Functional Programming](../../../repo-governance/development/pattern/functional-programming.md) —
   requires pure domain logic and an explicit imperative persistence edge.
-- [Database Audit Trail](../../repo-governance/development/pattern/database-audit-trail.md) — applies
+- [Database Audit Trail](../../../repo-governance/development/pattern/database-audit-trail.md) — applies
   to every future domain table.
 
 ## Proposed direction (sketch)

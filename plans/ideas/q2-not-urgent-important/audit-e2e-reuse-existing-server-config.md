@@ -29,7 +29,7 @@ six configs (`ayokoding-www-fe-e2e`, `ayokoding-www-be-e2e`, `organiclever-www-f
 
 **Re-derived against this repo on 2026-08-05, the problem is almost entirely absent here.** BeaverNest
 has a different app set — all seven of those projects were deleted by the
-[repo reset](../done/2026-07-31__baseerah-repo-reset/README.md). A fresh search finds **three**
+[repo reset](../../done/2026-07-31__baseerah-repo-reset/README.md). A fresh search finds **three**
 `playwright.config.ts` files in total, and only **one** mentions `reuseExistingServer` at all:
 
 - `libs/web-ui/e2e/playwright.config.ts` — line 19, `reuseExistingServer: true`, inside a `webServer`
@@ -69,20 +69,20 @@ seven apps are gone.
 
 - **Playwright configuration reference** — the repo's own authoritative notes on `webServer` and
   config structure; the natural home for any documented caveat this brief produces.
-  [configuration](../../docs/explanation/software-engineering/automation-testing/tools/playwright/configuration.md)
+  [configuration](../../../docs/explanation/software-engineering/automation-testing/tools/playwright/configuration.md)
 - **Playwright best practices** — where a "never reuse a server you did not start" convention would sit
   alongside the existing guidance.
-  [best-practices](../../docs/explanation/software-engineering/automation-testing/tools/playwright/best-practices.md)
+  [best-practices](../../../docs/explanation/software-engineering/automation-testing/tools/playwright/best-practices.md)
 - **`ci-checker`** — the existing agent that already validates projects against mandatory Nx targets,
   E2E pairing, and env-variable compliance; the obvious host for an automated guard if one is warranted.
-  [ci-checker](../../.claude/agents/ci-checker.md)
+  [ci-checker](../../../.claude/agents/ci-checker.md)
 - **`nx-affected-cross-worktree-contamination` two-pager** — same underlying class: ambient
   machine-local state (there, uncommitted WIP; here, a stray listening process) silently changing what
   a nominally hermetic run actually exercises.
-  [nx-affected-cross-worktree-contamination](./nx-affected-cross-worktree-contamination.md)
+  [nx-affected-cross-worktree-contamination](https://github.com/wahidyankf/ose-public/blob/main/plans/ideas/q2-not-urgent-important/nx-affected-cross-worktree-contamination.md)
 - **`acceptance-clause-vacuity` two-pager** — directly relevant to the trap this re-derivation caught:
   gating a config path that never executes produces a check that cannot fail and certifies nothing.
-  [acceptance-clause-vacuity](./acceptance-clause-vacuity.md)
+  [acceptance-clause-vacuity](https://github.com/wahidyankf/ose-public/blob/main/plans/ideas/q1-urgent-important/acceptance-clause-vacuity.md)
 
 ## Proposed direction (sketch)
 

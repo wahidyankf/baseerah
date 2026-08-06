@@ -5,6 +5,7 @@ One-line summary: `ose-private` carries a stale `.opencode/agents/ci-monitor-sub
 that lets the whole class of source-less binding artifacts pass validation silently.
 
 > Demoted from a full `backlog/` plan to a two-pager on 2026-08-05.
+> Renamed from ose-private-opencode-ci-monitor-orphan.md on 2026-08-06 by plan-ideas-grooming.
 
 ## Problem / context
 
@@ -60,19 +61,19 @@ validation surface, so the remediation does not depend on any upstream vendor ti
 
 - **Multi-Harness Binding convention** — defines the two-tier binding model and the primary/mirror
   relationship that a source-less mirror violates.
-  [multi-harness-binding](../../repo-governance/conventions/structure/multi-harness-binding.md)
+  [multi-harness-binding](../../../repo-governance/conventions/structure/multi-harness-binding.md)
 - **Platform Bindings reference** — already carries a "Provenance of pre-existing partial bindings"
   section for `.codex/`; the natural home for an equivalent entry covering tool-provisioned
-  `.opencode/` subdirectories. [platform-bindings](../../docs/reference/platform-bindings.md)
+  `.opencode/` subdirectories. [platform-bindings](../../../docs/reference/platform-bindings.md)
 - **`repo-harness-compatibility-checker`** — the agent that validates cross-vendor parity invariants
   and would be the natural owner of an orphan-detection check.
-  [checker agent](../../.claude/agents/repo-harness-compatibility-checker.md)
+  [checker agent](../../../.claude/agents/repo-harness-compatibility-checker.md)
 - **Agent-skills README** — documents the "OpenCode reads `.claude/skills/` natively, no mirror"
   rule and the `No Synced Skill Mirror` check whose predicate the orphans slip past.
-  [skills README](../../.claude/skills/README.md)
+  [skills README](../../../.claude/skills/README.md)
 - **Harness binding catalog drift two-pager** — the sibling brief covering _external_ catalog drift;
   this one covers _internal_ artifacts absent from the catalog, and the two should be triaged
-  together. [harness-binding-catalog-drift](./harness-binding-catalog-drift.md)
+  together. [harness-binding-catalog-drift](https://github.com/wahidyankf/ose-public/blob/main/plans/ideas/q2-not-urgent-important/harness-binding-catalog-drift.md)
 
 ## Proposed direction (sketch)
 
