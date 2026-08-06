@@ -134,6 +134,13 @@ and [§Phase 0 Opens No PR](./repo-governance/conventions/structure/plans.md#pha
 and [§PRs Open at Delivery Boundaries](./repo-governance/conventions/structure/plans.md#prs-open-at-delivery-boundaries-not-every-phase-hard-rule),
 [PR Review Quality Gate workflow](./repo-governance/workflows/pr/pr-review-quality-gate.md)
 
+### Integration Diff Review
+
+Read the incoming diff after rebase/pull/merge/cherry-pick before continuing — a clean, conflict-free
+integration doesn't mean it's safe to ignore for in-flight work.
+
+**See**: [Integration Diff Review Convention](./repo-governance/development/workflow/integration-diff-review.md)
+
 ## Git Hooks (Automated Quality)
 
 Pre-commit: format (Prettier/gofmt/rustfmt), validate markdown links + markdownlint, lint
