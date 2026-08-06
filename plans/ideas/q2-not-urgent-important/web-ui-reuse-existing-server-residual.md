@@ -12,6 +12,7 @@ CI never runs, so the originally-proposed `!process.env.CI` gate would be a no-o
 > `ayokoding-www-tools-ai-benchmark` Phase 10 Rule-15 retest, and had already been rescoped once
 > (2026-07-31) after the repo reset deleted the apps it originally targeted. The re-derivation below
 > shrinks it further, which is why it belongs here rather than in `backlog/`.
+> Renamed from audit-e2e-reuse-existing-server-config.md on 2026-08-06 by plan-ideas-grooming.
 
 ## Problem / context
 

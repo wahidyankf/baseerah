@@ -16,11 +16,11 @@ Grouped into Eisenhower quadrants by [`plan-ideas-grooming`](../../repo-governan
 
 No active plan waits on these and no live defect is running, but each carries a real stake. This is the plan-from-here quadrant.
 
-- [audit-e2e-reuse-existing-server-config](./q2-not-urgent-important/audit-e2e-reuse-existing-server-config.md) — a stale dev server on the target port silently absorbs e2e runs via unconditional `reuseExistingServer: true`.
 - [beaver-nest-first-deploy](./q2-not-urgent-important/beaver-nest-first-deploy.md) — provision the first real `prod-beaver-nest-fe`/`stag-beaver-nest-be` deploy targets; the deployer agents and CI callers ship wired but dormant.
-- [cross-repo-governance-link-parity](./q2-not-urgent-important/cross-repo-governance-link-parity.md) — governance docs copied to a sibling repo carry anchors that break there; check link parity before the copy, not at the destination's push gate.
-- [orphaned-harness-binding-artifacts](./q2-not-urgent-important/orphaned-harness-binding-artifacts.md) — an unsourced `.opencode/agents/ci-monitor-subagent.md` mirror survives only via a hardcoded filename skip all three repos inherit.
-- [vitest-glob-coverage-guard](./q2-not-urgent-important/vitest-glob-coverage-guard.md) — a regression test that matched no Vitest project's include glob ran zero times and passed green; guard the class.
+- [orphaned-harness-binding-artifacts](./q2-not-urgent-important/orphaned-harness-binding-artifacts.md) — seven `.opencode/skills/` directories and `.opencode/commands/monitor-ci.md` have no `.claude/` source at all, so nothing regenerates or validates them.
+- [unvalidated-cross-repo-citations](./q2-not-urgent-important/unvalidated-cross-repo-citations.md) — the link gate stops at this repo's root and skips inline code, so 16 `plans/done/` citations went unchecked and 14 name folders that do not exist here.
+- [vitest-include-glob-silent-false-pass](./q2-not-urgent-important/vitest-include-glob-silent-false-pass.md) — all three Vitest configs here use a single `test` block rather than named projects, so the originating multi-project miss cannot recur, but the silent-false-pass class still can.
+- [web-ui-reuse-existing-server-residual](./q2-not-urgent-important/web-ui-reuse-existing-server-residual.md) — `reuseExistingServer: true` survives in exactly one config, `libs/web-ui/e2e/playwright.config.ts:19`, behind a target CI never runs, so the proposed `!process.env.CI` gate would be a no-op here.
 
 ### Q4 — Neither Urgent nor Important
 
@@ -77,7 +77,17 @@ promoted yet" is a legitimate state, distinct from "rejected".
 Swept 120 two-pagers across `ose-public`, `ose-primer`, `ose-private`, and `beaver-nest`; 79 survive. Every surviving idea carries a residency verdict (R1 secrets-bearing, R2 single-repo-only, R3 generalizable) and an Eisenhower quadrant.
 
 - **Classified**: 8 idea(s) resident here, filed into quadrant folders.
-- **Renamed**: `ose-private-opencode-ci-monitor-orphan.md` → `orphaned-harness-binding-artifacts.md` (filename no longer matched content).
+- **Renamed** (4) — each of these four briefs shares a subject with an `ose-public` brief but is an
+  independent idea, re-derived against this repo's own measured state; each kept a filename that
+  described the sibling's framing rather than its own content, so all four are renamed as one class:
+  - `ose-private-opencode-ci-monitor-orphan.md` → `orphaned-harness-binding-artifacts.md` — the named
+    `ose-private` artifact does not exist here; the finding is this repo's source-less `.opencode/` surfaces.
+  - `audit-e2e-reuse-existing-server-config.md` → `web-ui-reuse-existing-server-residual.md` — one
+    residual instance in `libs/web-ui`, not the six-config sweep the old name implied.
+  - `cross-repo-governance-link-parity.md` → `unvalidated-cross-repo-citations.md` — this repo stands
+    outside the parity loop; the defect is unvalidated inherited citations, not parity drift.
+  - `vitest-glob-coverage-guard.md` → `vitest-include-glob-silent-false-pass.md` — no named Vitest
+    projects exist here, so the subject is the silent-false-pass class, not a glob guard.
 - **Deduplicated out** (31) — the surviving copy is named for each:
   - `acceptance-clause-vacuity.md` → `ose-public/plans/ideas/q1-urgent-important/acceptance-clause-vacuity.md`
   - `agents-md-progressive-disclosure.md` → `ose-public/plans/ideas/q1-urgent-important/agents-md-progressive-disclosure.md`
@@ -110,6 +120,8 @@ Swept 120 two-pagers across `ose-public`, `ose-primer`, `ose-private`, and `beav
   - `tri-repo-rhino-cli-byte-identity-gate.md` → `ose-public/plans/ideas/q1-urgent-important/tri-repo-rhino-cli-byte-identity-gate.md`
   - `vendor-audit-kiro-term.md` → `ose-public/plans/ideas/q2-not-urgent-important/vendor-audit-kiro-term.md`
   - `web-ui-alert-destructive-dark-contrast.md` → `ose-public/plans/ideas/q2-not-urgent-important/web-ui-alert-destructive-dark-contrast.md`
-- **Unresolved follow-ups**: none. No relocation was interrupted and no filename collision was deferred.
+- **Unresolved follow-ups**: none. No relocation was interrupted, and no rename hit a collision at its
+  computed name. A termination-condition audit run after the first pass caught three briefs still
+  sharing a filename with a different `ose-public` idea; they are the three extra renames above.
 
 > Last groomed: 2026-08-06

@@ -14,6 +14,7 @@ the file reads as covered in every status report while never executing once.
 > of `apps/ayokoding-www/vitest.config.ts`'s two named projects — `unit` (Node environment,
 > `test/unit/be-steps/**/*.steps.ts` plus `**/*.unit.{test,spec}.{ts,tsx}`) nor `unit-fe` (jsdom,
 > `test/unit/fe-steps/**/*.steps.{ts,tsx}` plus `src/features/**/*.test.{ts,tsx}`). The reviewer
+> Renamed from vitest-glob-coverage-guard.md on 2026-08-06 by plan-ideas-grooming.
 > reverted the actual code fix and re-ran the full suite; it still passed 144/144 test files with
 > the bug fully reintroduced. That repo fixed its own config inline by widening `unit-fe` to also
 > cover `src/app/**/*.test.{ts,tsx}`; the defect class was never fixed anywhere.

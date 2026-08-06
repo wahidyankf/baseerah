@@ -7,6 +7,7 @@ siblings are, by construction, never checked.
 > Demoted from a full `backlog/` plan to a two-pager on 2026-08-05. The backlog folder never grew
 > past a three-line stub; it was captured from an upstream `adopt-cursor-platform-binding` Phase 8
 > hand-off that no longer exists in this repository's history.
+> Renamed from cross-repo-governance-link-parity.md on 2026-08-06 by plan-ideas-grooming.
 
 ## Problem / context
 
