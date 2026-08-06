@@ -858,6 +858,23 @@ the PR is considered done. Selecting a `*-to-pr` mode authorizes PR steps at the
 never at Phase 0 under any mode, per
 [Phase 0 Opens No PR](#phase-0-opens-no-pr--the-earliest-pr-is-phase-1-hard-rule).
 
+**`main-to-origin-main` carries a further content restriction, on top of Standard 2's
+selection-signal test in the
+[Git Push Default Convention](../../development/workflow/git-push-default.md#standard-2-direct-push-modes-are-explicit-selections-not-inferred).**
+An explicit selection signal (invocation argument or plan field) is necessary but not sufficient:
+choosing `main-to-origin-main` is additionally valid only when **one** of two conditions holds —
+
+1. the change set is **`.md` files only** (no source, config, spec, or generated-mirror files), or
+2. the user has given **explicit, standing go-ahead** for that specific change.
+
+Absent one of these two, use `worktree-to-pr` even if a direct-push mode would otherwise be
+convenient. This restriction targets `main-to-origin-main` specifically — working directly in the
+primary checkout skips both PR review and worktree isolation, so it is held to a narrower bar than
+`worktree-to-origin-main`, which still isolates work from the primary checkout even though it also
+skips review. The [Plan-Docs-Only Carve-Out](../../workflows/plan/plan-planning.md#the-plan-docs-only-carve-out)
+is the plan-authoring-time instance of condition 1 above — see that section for how the two
+reconcile when a plan folder's push includes non-markdown evidence files.
+
 **[AI] merges by default.** A `[HUMAN]` merge gate applies only where a plan's own step says so explicitly.
 The **preconditions are unchanged — only the actor is.** A PR still merges only when
 all five hardened merge preconditions hold (3 review cycles complete — a **hard ceiling, not a
