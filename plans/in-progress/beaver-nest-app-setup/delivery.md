@@ -9,6 +9,16 @@
 
 ## Delivery Mode: `worktree-to-pr`
 
+> **Worktree Cap conformance note (added when the rule landed):** this plan declares three
+> worktrees (`beaver-nest-app-setup`, `beaver-nest-app-setup-backend`,
+> `beaver-nest-app-setup-client-runtime`) across its delivery units. All three were already
+> provisioned (`git worktree add` steps checked `[x]`) before the
+> [Worktree Cap](../../../repo-governance/conventions/structure/plans.md#worktree-cap--one-worktree-per-repository-per-plan-hard-rule)
+> and
+> [Per-Repository Delivery Mode Restrictions](../../../repo-governance/conventions/structure/plans.md#per-repository-delivery-mode-restrictions-hard-rule)
+> rules landed — grandfathered as historical record, not rewritten. No new worktree provisioning
+> remains pending in this plan.
+
 Use three sequential worktree-to-PR delivery units. Each PR targets `main`, follows the
 [PR Merge Protocol](../../../repo-governance/development/workflow/pr-merge-protocol.md), and runs the
 default three-cycle PR-Review Maker→Fixer quality gate. Phase 0 is setup only and never opens a PR.
