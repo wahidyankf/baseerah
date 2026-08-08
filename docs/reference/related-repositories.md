@@ -91,6 +91,29 @@ Colours follow the repository's [color-blind friendly palette](../../repo-govern
 - **`apps/rhino-cli` is a fork.** The shared CLI must be byte-identical across the three loop repositories per the [SDLC Gate Standard](./sdlc-gate-standard.md#rhino-cli-byte-identity-boundary). This repository's copy is explicitly **not** bound by that byte-identity rule and may diverge to serve BeaverNest's needs.
 - **Product surface never propagates.** `apps/beaver-nest-fe` and `apps/beaver-nest-be` are product-specific and are never contributed back to any sibling.
 
+## Sync Cadence Across Repos
+
+Content parity above answers **what** stays identical within the three-repo loop; this section
+answers **how often** each OSE-family repository is brought current with `ose-public` — the three
+non-`ose-public` repositories differ, and the difference is deliberate, not an oversight:
+
+- **`ose-private`** — kept **in real time**. `rhino-cli` and the shared `repo-governance/` content
+  (conventions, workflows, agent definitions) propagate to `ose-private` as they land in
+  `ose-public`, not on a batched schedule. That repo backs live authorized-maintainer and
+  infrastructure operations, so governance and tooling drift there is costly immediately, not just
+  eventually.
+- **`ose-primer`** — kept on a **delayed** sync. As the reusable polyglot starter, `ose-primer` does
+  not need every `ose-public` governance change the moment it lands; batching updates conserves the
+  review and propagation cost of a sync that public downstream adopters do not need on a real-time
+  cadence.
+- **`beaver-nest`** — **not synced** on an ongoing basis, consistent with standing outside the parity
+  loop described above. `beaver-nest` is planned to merge back into `ose-public` in the near term, so
+  investing in an ongoing sync mechanism for a repository expected to be reabsorbed is not worth the
+  cost; its `rhino-cli` fork and governance content are reconciled at merge time instead of on a
+  recurring cadence — this section states the general policy across all three non-`ose-public` repos,
+  and the "no ongoing sync" line in the catalogue and diagram above is `beaver-nest`'s own instance of
+  it.
+
 ## Cross-Repository Awareness
 
 The four repositories maintain awareness of one another through documentation cross-references. Each repository's `README.md`, `AGENTS.md`, and its own `Related Repositories` catalogue name the other three siblings, link their GitHub URLs, and describe their roles. Each repository's `CLAUDE.md` is a platform-binding shim that imports `AGENTS.md`, so it inherits the same statement rather than duplicating it.
